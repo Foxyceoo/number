@@ -2,6 +2,10 @@ import streamlit as st
 import json
 import streamlit.components.v1 as components
 from fpdf import FPDF
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 # Cấu hình tên trang
 st.set_page_config(page_title='"Number" one Foxy')
@@ -87,27 +91,27 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
 
     # Nút Tải về PDF dùng FPDF
     if st.button("Tải về PDF"):
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", 'B', 16)
-        pdf.cell(200, 10, txt=song_name, ln=True, align='C')
-        
-        pdf.set_font("Courier", '', 12)
-        pdf.ln(10) # Khoảng cách dòng
-        
-        # In dữ liệu ra PDF (đơn giản hóa)
-        for phach, notes in time_map.items():
-            line = f"Phach {phach}: {', '.join(map(str, notes))}"
-            pdf.cell(200, 10, txt=line, ln=True)
-            
-        # Thay vì dùng pdf.output(dest='S').encode('latin-1')
-        # Hãy dùng cách này cho FPDF phiên bản mới:
-        # Sửa đoạn nút tải về:
-        pdf_output = pdf.output() # Lấy kết quả từ FPDF 2.x
-
-        st.download_button(
-            label="Tải file PDF (FPDF)",
-            data=bytes(pdf_output),  # <--- Ép kiểu sang bytes ở đây
-            file_name=f"{song_name}.pdf",
-            mime="application/pdf"
-        )
+    # Tạo file PDF
+    pdf_filename = f"{song_name}.pdf"
+    doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
+    elements = []
+    
+    # Tạo dữ liệu cho bảng
+    table_data = [["Phách", "Nốt"]] # Tiêu đề bảng
+    for phach, notes in time_map.items():
+        table_data.append([str(phach), ", ".join(map(str, notes))])
+    
+    # Tạo bảng và định dạng
+    t = Table(table_data)
+    t.setStyle(TableStyle([
+        ('GRID', (0,0), (-1,-1), 1, colors.black),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+    ]))
+    
+    elements.append(t)
+    doc.build(elements)
+    
+    # Đọc lại file để cho tải về
+    with open(pdf_filename, "rb") as f:
+        st.download_button("Tải file PDF", f, file_name=pdf_filename, mime="application/pdf")
