@@ -172,23 +172,13 @@ if uploaded_file:
 
     # HIỂN THỊ VỚI THANH CUỘN
     # Bỏ chữ f ở đầu, dùng dấu + để nối các biến vào
-    html_to_render = """
-    <html>
-        <head>
-            """ + style + """
-            <style>
-                /* Bây giờ bạn có thể dùng dấu { } thoải mái mà không bị lỗi */
-                #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
-                .styles_viewerBadge__1yB5_, div[data-testid="stDecoration"] { 
-                    display: none !important; 
-                }
-            </style>
-        </head>
-        <body>""" + display_html + """</body>
-    </html>
-    """
+    # Giả sử bạn đã có danh sách all_khuong_html
+    so_luong_khuong = len(all_khuong_html)
+    # Tính chiều cao: Mỗi khuông 50px + 100px cho tiêu đề và lề
+    tinh_height = (so_luong_khuong * 50) + 150 
 
-    components.html(html_to_render, height=960, scrolling=True)
+    # Gọi component với chiều cao đã tính và scrolling=False
+    components.html(html_to_render, height=tinh_height, scrolling=False)
 
     # NÚT IN PDF
     st.markdown("""
