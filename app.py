@@ -63,14 +63,14 @@ if uploaded_file:
     td {{ 
         padding-top: 2px !important;     
 
-        /* Thiết lập chiều cao tối thiểu 50px */
-        min-height: 50px !important;
-        height: 50px !important;
+        /* Thiết lập chiều cao tối thiểu 40px */
+        min-height: 40px !important;
+        height: 40px !important;
         
         * QUAN TRỌNG: Ép độ rộng cố định */
-        width: 40px !important;       /* Thay đổi số này theo ý bạn */
-        min-width: 40px !important;
-        max-width: 40px !important;
+        width: 50px !important;       /* Thay đổi số này theo ý bạn */
+        min-width: 50px !important;
+        max-width: 50px !important;
         
         vertical-align: top !important; /* Vẫn giữ căn lề trên */
         font-weight: bold; 
