@@ -10,8 +10,9 @@ margin_side = "900px"
 
 def get_number_from_key(key_str):
     try: 
-        # Bỏ % 15 để nó giữ nguyên số thứ tự của phím
-        return int(key_str.split('Key')[1]) 
+        # Thay % 15 thành % 3
+        # Phép tính này sẽ trả về 0, 1, 2. Nếu muốn 1, 2, 3 thì cộng thêm 1.
+        return ((int(key_str.split('Key')[1]) - 1) % 3) + 1
     except: 
         return ""
         
