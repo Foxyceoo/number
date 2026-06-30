@@ -32,35 +32,34 @@ if uploaded_file:
     max_beat = max(time_map.keys()) if time_map else 0
 
     # CSS của bạn được giữ nguyên
+    # Nhân đôi {{ }} cho những đoạn CSS không phải biến Python
     style = f"""
     <style>
-    /* 1. Ép ẩn hoàn toàn thanh cuộn cho toàn bộ iframe */
     ::-webkit-scrollbar {{
         display: none !important;
     }}
-    
-    /* 2. Cấu hình body của iframe để không bao giờ sinh thanh cuộn */
+
     html, body {{
         width: 100%;
         margin: 0;
         padding: 0;
-        overflow-y: hidden !important; /* Quan trọng: Ẩn thanh cuộn dọc */
-        overflow-x: hidden !important; /* Quan trọng: Ẩn thanh cuộn ngang */
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
     }}
 
-    table { 
+    table {{ 
         border-collapse: collapse; 
         text-align: center; 
         font-size: 16px; 
-        table-layout: fixed; /* CỐ ĐỊNH: Bảng không tự co giãn */
-        width: 100%;         /* Chiếm trọn khung cha */
+        table-layout: fixed;
+        width: {margin_side}; 
         margin: 0 auto 50px auto; 
         color: inherit; 
-    }
+    }}
 
-    td { 
+    td {{ 
         height: 50px !important; 
-        width: 30px !important;  /* CỐ ĐỊNH: Chiều rộng mỗi phách */
+        width: 30px !important;
         min-width: 30px !important;
         vertical-align: top !important; 
         padding: 0; 
@@ -69,27 +68,25 @@ if uploaded_file:
         border-left: none;
         overflow: hidden; 
         line-height: 1.2;
-    }
-
-    /* Style cho in PDF */
-    @media print {{
-        body, html {{
-            overflow: hidden !important; 
-        }}
-        .print-btn, .sidebar, header, .stAppDeployButton, footer {{ 
-            display: none !important; 
-        }}
-        table {{
-            page-break-inside: avoid;
-        }}
-        #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
-        .styles_viewerBadge__1yB5_ {{ 
-            display: none !important; 
-        }}
     }}
+
+    @media print {{{{
+        body, html {{{{
+            overflow: hidden !important; 
+        }}}}
+        .print-btn, .sidebar, header, .stAppDeployButton, footer {{{{ 
+            display: none !important; 
+        }}}}
+        table {{{{
+            page-break-inside: avoid;
+        }}}}
+        #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
+        .styles_viewerBadge__1yB5_ {{{{ 
+            display: none !important; 
+        }}}}
+    }}}}
     </style>
     """
-
     # Tạo danh sách các dòng nhạc
     all_khuong_html = []
     line_number = 1
