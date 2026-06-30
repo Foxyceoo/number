@@ -11,10 +11,8 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    # Tính độ dài 1 phách (ms)
     beat_duration = 60000 / bpm / 4 
     
-    # Gom nốt theo phách
     time_map = {}
     for n in notes:
         beat_idx = round(n['time'] / beat_duration)
@@ -24,27 +22,25 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     
     st.subheader(f"Nhạc phổ (BPM: {bpm}) - Nhịp 4/4")
     
-    # Xây dựng bảng HTML
-    html_content = """
+    # CSS chung cho các khuông
+    style = """
     <style>
-        table { border-collapse: collapse; text-align: center; font-size: 16px; color: white; width: 100%; background-color: #0e1117; }
+        table { border-collapse: collapse; text-align: center; font-size: 16px; color: white; width: 100%; background-color: #0e1117; margin-bottom: 40px; }
         td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; }
     </style>
-    <table>
     """
     
-    # Chia mỗi khuông là 16 phách (4 nhịp x 4 phách)
+    # Tạo danh sách các bảng HTML
+    all_html = style
     for khuong in range(0, max_beat + 16, 16):
-        html_content += "<tr>"
+        html_content = "<table><tr>"
         for phach in range(khuong, khuong + 16):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
-            # Cấu hình vạch kẻ
             border_right = "1px solid #555"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa" # Vạch nhịp
-            if (phach + 1) % 16 == 0: border_right = "4px solid white" # Vạch khuông
+            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
+            if (phach + 1) % 16 == 0: border_right = "4px solid white"
             
-            # Xử lý nội dung hiển thị (xếp dọc nốt phụ)
             cell_content = ""
             if vals:
                 cell_content = f"{vals[0]}"
@@ -52,9 +48,8 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
                     cell_content += "<br>" + "<br>".join(map(str, vals[1:]))
             
             html_content += f"<td style='border-right: {border_right};'>{cell_content}</td>"
-        html_content += "</tr>"
-        
-    html_content += "</table>"
+        html_content += "</tr></table>"
+        all_html += html_content
     
-    # Nhúng vào Streamlit
-    components.html(f"<html><body>{html_content}</body></html>", height=600, scrolling=True)
+    # Hiển thị
+    components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
