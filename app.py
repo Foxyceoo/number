@@ -4,8 +4,6 @@ import json
 import streamlit.components.v1 as components
 
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
-st.title("Bộ chuyển đổi sheet số")
-# Tùy chỉnh khoảng cách tên bài hát (thay số 40 theo ý bạn)
 padding_top_px = 40
 padding_bottom_px = 90
 
