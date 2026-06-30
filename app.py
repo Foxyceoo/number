@@ -29,30 +29,22 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     st.markdown(f"<h2 style='text-align: center;'>{song_name}</h2>", unsafe_allow_html=True)
     
     # CSS và JS để tự đổi màu theo theme
+    # CSS và JS để tự đổi màu theo theme
     style = """
     <style>
-        table { 
-            border-collapse: collapse; 
-            text-align: center; 
-            font-size: 16px; 
-            width: 100%; 
-            margin-bottom: 40px; 
-            /* SỐ: Luôn lấy màu chủ đạo của Streamlit để đảm bảo tương phản cao nhất */
-            color: var(--text-color); 
-        }
-        td { 
-            height: 60px; 
-            vertical-align: top; 
-            padding-top: 5px; 
-            font-weight: bold; 
-            width: 40px; 
-            border-top: none;
-            border-bottom: none;
-            /* NÉT KẺ: Dùng màu nhạt hơn (rgba) để không làm chìm số */
-            border-right: 1px solid rgba(128, 128, 128, 0.3);
-            border-left: none;
-        }
+        table { border-collapse: collapse; text-align: center; font-size: 16px; width: 100%; margin-bottom: 40px; color: inherit; }
+        td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; border: 1px solid #555; }
     </style>
+    <script>
+        // Tự động kiểm tra màu nền của Streamlit để đổi màu chữ cho khớp
+        function adjustTheme() {
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.body.style.color = isDarkMode ? '#FFFFFF' : '#000000';
+            document.body.style.backgroundColor = 'transparent';
+        }
+        window.onload = adjustTheme;
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
+    </script>
     """
     
     all_html = style
