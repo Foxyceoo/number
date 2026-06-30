@@ -14,9 +14,9 @@ def get_number_from_key(key_str):
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     st.markdown("---") # Kẻ vạch ngăn cách cho đẹp
-    uploaded_file = st.file_uploader("Sheet 123", type=["json"])
-    st.markdown("---")
+    uploaded_file = st.file_uploader("**Sheet 123**", type=["json"])
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
+    st.markdown("---")
 
 # --- THÊM PHẦN GHÉP PDF VÀO ĐÂY ---
     st.subheader("Ghép PDF")
