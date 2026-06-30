@@ -37,7 +37,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             font-size: 16px; 
             width: 100%; 
             margin-bottom: 40px; 
-            /* Dùng màu xám đậm hoặc trắng tùy vào theme để đảm bảo luôn nổi */
+            /* SỐ: Luôn lấy màu chủ đạo của Streamlit để đảm bảo tương phản cao nhất */
             color: var(--text-color); 
         }
         td { 
@@ -46,11 +46,10 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             padding-top: 5px; 
             font-weight: bold; 
             width: 40px; 
-            /* Chỉ có vạch đứng */
             border-top: none;
             border-bottom: none;
-            /* Thêm độ dày cho vạch đứng để dễ nhìn hơn */
-            border-right: 1px solid var(--text-color);
+            /* NÉT KẺ: Dùng màu nhạt hơn (rgba) để không làm chìm số */
+            border-right: 1px solid rgba(128, 128, 128, 0.3);
             border-left: none;
         }
     </style>
