@@ -1,52 +1,49 @@
 import streamlit as st
 import json
-import pandas as pd
 from itertools import groupby
 
-st.title("🎵 Nhạc phổ chuẩn 16 Cột")
+st.set_page_config(layout="wide") # Mở rộng màn hình để dải nhạc phổ hiển thị đẹp
+st.title("🎵 Nhạc phổ trải dài")
+
 uploaded_file = st.file_uploader("Tải file JSON", type=["json"])
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
     except: return ""
 
-# Hàm hiển thị bảng với CSS tùy chỉnh
-def display_custom_table(data_chunk):
-    # Tạo bảng với màu nền #ffe4e1 (hồng nhạt)
-    html = "<table style='width:100%; border-collapse: collapse; background-color: #ffe4e1; text-align: center;'>"
-    for row in data_chunk:
-        html += "<tr>"
-        for i, val in enumerate(row):
-            # Đường kẻ dọc đậm hơn ở mỗi cột thứ 4 (4, 8, 12)
-            border_style = "1px solid #999"
-            if (i + 1) % 4 == 0 and i != 15:
-                border_style = "2px solid #555" # Đường kẻ đậm
-            
-            html += f"<td style='border: {border_style}; padding: 8px; width: 6.25%;'>{val}</td>"
-        html += "</tr>"
-    html += "</table>"
-    st.markdown(html, unsafe_allow_html=True)
-
 if uploaded_file is not None:
     data = json.load(uploaded_file)
     notes = sorted(data[0].get("songNotes", []), key=lambda x: x['time'])
     
-    grouped = groupby(notes, key=lambda x: x['time'])
+    # Gom nốt theo nhịp (giả sử mỗi nhóm 4 nốt là 1 phân khu)
+    # Tớ sẽ tạo một list các cột, mỗi cột là 1 danh sách các nốt tại thời điểm đó
+    grouped_notes = [list(group) for time_val, group in groupby(notes, key=lambda x: x['time'])]
     
-    table_data = []
-    for time_val, group in grouped:
-        row = [""] * 16
-        for i, n in enumerate(group):
-            if i < 16:
-                row[i] = get_number_from_key(n['key'])
-        table_data.append(row)
+    # Tạo HTML cho dải nhạc phổ
+    html = "<table style='width:100%; border-collapse: collapse; text-align: center; table-layout: fixed;'>"
     
-    chunk_size = 20
-    chunks = [table_data[i:i + chunk_size] for i in range(0, len(table_data), chunk_size)]
+    # Hàng 1: Hiển thị chỉ số nhịp (1), (2)...
+    html += "<tr>"
+    for i in range(len(grouped_notes)):
+        label = f"({(i//4)+1})" if i % 4 == 0 else ""
+        html += f"<td style='color: red; font-size: 10px; text-align: left;'>{label}</td>"
+    html += "</tr>"
     
-    for i in range(0, len(chunks), 2):
-        row = st.columns(2)
-        for col_idx in range(2):
-            if i + col_idx < len(chunks):
-                with row[col_idx]:
-                    display_custom_table(chunks[i + col_idx])
+    # Hàng 2 & 3: Hiển thị nốt (Phân loại nốt cao/thấp)
+    for row_idx in range(2): 
+        html += "<tr>"
+        for group in grouped_notes:
+            # Lọc nốt: hàng 0 là nốt > 7, hàng 1 là nốt <= 7
+            vals = [str(get_number_from_key(n['key'])) for n in group]
+            filtered = [v for v in vals if (int(v) > 7 if row_idx == 0 else int(v) <= 7)]
+            
+            # Tạo vạch kẻ nhịp (vạch đen dọc) sau mỗi 4 nhóm nốt
+            border_right = "1px solid #ccc"
+            if (grouped_notes.index(group) + 1) % 4 == 0:
+                border_right = "2px solid black"
+                
+            html += f"<td style='border-right: {border_right}; border-bottom: 1px solid #eee; height: 30px;'>{' '.join(filtered)}</td>"
+        html += "</tr>"
+    
+    html += "</table>"
+    st.markdown(html, unsafe_allow_html=True)
