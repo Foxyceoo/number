@@ -34,5 +34,6 @@ if uploaded_file is not None:
             with cols[i % 8]:
                 st.markdown(f"<h2 style='text-align: center;'>{number}</h2>", unsafe_allow_html=True)
                 # Dấu gạch đứng phân cách nhịp
+                # Dấu gạch đứng phân cách nhịp
                 if (i + 1) % 8 == 0:
-                    st.write("---")
+                    st.markdown("<hr>", unsafe_allow_html=True) # Dòng này sẽ tạo đường kẻ ngang phân cách nhịp
