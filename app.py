@@ -51,16 +51,16 @@ if uploaded_file:
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
-        font-size: 16px; 
+        font-size: 18px; 
         table-layout: fixed;
         width: {margin_side}; 
-        margin: 0 auto 20px auto; 
+        margin: 0 auto 30px auto; 
         color: inherit; 
     }}
 
     td {{ 
-        padding-top: 5px !important;    
-        padding-bottom: 5px !important; 
+        padding-top: 2px !important;    
+        padding-bottom: 2px !important; 
         
         width: 25px !important;
         min-width: 25px !important;
