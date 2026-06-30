@@ -75,7 +75,11 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0: 
-                border_right = "3px solid #ff0000"
+                border_right = "2px solid #ff0000"
+
+            # Vạch đậm hơn mỗi 8 phách
+            if (phach + 1) % 8 == 0: 
+                border_right = "3px solid #000000"
             
             # Vạch đậm nhất mỗi 16 phách
             if (phach + 1) % 16 == 0: 
