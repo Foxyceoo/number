@@ -11,28 +11,19 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    # Tăng độ dài khuông hoặc tinh chỉnh lại cách tính beat_idx
-    # Thử chia beat_duration cho 4 để mỗi ô là 1 phách chính xác
-    beat_duration = 60000 / bpm  
+    # Sử dụng * 4 như bạn đã xác nhận là chạy đúng với nhạc phổ của bạn
+    beat_duration = 60000 / bpm * 4 
     
     time_map = {}
     for n in notes:
-        # Làm tròn để nốt nhạc "rơi" đúng vào phách, không bị nhảy dòng
-        beat_idx = round(n['time'] / beat_duration) 
+        beat_idx = round(n['time'] / beat_duration)
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     
-    # Ở phần hiển thị, đảm bảo hiển thị đủ phách trên một hàng
-    # Nếu nốt vẫn bị nhảy, hãy tăng số lượng phách trên một hàng (ví dụ: 32 thay vì 16)
-    for khuong in range(0, max_beat + 32, 32): # Tăng lên 32 phách mỗi hàng
-        html_content = "<table><tr>"
-        for phach in range(khuong, khuong + 32):
-            # ... (phần code hiển thị còn lại giữ nguyên)
-    
+    # Phải tính max_beat TRƯỚC khi dùng nó trong vòng lặp
     max_beat = max(time_map.keys()) if time_map else 0
     
     st.subheader(f"Nhạc phổ (BPM: {bpm}) - Nhịp 4/4")
     
-    # CSS chung cho các khuông
     style = """
     <style>
         table { border-collapse: collapse; text-align: center; font-size: 16px; color: white; width: 100%; background-color: #0e1117; margin-bottom: 40px; }
@@ -40,32 +31,27 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     </style>
     """
     
-    # Tạo danh sách các bảng HTML
     all_html = style
+    # Vòng lặp khuông chuẩn (mỗi khuông 16 phách)
     for khuong in range(0, max_beat + 16, 16):
         html_content = "<table><tr>"
         for phach in range(khuong, khuong + 16):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
-            # Cấu hình vạch kẻ phải
             border_right = "1px solid #555"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa" # Vạch nhịp
-            if (phach + 1) % 16 == 0: border_right = "4px solid white" # Vạch khuông
+            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
+            if (phach + 1) % 16 == 0: border_right = "4px solid white"
             
-            # Cấu hình vạch kẻ trái (thêm viền cho cột đầu tiên mỗi khuông)
             border_left = "2px solid #aaa" if phach == khuong else "none"
             
-            # Xử lý nội dung hiển thị
             cell_content = ""
             if vals:
                 cell_content = f"{vals[0]}"
                 if len(vals) > 1:
                     cell_content += "<br>" + "<br>".join(map(str, vals[1:]))
             
-            # Gộp border-left và border-right vào style của td
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
         html_content += "</tr></table>"
         all_html += html_content
     
-    # Hiển thị
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
