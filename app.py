@@ -46,7 +46,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             # Cấu hình vạch kẻ
             border_right = "1px solid #555"
             if (phach + 1) % 4 == 0: border_right = "2px solid #aaa" # Vạch nhịp
-            if (phach + 1) % 16 == 0: border_right = "4px solid #f1c40f" # Vạch kết khuông màu vàng
+            if (phach + 1) % 16 == 0: border_right = "4px solid #00008c" # Vạch kết khuông màu vàng
             
             # Vạch đầu khuông màu vàng
             border_left = "2px solid #00008c" if phach == khuong else "none"
