@@ -34,9 +34,9 @@ if uploaded_file :
     style = """
     <style>
     /* Chỉnh lề body để bảng không bị dính sát mép trình duyệt */
-    body { 
-        font-family: sans-serif; 
-        padding: 40px 20px; /* Cách trên dưới 40px, trái phải 20px */
+    body {
+        overflow-x: hidden !important; /* Ẩn thanh cuộn ngang */
+        overflow-y: hidden !important; /* Ẩn thanh cuộn dọc */
     }
     
     table { 
