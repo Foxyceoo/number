@@ -11,6 +11,10 @@ def get_number_from_key(key_str):
 
 if uploaded_file is not None:
     data = json.load(uploaded_file)
+    # Lấy BPM từ file, mặc định là 120 nếu không tìm thấy
+    bpm = data[0].get("bpm", 120)
+    st.subheader(f"Nhịp độ (BPM): {bpm}")
+    
     notes = sorted(data[0].get("songNotes", []), key=lambda x: x['time'])
     grouped_notes = [list(group) for time_val, group in groupby(notes, key=lambda x: x['time'])]
     
@@ -23,19 +27,20 @@ if uploaded_file is not None:
         for row_idx in range(2): 
             html += "<tr>"
             for col_idx, group in enumerate(chunk):
-                # Lấy tất cả số trong nhóm và sắp xếp từ lớn đến bé
                 vals = sorted([get_number_from_key(n['key']) for n in group], reverse=True, key=lambda x: int(x) if x != "" else 0)
                 
-                # Hàng 0: chỉ lấy số to nhất. Hàng 1: lấy các số còn lại.
                 if row_idx == 0:
                     content = str(vals[0]) if len(vals) > 0 else ""
                 else:
                     content = " ".join([str(v) for v in vals[1:]]) if len(vals) > 1 else ""
                 
-                # Vẽ vạch kẻ nhịp (mỗi 4 cột là 1 nhịp)
+                # Logic tô đậm viền nhịp:
+                # Mỗi 4 phách (mỗi 4 cột) là một nhịp nhỏ, mỗi 16 cột là 1 nhịp lớn
                 border_right = "1px solid #eee"
-                if (col_idx + 1) % 4 == 0:
-                    border_right = "2px solid black"
+                if (col_idx + 1) % 16 == 0:
+                    border_right = "3px solid #FF5733" # Viền đậm cho nhịp lớn
+                elif (col_idx + 1) % 4 == 0:
+                    border_right = "2px solid black"    # Viền cho phách
                 
                 cell_style = (
                     f"border-right: {border_right}; "
