@@ -177,11 +177,10 @@ if uploaded_file:
     html_to_render = style + display_html
 
     # Tính chiều cao động
-    so_luong_khuong = len(all_khuong_html)
-    tinh_height = (so_luong_khuong * 50) + 200 
+    total_height = (len(all_khuong_html) * 110) + 500 
 
     # Gọi component với chiều cao đã tính, scrolling=False như bạn muốn
-    components.html(html_to_render, height=tinh_height, scrolling=False)
+    components.html(html_to_render, height=total_height, scrolling=False)
     # --------------------------
 
     # NÚT IN PDF
