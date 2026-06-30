@@ -63,71 +63,54 @@ if uploaded_file:
     style = f"""
     <style>
     /* BẮT BUỘC: Cho phép body cuộn */
-    html, body {
+    html, body {{
         width: 100%;
         height: 100%;
         margin: 0;
         padding: 0;
-        overflow-y: auto !important; /* Luôn hiện thanh cuộn dọc */
+        overflow-y: auto !important;
         overflow-x: auto !important;
-    }
+    }}
 
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
         font-size: 16px; 
-        
-        /* Dùng biến ở đây, số < 100% mới tạo lề */
-        width: {margin_side};            
+        width: {margin_side}; 
         margin: 0 auto 50px auto; 
-        
         color: inherit; 
     }}
-    
-    /* Nhớ nhân đôi các dấu {{ }} cho các phần tử khác */
-    td {{ 
-        height: 50px !important;
-    }
 
-    td { 
-        height: 50px !important;    /* Ép cứng chiều cao, không phụ thuộc nội dung */
+    td {{ 
+        height: 50px !important; 
         min-height: 50px !important;
         max-height: 50px !important;
-
-        vertical-align: top !important;   /* Luôn giữ nội dung ở đỉnh ô */
-        padding: 0;                   /* Bỏ padding để không làm đẩy ô */
-
+        vertical-align: top !important; 
+        padding: 0; 
         font-weight: bold; 
         width: 40px; 
         border-right: 1px solid #555; 
         border-left: none;
-
-        /* Đảm bảo số nằm gọn và không đẩy ô */
         overflow: hidden; 
         line-height: 1.2;
-    }
+    }}
 
     /* Style cho in PDF */
-    @media print {
-        /* Ẩn hoàn toàn thanh cuộn và các phần thừa của iframe */
-        body, html {
+    @media print {{
+        body, html {{
             overflow: hidden !important; 
-        }
-
-        /* Ẩn các nút bấm, header, sidebar và cả iframe container nếu cần */
-        .print-btn, .sidebar, header, .stAppDeployButton, footer { 
+        }}
+        .print-btn, .sidebar, header, .stAppDeployButton, footer {{ 
             display: none !important; 
-        }
-
-        /* Đảm bảo bảng không bị cắt ngang dòng khi sang trang */
-        table {
+        }}
+        table {{
             page-break-inside: avoid;
-        }
-        /* Đưa dòng này vào trong khối style này */
+        }}
         #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
-        .styles_viewerBadge__1yB5_ { 
+        .styles_viewerBadge__1yB5_ {{ 
             display: none !important; 
-        }
+        }}
+    }}
     </style>
     """
 
