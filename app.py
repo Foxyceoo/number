@@ -49,7 +49,7 @@ if uploaded_file :
     }
     
     td { 
-        height: 50px !important;    /* Ép cứng chiều cao, không phụ thuộc nội dung */
+        height: 60px !important;    /* Ép cứng chiều cao, không phụ thuộc nội dung */
         min-height: 50px !important;
         max-height: 50px !important;
         
