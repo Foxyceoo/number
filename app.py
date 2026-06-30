@@ -177,7 +177,7 @@ if uploaded_file:
     html_to_render = style + display_html
 
     # Tính chiều cao động
-    total_height = (len(all_khuong_html) * 110) + 500 
+    total_height = (len(all_khuong_html) * 110) + 200
 
     # Gọi component với chiều cao đã tính, scrolling=False như bạn muốn
     components.html(html_to_render, height=total_height, scrolling=False)
