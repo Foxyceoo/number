@@ -62,14 +62,18 @@ if uploaded_file:
     # CSS của bạn được giữ nguyên
     style = f"""
     <style>
-    /* BẮT BUỘC: Cho phép body cuộn */
+    /* 1. Ép ẩn hoàn toàn thanh cuộn cho toàn bộ iframe */
+    ::-webkit-scrollbar {{
+        display: none !important;
+    }}
+    
+    /* 2. Cấu hình body của iframe để không bao giờ sinh thanh cuộn */
     html, body {{
         width: 100%;
-        height: 100%;
         margin: 0;
         padding: 0;
-        overflow-y: auto !important;
-        overflow-x: auto !important;
+        overflow-y: hidden !important; /* Quan trọng: Ẩn thanh cuộn dọc */
+        overflow-x: hidden !important; /* Quan trọng: Ẩn thanh cuộn ngang */
     }}
 
     table {{ 
