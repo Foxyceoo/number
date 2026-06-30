@@ -33,10 +33,14 @@ if uploaded_file :
     # CSS của bạn được giữ nguyên
     style = """
     <style>
-    /* Cho phép thanh cuộn hiện ra khi nội dung dài */
-    body {
-        overflow-x: auto !important; 
-        overflow-y: auto !important; 
+    /* BẮT BUỘC: Cho phép body cuộn */
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto !important; /* Luôn hiện thanh cuộn dọc */
+        overflow-x: auto !important;
     }
     
     table { 
