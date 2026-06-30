@@ -7,7 +7,7 @@ def get_number_from_key(key_str):
     except: return ""
 
 # Bạn để trống label hoặc đặt tên mới, sau đó dùng help để hiển thị "- 123 -"
-if uploaded_file := st.file_uploader("Sheet số (123))", type=["json"]):
+if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     data = json.load(uploaded_file)
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
