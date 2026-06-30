@@ -57,21 +57,20 @@ if uploaded_file:
         color: inherit; 
     }}
 
-    td {{ 
-        /* Bỏ height cố định hoặc đặt theo % */
-        height: auto !important; 
-        padding-top: 20px !important;    /* Khoảng trống phía trên số */
-        padding-bottom: 20px !important; /* Khoảng trống phía dưới số */
+    td { 
+        /* Bỏ height cố định, dùng padding để tạo độ dài cho cột */
+        padding-top: 15px !important;    
+        padding-bottom: 15px !important; 
+        
         width: 25px !important;
         min-width: 25px !important;
-        vertical-align: top !important; 
-        padding: 0; 
+        vertical-align: middle !important; /* Căn giữa nội dung theo chiều dọc */
         font-weight: bold; 
         border-right: 1px solid #555; 
         border-left: none;
-        overflow: hidden; 
-        line-height: 1.2;
-    }}
+        overflow: hidden;
+        line-height: 1.5; /* Khoảng cách giữa các dòng số */
+    }
 
     @media print {{{{
         body, html {{{{
@@ -116,12 +115,14 @@ if uploaded_file:
 
             # Trong vòng lặp tạo cell_content:
             if vals:
-                top_num = vals[0]  # Số lớn nhất (đã được sắp xếp bởi reverse=True)
-                # Các số còn lại nối lại với nhau bằng <br> để chúng nằm cùng một hàng dưới
-                bottom_nums = "<br>".join(map(str, vals[1:])) if len(vals) > 1 else ""
-                # Ép vào cấu trúc 2 tầng cố định
+                top_num = vals[0]
+                # Nối các số còn lại
+                bottom_nums = "<br>".join(map(str, vals[1:]))
+                
+                # Tăng chiều cao nội dung dựa trên số lượng nốt (len(vals))
+                # Cột càng nhiều nốt thì các thẻ div càng đẩy cột dài ra
                 cell_content = f"""
-                <div class='grid-cell'>
+                <div class='grid-cell' style='min-height: {len(vals) * 20}px;'>
                     <div class='top-row'>{top_num}</div>
                     <div class='bottom-row'>{bottom_nums}</div>
                 </div>
