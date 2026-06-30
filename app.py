@@ -1,52 +1,42 @@
 import streamlit as st
 import json
-from itertools import groupby
+import pandas as pd
 
-# Thiết lập BPM để chia nhịp
-BPM = 100
-MS_PER_BEAT = 60000 / BPM
-MS_PER_MEASURE = MS_PER_BEAT * 4
+st.title("🎵 Nhạc phổ chuẩn 16 Cột")
+uploaded_file = st.file_uploader("Tải file JSON", type=["json"])
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
-    except: return "?"
-
-st.title("🎵 Nhạc phổ chuẩn")
-uploaded_file = st.file_uploader("Tải file JSON", type=["json"])
+    except: return ""
 
 if uploaded_file is not None:
     data = json.load(uploaded_file)
     notes = sorted(data[0].get("songNotes", []), key=lambda x: x['time'])
     
-    # Gom nốt theo nhịp (Measure)
-    measures = {}
-    for n in notes:
-        m_idx = int(n['time'] / MS_PER_MEASURE)
-        if m_idx not in measures: measures[m_idx] = []
-        measures[m_idx].append(n)
-
-    # Hiển thị các nhịp
-    for m_idx in sorted(measures.keys()):
-        st.markdown(f"**Nhịp {m_idx + 1}**")
-        
-        # Nhóm theo thời điểm (time) bên trong nhịp
-        measure_notes = sorted(measures[m_idx], key=lambda x: x['time'])
-        
-        st.markdown("<div style='border-left: 2px solid #555; padding-left: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
-        
-        for time_val, group in groupby(measure_notes, key=lambda x: x['time']):
-            notes_at_time = list(group)
-            
-            # Phân loại nốt
-            row1_vals = [str(get_number_from_key(n['key'])) for n in notes_at_time if get_number_from_key(n['key']) > 7]
-            row2_vals = [str(get_number_from_key(n['key'])) for n in notes_at_time if get_number_from_key(n['key']) <= 7]
-            
-            # Gộp các nốt lại thành một chuỗi duy nhất để hiển thị trên cùng một dòng
-            if row1_vals:
-                st.markdown(f"**{' '.join(row1_vals)}**")
-            if row2_vals:
-                st.markdown(f"**{' '.join(row2_vals)}**")
-            
-            st.markdown("<hr style='margin: 5px 0;'>", unsafe_allow_html=True)
-            
-        st.markdown("</div>", unsafe_allow_html=True)
+    # Gom nhóm theo thời điểm
+    from itertools import groupby
+    grouped = groupby(notes, key=lambda x: x['time'])
+    
+    # Tạo danh sách các dòng cho bảng
+    table_data = []
+    for time_val, group in grouped:
+        row = [""] * 16  # Bảng 16 cột
+        # Điền nốt vào cột dựa trên thứ tự xuất hiện
+        for i, n in enumerate(group):
+            if i < 16:
+                row[i] = get_number_from_key(n['key'])
+        table_data.append(row)
+    
+    # Hiển thị 2 bảng trên 1 hàng
+    # Chia dữ liệu thành các phần (mỗi phần 20 dòng để bảng không quá dài)
+    chunk_size = 20
+    chunks = [table_data[i:i + chunk_size] for i in range(0, len(table_data), chunk_size)]
+    
+    for i in range(0, len(chunks), 2):
+        row = st.columns(2)
+        for col_idx in range(2):
+            if i + col_idx < len(chunks):
+                with row[col_idx]:
+                    df = pd.DataFrame(chunks[i + col_idx], columns=[f"C{i+1}" for i in range(16)])
+                    # Hiển thị bảng không có index để trông giống nhạc phổ
+                    st.table(df.astype(str).replace('nan', '').replace('0', ''))
