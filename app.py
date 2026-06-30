@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title='Sheet Music Converter', layout="wide")
+st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 st.title("Bộ chuyển đổi sheet số")
 
 def get_number_from_key(key_str):
@@ -92,8 +92,8 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         all_khuong_html.append(html_content)
         line_number += 2
 
-    # Gộp theo yêu cầu chia trang
-    display_html = f"<h1>{song_name}</h1>" + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
+    # Thay bằng dòng này:
+    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>" + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
     for i in range(8, len(all_khuong_html), 10):
         display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
