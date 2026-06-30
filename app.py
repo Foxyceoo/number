@@ -40,9 +40,23 @@ if uploaded_file:
         .page-break { page-break-after: always; }
         
         @media print {
-            .print-btn, [data-testid="stSidebar"], header { display: none !important; }
-            body { padding: 0 !important; }
+        /* Các thành phần không cần in */
+        .print-btn, [data-testid="stSidebar"], header { display: none !important; }
+    
+        /* Ép ngắt trang cực mạnh */
+        .page-break { 
+            display: block; 
+            page-break-after: always !important; 
+            break-after: page !important; 
+            height: 0 !important;
+       }
+    
+        /* Đảm bảo nội dung không bị co lại vào 1 trang */
+        body, html {
+            height: auto !important;
+            overflow: visible !important;
         }
+    }
     </style>
     """
 
