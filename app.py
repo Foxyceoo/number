@@ -31,12 +31,24 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     # CSS với quy định kích thước A4 cho PDF
     style = """
     <style>
-        /* Dùng 'color: inherit' để số tự động đổi màu theo nền của Streamlit */
-        table { border-collapse: collapse; text-align: center; font-size: 16px; color: inherit; width: 100%; margin-bottom: 40px; }
-        td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; border: 1px solid #ddd; }
-        
-        /* Đảm bảo khung bảng luôn hiển thị tốt trên cả 2 nền */
-        tr { background-color: transparent !important; }
+        /* Dùng biến của Streamlit để màu tự đảo ngược theo nền */
+        table { 
+            border-collapse: collapse; 
+            text-align: center; 
+            font-size: 16px; 
+            width: 100%; 
+            margin-bottom: 40px; 
+            /* Biến màu chữ tự động của Streamlit */
+            color: var(--text-color); 
+        }
+        td { 
+            height: 60px; 
+            vertical-align: top; 
+            padding-top: 5px; 
+            font-weight: bold; 
+            width: 40px; 
+            border: 1px solid var(--text-color); 
+        }
     </style>
     """
     
