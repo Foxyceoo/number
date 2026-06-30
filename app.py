@@ -59,15 +59,16 @@ if uploaded_file:
     }}
 
     td {{
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start; /* Căn từ trên xuống */
-        align-items: center;        /* Căn giữa theo chiều ngang */
+        /* Bỏ display: flex và flex-direction ở đây */
+        vertical-align: top !important; 
+        text-align: center !important;
         
-        min-height: 50px; 
+        min-height: 50px !important; 
+        height: 50px !important;
         width: 25px !important;
         min-width: 25px !important;
-        padding: 5px 0;
+        
+        padding: 0 !important;
         font-weight: bold; 
         border-right: 1px solid #555; 
         border-left: none;
@@ -125,17 +126,13 @@ if uploaded_file:
             # ------------------------
 
             # Trong vòng lặp tạo cell_content:
+            # Phần này nằm trong vòng lặp for phach
             if vals:
-                top_num = vals[0]
-                # Nối các số còn lại
-                bottom_nums = "<br>".join(map(str, vals[1:]))
-                
-                # Tăng chiều cao nội dung dựa trên số lượng nốt (len(vals))
-                # Cột càng nhiều nốt thì các thẻ div càng đẩy cột dài ra
+                # Dùng flex cho div này để các số chồng lên nhau đẹp
                 cell_content = f"""
-                <div class='grid-cell'>
-                    <div class='top-row'>{vals[0] if vals else ''}</div>
-                    <div class='bottom-row'>{"<br>".join(map(str, vals[1:]))}</div>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;'>
+                    <div style='font-size: 14px;'>{vals[0]}</div>
+                    <div style='font-size: 12px; color: #555;'>{"<br>".join(map(str, vals[1:]))}</div>
                 </div>
                 """
             else:
