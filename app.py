@@ -28,28 +28,22 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     
     st.markdown(f"<h2 style='text-align: center;'>{song_name}</h2>", unsafe_allow_html=True)
     
-    # CSS với quy định kích thước A4 cho PDF
+    # CSS và JS để tự đổi màu theo theme
     style = """
     <style>
-        /* Dùng biến của Streamlit để màu tự đảo ngược theo nền */
-        table { 
-            border-collapse: collapse; 
-            text-align: center; 
-            font-size: 16px; 
-            width: 100%; 
-            margin-bottom: 40px; 
-            /* Biến màu chữ tự động của Streamlit */
-            color: var(--text-color); 
-        }
-        td { 
-            height: 60px; 
-            vertical-align: top; 
-            padding-top: 5px; 
-            font-weight: bold; 
-            width: 40px; 
-            border: 1px solid var(--text-color); 
-        }
+        table { border-collapse: collapse; text-align: center; font-size: 16px; width: 100%; margin-bottom: 40px; color: inherit; }
+        td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; border: 1px solid #555; }
     </style>
+    <script>
+        // Tự động kiểm tra màu nền của Streamlit để đổi màu chữ cho khớp
+        function adjustTheme() {
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.body.style.color = isDarkMode ? '#FFFFFF' : '#000000';
+            document.body.style.backgroundColor = 'transparent';
+        }
+        window.onload = adjustTheme;
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
+    </script>
     """
     
     all_html = style
