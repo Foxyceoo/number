@@ -75,9 +75,9 @@ if uploaded_file:
         min-width: 30px !important;
         max-width: 30px !important;
         
-        height: 80px !important;
-        min-height: 80px !important;
-        max-height: 80px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
         
         vertical-align: top !important;
         border-right: 1px solid #555 !important; 
