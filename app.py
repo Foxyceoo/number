@@ -12,7 +12,7 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     notes = data[0].get("songNotes", [])
     
     # Sử dụng * 4 như bạn đã xác nhận là chạy đúng với nhạc phổ của bạn
-    beat_duration = 60000 / bpm * 4 
+    beat_duration = 60000 / bpm /4
     
     time_map = {}
     for n in notes:
