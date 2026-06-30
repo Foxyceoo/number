@@ -97,8 +97,16 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     for i in range(8, len(all_khuong_html), 10):
         display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
-    # HIỂN THỊ
-    components.html(f"<html><head>{style}</head><body>{display_html}</body></html>", height=1000, scrolling=True)
+    # 1. Tính chiều cao động dựa trên tổng số dòng (all_khuong_html)
+    # Mỗi dòng cao 60px (theo CSS của bạn) + một chút khoảng đệm
+    total_height = (len(all_khuong_html) * 60) + 100 
+    
+    # 2. Sử dụng scrolling=False để ẩn thanh cuộn nội bộ
+    components.html(
+        f"<html><head>{style}</head><body>{display_html}</body></html>", 
+        height=total_height, 
+        scrolling=False
+    )
 
     # NÚT IN PDF
     if st.button("🖨️ Mở bảng in (Để lưu PDF)"):
