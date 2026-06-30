@@ -59,17 +59,12 @@ if uploaded_file:
         overflow: hidden;
     }}
 
-    /* Đưa các class này ra ngoài table để chúng có hiệu lực */
-    .top-row {{ 
+    /* Thiết lập chung cho mọi số trong bảng */
+    .note-number {{ 
         font-size: 15px !important; 
         font-weight: bold !important; 
-        line-height: 1 !important; 
-    }}
-
-    .bottom-row {{ 
-        font-size: 15px !important; 
-        line-height: 1 !important; 
-        margin-top: 2px !important;
+        line-height: 1.5 !important; 
+        display: block;
     }}
 
     @media print {{
