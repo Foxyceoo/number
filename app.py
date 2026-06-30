@@ -45,7 +45,7 @@ with st.sidebar:
             st.success("Ghép thành công!")
     # -----------------------------------
 
-    st.caption("Hãy chọn file JSON hoặc PDF để bắt đầu!")
+    st.caption("Hãy chọn file PDF để bắt đầu!")
 
 if uploaded_file:
     data = json.load(uploaded_file)
