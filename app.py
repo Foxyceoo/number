@@ -1,7 +1,7 @@
 import streamlit as st
 import json
 
-st.title("🎵 Trình diễn Nhạc phổ số (1-15)")
+st.title("Trình diễn Nhạc phổ số")
 
 uploaded_file = st.file_uploader("Tải lên file JSON bài nhạc", type=["json"])
 
