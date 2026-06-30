@@ -124,7 +124,7 @@ if uploaded_file:
 
             # --- CẤU HÌNH VẠCH KẺ ---
             # Vạch mặc định cho mỗi phách
-            border_right = "0px solid #555"
+            border_right = "1px solid #b2b2b2"
 
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0:
