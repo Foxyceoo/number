@@ -1,6 +1,9 @@
 import streamlit as st
 import json
 import streamlit.components.v1 as components
+import streamlit as st
+
+st.set_page_config(page_title='"Number" one Foxy')
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
