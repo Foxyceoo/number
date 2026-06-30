@@ -14,9 +14,11 @@ def get_number_from_key(key_str):
     except: return ""
 
 with st.sidebar:
-    st.header("Công cụ")
+    st.title("Bộ chuyển đổi sheet số")
+    st.markdown("---") # Kẻ vạch ngăn cách cho đẹp
     uploaded_file = st.file_uploader("Tải lên file JSON", type=["json"])
-    st.info("Sau khi tải file, sheet nhạc sẽ tự động hiển thị ở khu vực chính.")
+    st.markdown("---")
+    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
 
 if uploaded_file :
     data = json.load(uploaded_file)
