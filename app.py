@@ -49,21 +49,18 @@ if uploaded_file :
     }
     
     td { 
-        height: 50px !important;    /* Ép cứng chiều cao, không phụ thuộc nội dung */
-        min-height: 50px !important;
-        max-height: 50px !important;
-        
-        vertical-align: middle;     /* Căn giữa số theo chiều dọc để cân đối */
-        padding: 0;                 /* Bỏ padding để không làm đẩy ô */
-        
-        font-weight: bold; 
-        width: 40px; 
+        height: 60px !important; 
+        padding-top: 5px !important; /* Tạo một khoảng đệm nhỏ phía trên */
+        padding-bottom: 0 !important;
         border-right: 1px solid #555; 
         border-left: none;
-        
-        /* Đảm bảo số nằm gọn và không đẩy ô */
-        overflow: hidden; 
-        line-height: 1.2;
+    
+        /* Ép tất cả nội dung căn đỉnh */
+        vertical-align: top !important; 
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 1.2; /* Giúp các dòng số sát nhau hơn */
     }
     
     /* Style cho in PDF */
@@ -105,16 +102,9 @@ if uploaded_file :
             
             # Trong vòng lặp tạo cell_content:
             if vals:
-                top_num = vals[0]  # Số lớn nhất (đã được sắp xếp bởi reverse=True)
-                # Các số còn lại nối lại với nhau bằng <br> để chúng nằm cùng một hàng dưới
-                bottom_nums = "<br>".join(map(str, vals[1:])) if len(vals) > 1 else ""
-                # Ép vào cấu trúc 2 tầng cố định
-                cell_content = f"""
-                <div class='grid-cell'>
-                    <div class='top-row'>{top_num}</div>
-                    <div class='bottom-row'>{bottom_nums}</div>
-                </div>
-                """
+                # Chỉ cần nối các số bằng <br>
+                # Với vertical-align: top ở trên, nó sẽ tự động căn lề trên
+                cell_content = "<br>".join(map(str, vals))
             else:
                 cell_content = ""
             
