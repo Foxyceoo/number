@@ -56,11 +56,12 @@ if uploaded_file:
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
         color: inherit; 
+        /* Thêm chiều cao mặc định cho cả bảng khuông nhạc */
+        height: 110px !important;
     }}
 
     td {{ 
-        padding-top: 2px !important;    
-        padding-bottom: 2px !important; 
+        padding-top: 2px !important;     
 
         /* Thiết lập chiều cao tối thiểu 50px */
         min-height: 50px !important;
