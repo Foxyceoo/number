@@ -7,7 +7,7 @@ st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 st.title("Bộ chuyển đổi sheet số")
 # Tùy chỉnh khoảng cách tên bài hát (thay số 40 theo ý bạn)
 padding_top_px = 40
-padding_bottom_px = 60
+padding_bottom_px = 90
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
