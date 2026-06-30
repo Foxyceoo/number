@@ -74,7 +74,7 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             
             # --- CẤU HÌNH VẠCH KẺ ---
             # Vạch mặc định cho mỗi phách
-            border_right = "0px solid #555" 
+            border_right = "1px solid #555" 
             
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0: 
