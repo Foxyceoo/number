@@ -51,7 +51,17 @@ if uploaded_file:
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
-        font-size: 16px; 
+        /* Tăng size cho số ở trên */
+        .top-row {{
+            font-size: 16px !important; 
+            font-weight: bold;
+    }}
+
+        /* Tăng size cho các số ở dưới, đừng để nó quá nhỏ */
+        .bottom-row {{
+            font-size: 16px !important; 
+            line-height: 1.2 !important;
+    }}
         table-layout: fixed !important; /* Ép layout không co giãn */
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
