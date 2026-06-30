@@ -48,28 +48,28 @@ if uploaded_file:
         overflow-x: hidden !important; /* Quan trọng: Ẩn thanh cuộn ngang */
     }}
 
-    table {{ 
+    table { 
         border-collapse: collapse; 
         text-align: center; 
         font-size: 16px; 
-        width: {margin_side}; 
+        table-layout: fixed; /* CỐ ĐỊNH: Bảng không tự co giãn */
+        width: 100%;         /* Chiếm trọn khung cha */
         margin: 0 auto 50px auto; 
         color: inherit; 
-    }}
+    }
 
-    td {{ 
+    td { 
         height: 50px !important; 
-        min-height: 50px !important;
-        max-height: 50px !important;
+        width: 30px !important;  /* CỐ ĐỊNH: Chiều rộng mỗi phách */
+        min-width: 30px !important;
         vertical-align: top !important; 
         padding: 0; 
         font-weight: bold; 
-        width: 40px; 
         border-right: 1px solid #555; 
         border-left: none;
         overflow: hidden; 
         line-height: 1.2;
-    }}
+    }
 
     /* Style cho in PDF */
     @media print {{
