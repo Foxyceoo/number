@@ -6,6 +6,9 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 padding_top_px = 40
 padding_bottom_px = 90
+padding_top_px = 40
+padding_bottom_px = 90
+margin_side = "90%"
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
@@ -75,7 +78,7 @@ if uploaded_file:
         border-collapse: collapse; 
         text-align: center; 
         font-size: 16px; 
-        width: 100%; 
+        width: {margin_side}; 
         margin-bottom: 50px; /* Tăng khoảng cách giữa các bảng nhạc */
         color: inherit; 
     }
@@ -89,7 +92,7 @@ if uploaded_file:
         padding: 0;                   /* Bỏ padding để không làm đẩy ô */
 
         font-weight: bold; 
-        width: 100px; 
+        width: 40px; 
         border-right: 1px solid #555; 
         border-left: none;
 
