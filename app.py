@@ -11,28 +11,40 @@ def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
     except: return "?"
 
-if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
+st.title("🎵 Nhạc phổ chuẩn")
+uploaded_file = st.file_uploader("Tải file JSON", type=["json"])
+
+if uploaded_file is not None:
     data = json.load(uploaded_file)
     notes = sorted(data[0].get("songNotes", []), key=lambda x: x['time'])
     
-    # Chia nốt theo nhịp (Measure)
+    # Gom nốt theo nhịp (Measure)
     measures = {}
     for n in notes:
         m_idx = int(n['time'] / MS_PER_MEASURE)
         if m_idx not in measures: measures[m_idx] = []
         measures[m_idx].append(n)
 
-    # Thay đoạn hiển thị trong vòng lặp nhịp bằng đoạn này:
-
-    # Giả sử trong một nhịp, các nốt được chia thành 2 dòng (dòng 1: nốt cao, dòng 2: nốt thấp)
-    # Bạn cần một logic phân loại nốt vào dòng 1 hoặc dòng 2 dựa trên cao độ (ví dụ nốt > 7 là dòng 1)
-    
-    st.markdown("<div style='display: flex; gap: 20px; border-left: 2px solid #555; padding-left: 10px;'>", unsafe_allow_html=True)
-    
-    row1 = [str(get_number_from_key(n['key'])) for n in group if get_number_from_key(n['key']) > 7]
-    row2 = [str(get_number_from_key(n['key'])) for n in group if get_number_from_key(n['key']) <= 7]
-    
-    st.markdown(f"<div>{' '.join(row1)}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div>{' '.join(row2)}</div>", unsafe_allow_html=True)
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Hiển thị các nhịp
+    for m_idx in sorted(measures.keys()):
+        st.markdown(f"**Nhịp {m_idx + 1}**")
+        
+        # Nhóm theo thời điểm (time) bên trong nhịp
+        measure_notes = sorted(measures[m_idx], key=lambda x: x['time'])
+        
+        # Bắt đầu container cho nhịp
+        st.markdown("<div style='border-left: 2px solid #555; padding-left: 10px; margin-bottom: 10px;'>", unsafe_allow_html=True)
+        
+        for time_val, group in groupby(measure_notes, key=lambda x: x['time']):
+            notes_at_time = list(group)
+            
+            # Phân loại nốt vào row1 (nốt > 7) và row2 (nốt <= 7)
+            row1 = [str(get_number_from_key(n['key'])) for n in notes_at_time if get_number_from_key(n['key']) > 7]
+            row2 = [str(get_number_from_key(n['key'])) for n in notes_at_time if get_number_from_key(n['key']) <= 7]
+            
+            # Hiển thị 2 dòng số
+            if row1: st.write(" ".join(row1))
+            if row2: st.write(" ".join(row2))
+            st.write("---") # Dòng kẻ nhẹ giữa các thời điểm
+            
+        st.markdown("</div>", unsafe_allow_html=True)
