@@ -13,10 +13,12 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     
     beat_duration = 60000 / bpm / 2
     
+    # Thay vì dùng floor/round đơn giản, hãy thử chia nhỏ phách hơn nếu cần
+    # Thử tăng độ phân giải lên gấp đôi (mỗi phách chia làm 2) nếu bạn muốn nốt dàn ra
     time_map = {}
     for n in notes:
-        import math
-        beat_idx = math.floor(n['time'] / beat_duration)
+        # Nếu muốn nốt dàn ra, hãy thử dùng công thức này để nốt nằm ở các cột khác nhau
+        beat_idx = int(n['time'] / (beat_duration / 2)) 
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     
     max_beat = max(time_map.keys()) if time_map else 0
