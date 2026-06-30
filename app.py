@@ -47,8 +47,8 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             font-weight: bold; 
             width: 40px; 
             /* Kẻ ngang: Dùng màu xám nhạt (cùng tông theme) */
-            border-top: 1px solid rgba(128, 128, 128, 0.3);
-            border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+            border-top: 0px solid rgba(128, 128, 128, 0.3);
+            border-bottom: 0px solid rgba(128, 128, 128, 0.3);
             /* Kẻ dọc: Giữ nguyên màu đậm để phân chia phách */
             border-right: 1px solid #555; 
             border-left: none;
