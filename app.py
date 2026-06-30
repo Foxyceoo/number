@@ -60,7 +60,7 @@ if uploaded_file:
     max_beat = max(time_map.keys()) if time_map else 0
 
     # CSS của bạn được giữ nguyên
-    style = """
+    style = f"""
     <style>
     /* BẮT BUỘC: Cho phép body cuộn */
     html, body {
@@ -72,13 +72,21 @@ if uploaded_file:
         overflow-x: auto !important;
     }
 
-    table { 
+    table {{ 
         border-collapse: collapse; 
         text-align: center; 
         font-size: 16px; 
-        width: {margin_side}; 
-        margin-bottom: 50px; /* Tăng khoảng cách giữa các bảng nhạc */
+        
+        /* Dùng biến ở đây, số < 100% mới tạo lề */
+        width: {margin_side};            
+        margin: 0 auto 50px auto; 
+        
         color: inherit; 
+    }}
+    
+    /* Nhớ nhân đôi các dấu {{ }} cho các phần tử khác */
+    td {{ 
+        height: 50px !important;
     }
 
     td { 
