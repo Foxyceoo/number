@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
 import json
-import io
 import streamlit.components.v1 as components
-from weasyprint import HTML
 
 st.set_page_config(page_title='Sheet Music Converter', layout="wide")
 st.title("Bộ chuyển đổi sheet số")
@@ -24,16 +22,20 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     max_beat = max(time_map.keys()) if time_map else 0
 
-    # CSS chung
+    # CSS cải tiến để in đẹp hơn (tỉ lệ 9:16)
     style = """
     <style>
-        body { font-family: sans-serif; }
+        body { font-family: sans-serif; padding: 20px; }
         table { border-collapse: collapse; text-align: center; font-size: 14px; width: 100%; margin-bottom: 20px; }
         td { height: 50px; vertical-align: middle; font-weight: bold; width: 30px; border-right: 1px solid #ccc; }
+        /* Tự động ngắt trang khi in */
+        @media print {
+            .page-break { page-break-after: always; }
+        }
     </style>
     """
 
-    # Tạo danh sách các dòng nhạc (khuông)
+    # Tạo danh sách các dòng nhạc
     all_khuong_html = []
     line_number = 1
     for khuong in range(0, max_beat + 32, 32):
@@ -46,21 +48,20 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         all_khuong_html.append(html_content)
         line_number += 2
 
-    # HIỂN THỊ TRÊN WEB
-    st.subheader(song_name)
-    components.html(f"<html><body>{style}{''.join(all_khuong_html)}</body></html>", height=600, scrolling=True)
+    # Gộp theo yêu cầu chia trang: Trang 1 (8 dòng), các trang sau (10 dòng)
+    # Tớ thêm class 'page-break' vào sau mỗi nhóm để khi bạn bấm Ctrl+P nó tự ngắt trang
+    display_html = f"<h1>{song_name}</h1>" + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
+    
+    for i in range(8, len(all_khuong_html), 10):
+        display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
-    # XUẤT PDF (Chia trang 8 - 10)
-    if st.button("📥 Xuất file PDF (Chia trang 8-10)"):
-        pages = []
-        # Trang đầu: 8 dòng
-        pages.append(f"<html><head>{style}</head><body><h1>{song_name}</h1>{''.join(all_khuong_html[0:8])}</body></html>")
-        # Các trang sau: 10 dòng
-        for i in range(8, len(all_khuong_html), 10):
-            pages.append(f"<html><head>{style}</head><body>{''.join(all_khuong_html[i:i+10])}</body></html>")
-        
-        pdf_buffer = io.BytesIO()
-        HTML(string="".join(pages)).write_pdf(pdf_buffer)
-        pdf_buffer.seek(0)
-        
-        st.download_button("Tải PDF ngay", data=pdf_buffer, file_name=f"{song_name}.pdf", mime="application/pdf")
+    # HIỂN THỊ
+    components.html(f"<html><head>{style}</head><body>{display_html}</body></html>", height=1000, scrolling=True)
+
+    # NÚT IN PDF
+    if st.button("🖨️ Mở bảng in (Để lưu PDF)"):
+        st.write("### Hướng dẫn:")
+        st.write("1. Một cửa sổ mới sẽ hiện ra (hoặc trang hiện tại sẽ tự mở bảng in).")
+        st.write("2. Nếu trình duyệt hỏi, chọn **'Lưu dưới dạng PDF' (Save as PDF)**.")
+        st.write("3. Nhấn **In/Lưu** là xong!")
+        st.markdown("<script>window.print();</script>", unsafe_allow_html=True)
