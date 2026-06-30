@@ -51,7 +51,7 @@ if uploaded_file:
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
-        font-size: 15px; 
+        font-size: 16px; 
         table-layout: fixed;
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
@@ -66,8 +66,8 @@ if uploaded_file:
         min-height: 50px !important;
         height: 50px !important;
         
-        width: 22px !important;
-        min-width: 22px !important;
+        width: 20px !important;
+        min-width: 20px !important;
         vertical-align: top !important; /* Vẫn giữ căn lề trên */
         font-weight: bold; 
         border-right: 1px solid #555; 
