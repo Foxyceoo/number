@@ -37,12 +37,13 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
-            # Cấu hình vạch kẻ (vẫn giữ logic vạch nhịp mỗi 4 phách)
+            # Cấu hình vạch kẻ
             border_right = "1px solid #555"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
-            if (phach + 1) % 32 == 0: border_right = "4px solid white" # Vạch khuông tại 32
+            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa" # Vạch nhịp
+            if (phach + 1) % 32 == 0: border_right = "4px solid #f1c40f" # Vạch kết khuông màu vàng
             
-            border_left = "2px solid #aaa" if phach == khuong else "none"
+            # Vạch đầu khuông màu vàng
+            border_left = "2px solid #f1c40f" if phach == khuong else "none"
             
             cell_content = ""
             if vals:
