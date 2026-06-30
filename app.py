@@ -92,13 +92,13 @@ if uploaded_file:
             display: none !important; 
             
         /* Ép ngắt trang sau mỗi phần tử chứa khuông nhạc */
-        .page-break {{
+        .page-break {{{{
             page-break-after: always !important; /* Dùng cho trình duyệt cũ */
             break-after: page !important;        /* Dùng cho trình duyệt hiện đại */
-        }}
+        }}}}
         
         /* Đảm bảo các bảng không bị cắt ngang giữa chừng */
-        table {{
+        table {{{{
             page-break-inside: avoid !important;
             break-inside: avoid !important;
             
