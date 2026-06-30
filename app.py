@@ -22,24 +22,50 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     max_beat = max(time_map.keys()) if time_map else 0
 
-    # CSS cải tiến để in đẹp hơn (tỉ lệ 9:16)
+    # CSS của bạn được giữ nguyên
     style = """
     <style>
         body { font-family: sans-serif; padding: 20px; }
-        table { border-collapse: collapse; text-align: center; font-size: 14px; width: 100%; margin-bottom: 20px; }
-        td { height: 50px; vertical-align: middle; font-weight: bold; width: 30px; border-right: 1px solid #ccc; }
-        /* Tự động ngắt trang khi in */
+        table { 
+            border-collapse: collapse; 
+            text-align: center; 
+            font-size: 16px; 
+            width: 100%; 
+            margin-bottom: 40px; 
+            color: inherit; 
+        }
+        td { 
+            height: 60px; 
+            vertical-align: top; 
+            padding-top: 5px; 
+            font-weight: bold; 
+            width: 40px; 
+            border-top: 0px solid rgba(128, 128, 128, 0.3);
+            border-bottom: 0px solid rgba(128, 128, 128, 0.3);
+            border-right: 1px solid #555; 
+            border-left: none;
+        }
+        /* Style cho in PDF */
         @media print {
             .page-break { page-break-after: always; }
         }
     </style>
+    <script>
+        function adjustTheme() {
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.body.style.color = isDarkMode ? '#FFFFFF' : '#000000';
+            document.body.style.backgroundColor = 'transparent';
+        }
+        window.onload = adjustTheme;
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
+    </script>
     """
 
     # Tạo danh sách các dòng nhạc
     all_khuong_html = []
     line_number = 1
     for khuong in range(0, max_beat + 32, 32):
-        html_content = f"<table><tr><td style='color: red; border: none;'>{line_number}</td>"
+        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle;'>{line_number}</td>"
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True)
             cell_content = "<br>".join(map(str, vals)) if vals else ""
@@ -48,10 +74,8 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         all_khuong_html.append(html_content)
         line_number += 2
 
-    # Gộp theo yêu cầu chia trang: Trang 1 (8 dòng), các trang sau (10 dòng)
-    # Tớ thêm class 'page-break' vào sau mỗi nhóm để khi bạn bấm Ctrl+P nó tự ngắt trang
+    # Gộp theo yêu cầu chia trang
     display_html = f"<h1>{song_name}</h1>" + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
-    
     for i in range(8, len(all_khuong_html), 10):
         display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
@@ -60,8 +84,4 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
 
     # NÚT IN PDF
     if st.button("🖨️ Mở bảng in (Để lưu PDF)"):
-        st.write("### Hướng dẫn:")
-        st.write("1. Một cửa sổ mới sẽ hiện ra (hoặc trang hiện tại sẽ tự mở bảng in).")
-        st.write("2. Nếu trình duyệt hỏi, chọn **'Lưu dưới dạng PDF' (Save as PDF)**.")
-        st.write("3. Nhấn **In/Lưu** là xong!")
         st.markdown("<script>window.print();</script>", unsafe_allow_html=True)
