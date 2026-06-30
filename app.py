@@ -58,22 +58,23 @@ if uploaded_file:
         color: inherit; 
     }}
 
-    td {{ 
-        padding-top: 2px !important;    
-        padding-bottom: 2px !important; 
-
-        /* Thiết lập chiều cao tối thiểu 50px */
-        min-height: 50px !important;
-        height: 50px !important;
+    td {{
+        /* Cấu hình để các ô cùng hàng có chiều cao bằng nhau */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        
+        /* Chiều cao mặc định là 50px, nếu nốt nhiều hơn sẽ tự giãn */
+        min-height: 50px; 
         
         width: 25px !important;
         min-width: 25px !important;
-        vertical-align: top !important; /* Vẫn giữ căn lề trên */
+        padding: 5px 0;
         font-weight: bold; 
         border-right: 1px solid #555; 
         border-left: none;
         overflow: hidden;
-        line-height: 1.5; 
+        line-height: 1.2; 
     }}
 
     @media print {{{{
