@@ -35,6 +35,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     # 2. KHU VỰC HIỂN THỊ BẢNG TRÊN WEB
     style = """
     <style>
+        body { overflow: visible !important; } /* Ép nội dung hiển thị hết, không cuộn */
         table { 
             border-collapse: collapse; 
             text-align: center; 
@@ -83,7 +84,8 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
         html_content += "</tr></table></div>"
         all_html += html_content
     
-    # Sửa scrolling=True thành scrolling=False
+    # Bỏ hoàn toàn tham số scrolling hoặc để nó là False
+    # Chỉnh height cho đủ lớn hoặc để nó tự nhận diện nội dung
     components.html(f"<html><body>{all_html}</body></html>", height=None, scrolling=False)
 
     #3. TẢI VỀ
