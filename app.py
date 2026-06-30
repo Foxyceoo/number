@@ -27,13 +27,18 @@ if uploaded_file is not None:
     display_container = st.container()
     
     with display_container:
-        # Tạm thời nhóm mỗi 8 nốt thành một ô nhịp (có thể điều chỉnh)
-        cols = st.columns(8)
-        for i, note in enumerate(notes[:40]):  # Demo 40 nốt đầu
-            number = get_number_from_key(note['key'])
-            with cols[i % 8]:
-                st.markdown(f"<h2 style='text-align: center;'>{number}</h2>", unsafe_allow_html=True)
-                # Dấu gạch đứng phân cách nhịp
-                # Dấu gạch đứng phân cách nhịp
-                if (i + 1) % 8 == 0:
-                    st.markdown("<hr>", unsafe_allow_html=True) # Dòng này sẽ tạo đường kẻ ngang phân cách nhịp
+        # Sắp xếp và nhóm nốt theo thời gian
+    from itertools import groupby
+    notes = sorted(notes, key=lambda x: x['time'])
+    
+    for time_val, group in groupby(notes, key=lambda x: x['time']):
+        notes_at_same_time = list(group)
+        
+        # Tạo một hàng (row) cho mỗi thời điểm
+        row = st.columns(len(notes_at_same_time))
+        
+        # Hiển thị từng nốt trong hợp âm đó vào các cột tương ứng
+        for idx, n in enumerate(notes_at_same_time):
+            number = get_number_from_key(n['key'])
+            with row[idx]:
+                st.markdown(f"<h3 style='text-align: center; border: 1px solid #555; padding: 5px;'>{number}</h3>", unsafe_allow_html=True)
