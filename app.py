@@ -6,7 +6,8 @@ def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
     except: return ""
 
-if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
+# Bạn để trống label hoặc đặt tên mới, sau đó dùng help để hiển thị "- 123 -"
+if uploaded_file := st.file_uploader("Tải file JSON", type=["json"], help="- 123 -"):
     data = json.load(uploaded_file)
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
