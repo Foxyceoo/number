@@ -36,95 +36,46 @@ if uploaded_file:
     # Sửa lại đoạn style, xóa các dòng chú thích /*...*/ bên trong f-string
     style = f"""
     <style>
-    ::-webkit-scrollbar {{
-        display: none !important;
-    }}
-
-    html, body {{
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-y: hidden !important;
-        overflow-x: hidden !important;
-    }}
+    ::-webkit-scrollbar {{ display: none !important; }}
+    
+    html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
 
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
-        
-        table-layout: fixed !important; /* Ép layout không co giãn */
+        table-layout: fixed !important; 
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
-        color: inherit; 
-        
-        /* Khóa cứng chiều cao bảng */
         height: 50px !important; 
-        min-height: 50px !important;
-        max-height: 50px !important;
-
-        /* Tăng size cho số ở trên */
-        .top-row {{
-            font-size: 14px !important; 
-            font-weight: bold;
-    }}
-
-        /* Tăng size cho các số ở dưới, đừng để nó quá nhỏ */
-        .bottom-row {{
-            font-size: 14px !important; 
-            line-height: 1.2 !important;
     }}
 
     td {{ 
-        padding-top: 0px !important;     
-
-        /* Khóa cứng chiều cao ô */
-        height: 50px !important;
-        min-height: 50px !important;
-        max-height: 50px !important;
-        
-        /* Ép độ rộng cố định */
+        padding: 0 !important; 
+        height: 50px !important; 
         width: 20px !important; 
-        min-width: 20px !important;
-        max-width: 20px !important;
-        
-        vertical-align: top !important;
-        font-weight: bold; 
+        vertical-align: middle !important; 
         border-right: 1px solid #555; 
-        border-left: none;
+        border-left: none; 
         overflow: hidden;
-        line-height: 1.5; 
-        
     }}
 
-    @media print {{{{
-        body, html {{{{
-            overflow: hidden !important; 
-        }}}}
-        .print-btn, .sidebar, header, .stAppDeployButton, footer {{{{ 
-            display: none !important; 
-        }}}}
-        table {{{{
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            margin-bottom: 20px !important;
-        }}}}
-        #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
-        .styles_viewerBadge__1yB5_ {{{{ 
-            display: none !important; 
-            
-        /* Ép ngắt trang sau mỗi phần tử chứa khuông nhạc */
-        .page-break {{{{
-            page-break-after: always !important;
-            break-after: page !important;
-        }}}}
-        
-        /* Đảm bảo các bảng không bị cắt ngang giữa chừng */
-        table {{{{
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            
-        }}}}
-    }}}}
+    /* Đưa các class này ra ngoài table để chúng có hiệu lực */
+    .top-row {{ 
+        font-size: 16px !important; 
+        font-weight: bold !important; 
+        line-height: 1 !important; 
+    }}
+
+    .bottom-row {{ 
+        font-size: 14px !important; 
+        line-height: 1 !important; 
+        margin-top: 2px !important;
+    }}
+
+    @media print {{
+        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
+        table {{ page-break-inside: avoid !important; margin-bottom: 20px !important; }}
+    }}
     </style>
     """
     # Tạo danh sách các dòng nhạc
