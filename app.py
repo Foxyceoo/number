@@ -11,7 +11,7 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    beat_duration = 60000 / bpm / 2
+    beat_duration = 60000 / bpm
     
     # Thay vì dùng floor/round đơn giản, hãy thử chia nhỏ phách hơn nếu cần
     # Thử tăng độ phân giải lên gấp đôi (mỗi phách chia làm 2) nếu bạn muốn nốt dàn ra
