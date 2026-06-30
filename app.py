@@ -58,7 +58,10 @@ if uploaded_file:
     }}
 
     td {{ 
-        height: 50px !important; 
+        /* Tăng height từ 50px lên 80px hoặc hơn để cột dài ra */
+        height: 80px !important; 
+        min-height: 80px !important;
+        max-height: 80px !important;
         width: 25px !important;
         min-width: 25px !important;
         vertical-align: top !important; 
