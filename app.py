@@ -83,7 +83,8 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
         html_content += "</tr></table></div>"
         all_html += html_content
     
-    components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
+    # Sửa scrolling=True thành scrolling=False
+    components.html(f"<html><body>{all_html}</body></html>", height=None, scrolling=False)
 
     #3. TẢI VỀ
     if st.button("Tải về Excel (Bố cục Lưới)"):
