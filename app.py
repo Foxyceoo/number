@@ -98,13 +98,10 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     # Thay bằng dòng này:
     # Cập nhật đoạn này với f-string và các biến đã khai báo
     display_html = f"""
-    <h1 style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>
+    <h1 class='song-title' style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>
         {song_name}
     </h1>
     """ + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
-
-    for i in range(8, len(all_khuong_html), 10):
-        display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
     # 1. Tính chiều cao động dựa trên tổng số dòng (all_khuong_html)
     # Mỗi dòng cao 60px (theo CSS của bạn) + một chút khoảng đệm
