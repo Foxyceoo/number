@@ -103,7 +103,15 @@ if uploaded_file :
             border_left = "3px solid #00008c" if phach == khuong else "none"
             # ------------------------
             
-            cell_content = "<br>".join(map(str, vals)) if vals else ""
+            if vals:
+                # Lấy số thứ nhất (hàng trên) và số thứ hai (hàng dưới)
+                top_num = vals[0] if len(vals) > 0 else "&nbsp;"
+                bottom_num = vals[1] if len(vals) > 1 else "&nbsp;"
+    
+                # Ép nó vào 2 cái khung span có chiều cao cố định
+                cell_content = f"<div class='num-wrapper'><span>{top_num}</span><span>{bottom_num}</span></div>"
+            else:
+                cell_content = ""
             
             # Cập nhật style cho thẻ td với các biến trên
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
