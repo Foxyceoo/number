@@ -32,11 +32,29 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     # CSS và JS để tự đổi màu theo theme
     style = """
     <style>
-        table { border-collapse: collapse; text-align: center; font-size: 16px; width: 100%; margin-bottom: 40px; color: inherit; }
-        td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; border: 1px solid #555; }
+        table { 
+            border-collapse: collapse; 
+            text-align: center; 
+            font-size: 16px; 
+            width: 100%; 
+            margin-bottom: 40px; 
+            color: inherit; 
+        }
+        td { 
+            height: 60px; 
+            vertical-align: top; 
+            padding-top: 5px; 
+            font-weight: bold; 
+            width: 40px; 
+            /* Kẻ ngang: Dùng màu xám nhạt (cùng tông theme) */
+            border-top: 1px solid rgba(128, 128, 128, 0.3);
+            border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+            /* Kẻ dọc: Giữ nguyên màu đậm để phân chia phách */
+            border-right: 1px solid #555; 
+            border-left: none;
+        }
     </style>
     <script>
-        // Tự động kiểm tra màu nền của Streamlit để đổi màu chữ cho khớp
         function adjustTheme() {
             const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
             document.body.style.color = isDarkMode ? '#FFFFFF' : '#000000';
