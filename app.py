@@ -102,7 +102,7 @@ if uploaded_file:
             page-break-inside: avoid !important;
             break-inside: avoid !important;
             
-        }}}}}
+        }}}}
     }}}}
     </style>
     """
