@@ -101,7 +101,6 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     # Tính chiều cao dựa trên số phách: mỗi dòng có 32 phách, mỗi phách cao ~60px
     # Thêm một chút khoảng trống (ví dụ 100px) để không bị sát mép
     calculated_height = ((max_beat // 32) + 1) * 60 + 100
-    # Sửa dòng hiển thị thành:
     components.html(f"<html><body>{all_html}</body></html>", height=calculated_height, scrolling=False)
 
     # NÚT IN PDF
