@@ -19,34 +19,6 @@ with st.sidebar:
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
 
-    # --- THÊM PHẦN GHÉP PDF VÀO ĐÂY ---
-    st.subheader("Ghép PDF")
-    pdf_files = st.file_uploader("Chọn các file PDF cần ghép", type=["pdf"], accept_multiple_files=True)
-
-    if pdf_files:
-        if st.button("Ghép PDF"):
-            from pypdf import PdfWriter
-            import io
-
-            merger = PdfWriter()
-            for file in pdf_files:
-                merger.append(file)
-
-            pdf_stream = io.BytesIO()
-            merger.write(pdf_stream)
-            pdf_stream.seek(0)
-
-            st.download_button(
-                label="Tải xuống file đã ghép",
-                data=pdf_stream,
-                file_name="Sheet_Music_Combined.pdf",
-                mime="application/pdf"
-            )
-            st.success("Ghép thành công!")
-    # -----------------------------------
-
-    st.caption("Hãy chọn file PDF để bắt đầu!")
-
 if uploaded_file:
     data = json.load(uploaded_file)
     song_name = uploaded_file.name.replace(".json", "")
