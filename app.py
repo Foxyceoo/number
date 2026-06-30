@@ -74,18 +74,18 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             
             # --- CẤU HÌNH VẠCH KẺ ---
             # Vạch mặc định cho mỗi phách
-            border_right = "2px solid #555" 
+            border_right = "1px solid #555" 
             
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0: 
-                border_right = "3px solid #ff0000"
+                border_right = "2px solid #ff0000"
             
             # Vạch đậm nhất mỗi 16 phách
             if (phach + 1) % 16 == 0: 
-                border_right = "4px solid #00008c"
+                border_right = "3px solid #00008c"
             
             # Vạch bên trái khuông nhạc
-            border_left = "4px solid #00008c" if phach == khuong else "none"
+            border_left = "3px solid #00008c" if phach == khuong else "none"
             # ------------------------
             
             cell_content = "<br>".join(map(str, vals)) if vals else ""
