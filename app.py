@@ -67,9 +67,17 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     </script>
     """
     
+    # ... (phía trên giữ nguyên)
     all_html = style
+    # Biến đếm dòng để tính số thứ tự (bắt đầu từ 1, nhảy 2 đơn vị mỗi dòng)
+    line_number = 1
     for khuong in range(0, max_beat + 32, 32):
+        # Thêm class 'khuong-nhac' và bắt đầu hàng
         html_content = "<div class='khuong-nhac'><table><tr>"
+        
+        # 1. THÊM CỘT SỐ THỨ TỰ (tô màu đỏ cho nổi như ảnh)
+        html_content += f"<td style='width: 30px; color: red; font-weight: bold; border: none; vertical-align: middle;'>{line_number}</td>"
+        
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
@@ -81,8 +89,13 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             
             cell_content = "<br>".join(map(str, vals)) if vals else ""
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
+            
         html_content += "</tr></table></div>"
         all_html += html_content
+        
+        # Tăng số thứ tự cho dòng tiếp theo
+        line_number += 2
+    # ... (phía dưới giữ nguyên)
     
     # Thêm một chút khoảng trống (ví dụ 100px) để không bị sát mép
     calculated_height = ((max_beat // 32) + 1) * 60 + 100
