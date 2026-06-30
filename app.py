@@ -44,6 +44,7 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             border-bottom: 0px solid rgba(128, 128, 128, 0.3);
             border-right: 1px solid #555; 
             border-left: none;
+            color: currentColor; /* Dòng này quan trọng: tự theo màu của body */
         }
         /* Style cho in PDF */
         @media print {
