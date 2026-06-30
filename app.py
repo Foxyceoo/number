@@ -72,14 +72,21 @@ if uploaded_file :
     
     /* Style cho in PDF */
     @media print {
-            .page-break { 
-                page-break-after: always !important; 
-                break-after: page !important;
-                display: block;
-                height: 0;
-            }
-            .print-btn, .sidebar, header { display: none !important; }
+        /* Ẩn hoàn toàn thanh cuộn và các phần thừa của iframe */
+        body, html {
+            overflow: hidden !important; 
         }
+        
+        /* Ẩn các nút bấm, header, sidebar và cả iframe container nếu cần */
+        .print-btn, .sidebar, header, .stAppDeployButton, footer { 
+            display: none !important; 
+        }
+
+        /* Đảm bảo bảng không bị cắt ngang dòng khi sang trang */
+        table {
+            page-break-inside: avoid;
+        }
+    }
 </style>
     """
 
