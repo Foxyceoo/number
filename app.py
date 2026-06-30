@@ -90,7 +90,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
 
     # 3. KHU VỰC XUẤT FILE PDF
     # Tự động tạo file và hiển thị nút tải về ngay khi có dữ liệu
-    if st.button("Tải về PDF (Bản chuẩn lưới)"):
+    if st.button("Tải về PDF"):
         pdf_filename = f"{song_name}.pdf"
         doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
     
