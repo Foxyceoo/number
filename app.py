@@ -51,6 +51,17 @@ if uploaded_file:
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
+        
+        table-layout: fixed !important; /* Ép layout không co giãn */
+        width: {margin_side}; 
+        margin: 0 auto 30px auto; 
+        color: inherit; 
+        
+        /* Khóa cứng chiều cao bảng */
+        height: 50px !important; 
+        min-height: 50px !important;
+        max-height: 50px !important;
+
         /* Tăng size cho số ở trên */
         .top-row {{
             font-size: 16px !important; 
@@ -62,15 +73,6 @@ if uploaded_file:
             font-size: 16px !important; 
             line-height: 1.2 !important;
     }}
-        table-layout: fixed !important; /* Ép layout không co giãn */
-        width: {margin_side}; 
-        margin: 0 auto 30px auto; 
-        color: inherit; 
-        
-        /* Khóa cứng chiều cao bảng */
-        height: 50px !important; 
-        min-height: 50px !important;
-        max-height: 50px !important;
 
     td {{ 
         padding-top: 0px !important;     
@@ -157,8 +159,8 @@ if uploaded_file:
                 # Dùng height: 100% để ép div nằm gọn trong td 50px
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50px;'>
-                    <div style='line-height: 1; font-weight: bold;'>{top_num}</div>
-                    <div style='line-height: 1; font-size: 10px;'>{bottom_nums}</div>
+                    <div class='top-row'>{top_num}</div>
+                    <div class='bottom-row'>{bottom_nums}</div>
                 </div>
                 """
             else:
