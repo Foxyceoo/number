@@ -56,31 +56,7 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     
     /* Style cho in PDF */
     @media print {
-        /* Ẩn mọi thứ của trang web Streamlit */
-        body * {
-            visibility: hidden;
-        }
-
-        /* Chỉ hiển thị các khuông nhạc và nội dung bên trong */
-        .khuong-nhac, .khuong-nhac * {
-            visibility: visible;
-        }
-
-        /* Đưa các khuông nhạc lên đầu trang */
-        .khuong-nhac {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-        }
-
-        /* Đảm bảo màu sắc hiển thị đúng khi in */
-        body, table, td {
-            color: #000000 !important;
-            background-color: #ffffff !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
+        .page-break { page-break-after: always; }
     }
 </style>
     """
