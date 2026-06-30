@@ -64,7 +64,7 @@ if uploaded_file:
         
         width: 25px !important;
         min-width: 25px !important;
-        vertical-align: middle !important;
+        vertical-align: top !important; /* Vẫn giữ căn lề trên */
         font-weight: bold; 
         border-right: 1px solid #555; 
         border-left: none;
