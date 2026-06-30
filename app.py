@@ -3,137 +3,64 @@ import pandas as pd
 import json
 import io
 import streamlit.components.v1 as components
+from weasyprint import HTML
 
-# Cấu hình tên trang
-st.set_page_config(page_title='"Number" one Foxy')
+st.set_page_config(page_title='Sheet Music Converter', layout="wide")
 st.title("Bộ chuyển đổi sheet số")
 
-# Hàm lấy số từ key
 def get_number_from_key(key_str):
-    try:
-        return (int(key_str.split('Key')[1]) % 15) + 1
-    except:
-        return ""
+    try: return (int(key_str.split('Key')[1]) % 15) + 1
+    except: return ""
 
-# 1. KHU VỰC TẢI FILE VÀ XỬ LÝ DỮ LIỆU
-if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
+if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     data = json.load(uploaded_file)
     song_name = uploaded_file.name.replace(".json", "")
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
-    
     beat_duration = 60000 / bpm 
     time_map = {}
     for n in notes:
         beat_idx = round(n['time'] / beat_duration)
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
-    
     max_beat = max(time_map.keys()) if time_map else 0
-    
-    st.markdown(f"<h2 style='text-align: center;'>{song_name}</h2>", unsafe_allow_html=True)
-    
-    # 2. KHU VỰC HIỂN THỊ BẢNG TRÊN WEB
+
+    # CSS chung
     style = """
     <style>
-        body { overflow: visible !important; } /* Ép nội dung hiển thị hết, không cuộn */
-        table { 
-            border-collapse: collapse; 
-            text-align: center; 
-            font-size: 16px; 
-            width: 100%; 
-            margin-bottom: 40px; 
-            color: inherit; 
-        }
-        td { 
-            height: 60px; 
-            vertical-align: top; 
-            padding-top: 5px; 
-            font-weight: bold; 
-            width: 40px; 
-            border-top: 0px solid rgba(128, 128, 128, 0.3);
-            border-bottom: 0px solid rgba(128, 128, 128, 0.3);
-            border-right: 1px solid #555; 
-            border-left: none;
-        }
+        body { font-family: sans-serif; }
+        table { border-collapse: collapse; text-align: center; font-size: 14px; width: 100%; margin-bottom: 20px; }
+        td { height: 50px; vertical-align: middle; font-weight: bold; width: 30px; border-right: 1px solid #ccc; }
     </style>
-    <script>
-        function adjustTheme() {
-            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.body.style.color = isDarkMode ? '#FFFFFF' : '#000000';
-            document.body.style.backgroundColor = 'transparent';
-        }
-        window.onload = adjustTheme;
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
-    </script>
     """
-    
-    # ... (phía trên giữ nguyên)
-    all_html = style
-    # Biến đếm dòng để tính số thứ tự (bắt đầu từ 1, nhảy 2 đơn vị mỗi dòng)
+
+    # Tạo danh sách các dòng nhạc (khuông)
+    all_khuong_html = []
     line_number = 1
     for khuong in range(0, max_beat + 32, 32):
-        # Thêm class 'khuong-nhac' và bắt đầu hàng
-        html_content = "<div class='khuong-nhac'><table><tr>"
-        
-        # 1. THÊM CỘT SỐ THỨ TỰ (tô màu đỏ cho nổi như ảnh)
-        html_content += f"<td style='width: 30px; color: red; font-weight: bold; border: none; vertical-align: middle;'>{line_number}</td>"
-        
+        html_content = f"<table><tr><td style='color: red; border: none;'>{line_number}</td>"
         for phach in range(khuong, khuong + 32):
-            vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
-            
-            border_right = "1px solid #555"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
-            if (phach + 1) % 16 == 0: border_right = "4px solid #00008c"
-            
-            border_left = "4px solid #00008c" if phach == khuong else "none"
-            
-            cell_content = "<br>".join(map(str, vals)) if vals else ""
-            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
-            
-        html_content += "</tr></table></div>"
-        all_html += html_content
-        
-        # Tăng số thứ tự cho dòng tiếp theo
-        line_number += 2
-    # ... (phía dưới giữ nguyên)
-    
-    # Thêm một chút khoảng trống (ví dụ 100px) để không bị sát mép
-    calculated_height = ((max_beat // 32) + 1) * 60 + 100
-    components.html(f"<html><body>{all_html}</body></html>", height=calculated_height, scrolling=False)
-
-    #3. TẢI VỀ
-    if st.button("Tải về Excel (Bố cục Lưới)"):
-        # 1. Tổ chức lại dữ liệu: Phách ở cột A, các nốt trải dài sang các cột tiếp theo
-        rows = []
-        for phach in range(max_beat + 1):
             vals = sorted(time_map.get(phach, []), reverse=True)
-            # Dòng: [Phách, Nốt1, Nốt2, Nốt3...]
-            row = [f"{phach}"] + vals
-            rows.append(row)
+            cell_content = "<br>".join(map(str, vals)) if vals else ""
+            html_content += f"<td>{cell_content}</td>"
+        html_content += "</tr></table>"
+        all_khuong_html.append(html_content)
+        line_number += 2
+
+    # HIỂN THỊ TRÊN WEB
+    st.subheader(song_name)
+    components.html(f"<html><body>{style}{''.join(all_khuong_html)}</body></html>", height=600, scrolling=True)
+
+    # XUẤT PDF (Chia trang 8 - 10)
+    if st.button("📥 Xuất file PDF (Chia trang 8-10)"):
+        pages = []
+        # Trang đầu: 8 dòng
+        pages.append(f"<html><head>{style}</head><body><h1>{song_name}</h1>{''.join(all_khuong_html[0:8])}</body></html>")
+        # Các trang sau: 10 dòng
+        for i in range(8, len(all_khuong_html), 10):
+            pages.append(f"<html><head>{style}</head><body>{''.join(all_khuong_html[i:i+10])}</body></html>")
         
-        # 2. Tạo DataFrame
-        df = pd.DataFrame(rows)
+        pdf_buffer = io.BytesIO()
+        HTML(string="".join(pages)).write_pdf(pdf_buffer)
+        pdf_buffer.seek(0)
         
-        # 3. Xuất file Excel
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False, header=False)
-            workbook = writer.book
-            worksheet = writer.sheets['Sheet1']
-            
-            # Định dạng ô: kẻ bảng, căn giữa
-            format_cell = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
-            
-            # Chỉnh độ rộng cột (đủ cho số nốt) và chiều cao hàng
-            worksheet.set_column(0, df.shape[1]-1, 8, format_cell)
-            for i in range(len(rows)):
-                worksheet.set_row(i, 30, format_cell)
-            
-        buffer.seek(0)
-        
-        st.download_button(
-            label="📥 Tải file Excel (Đã tách ô)",
-            data=buffer,
-            file_name=f"{song_name}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        st.download_button("Tải PDF ngay", data=pdf_buffer, file_name=f"{song_name}.pdf", mime="application/pdf")
