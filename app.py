@@ -33,10 +33,10 @@ if uploaded_file :
     # CSS của bạn được giữ nguyên
     style = """
     <style>
-    /* Chỉnh lề body để bảng không bị dính sát mép trình duyệt */
+    /* Cho phép thanh cuộn hiện ra khi nội dung dài */
     body {
-        overflow-x: hidden !important; /* Ẩn thanh cuộn ngang */
-        overflow-y: hidden !important; /* Ẩn thanh cuộn dọc */
+        overflow-x: auto !important; 
+        overflow-y: auto !important; 
     }
     
     table { 
