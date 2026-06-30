@@ -59,8 +59,8 @@ if uploaded_file:
     }}
 
     td {{ 
-        padding-top: 15px !important;    
-        padding-bottom: 15px !important; 
+        padding-top: 5px !important;    
+        padding-bottom: 5px !important; 
         
         width: 25px !important;
         min-width: 25px !important;
