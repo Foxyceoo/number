@@ -61,13 +61,13 @@ if uploaded_file:
 
     /* Đưa các class này ra ngoài table để chúng có hiệu lực */
     .top-row {{ 
-        font-size: 20px !important; 
+        font-size: 15px !important; 
         font-weight: bold !important; 
         line-height: 1 !important; 
     }}
 
     .bottom-row {{ 
-        font-size: 20px !important; 
+        font-size: 15px !important; 
         line-height: 1 !important; 
         margin-top: 2px !important;
     }}
