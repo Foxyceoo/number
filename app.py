@@ -111,11 +111,14 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     total_height = (len(all_khuong_html) * 60) + 100 
     
     # 2. Sử dụng scrolling=False để ẩn thanh cuộn nội bộ
-    # Đảm bảo đoạn này sát lề trái, không thụt vào trong
-    st.markdown(f"<html><head>{style}</head><body>{display_html}</body></html>", unsafe_allow_html=True)
+    components.html(
+        f"<html><head>{style}</head><body>{display_html}</body></html>", 
+        height=total_height, 
+        scrolling=False
+    )
 
     # NÚT IN PDF
-    # Đoạn này cũng phải căn thẳng lề với st.markdown ở trên
+    # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
     st.markdown("""
     <style>
         @media print {
@@ -124,8 +127,10 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         .print-btn {
             display: inline-block;
             padding: 0.5em 1em;
-            background-color: #ffcbcc;
-            color: #00008c;
+            /* CHỈNH 2 DÒNG DƯỚI ĐÂY LÀ ĐƯỢC */
+            background-color: #ffcbcc; /* Màu nền mới */
+            color: #00008c;             /* Màu chữ mới */
+            /* ----------------------------- */
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
