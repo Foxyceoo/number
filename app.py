@@ -1,6 +1,6 @@
 import streamlit as st
 import json
-import streamlit.components.v1 as components # Thêm thư viện này
+import streamlit.components.v1 as components
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
@@ -11,8 +11,10 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
+    # Tính độ dài 1 phách (ms)
     beat_duration = 60000 / bpm / 4 
     
+    # Gom nốt theo phách
     time_map = {}
     for n in notes:
         beat_idx = round(n['time'] / beat_duration)
@@ -22,28 +24,37 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     
     st.subheader(f"Nhạc phổ (BPM: {bpm}) - Nhịp 4/4")
     
-    html_content = "<table style='border-collapse: collapse; text-align: center; font-size: 10px; width: 100%;'>"
+    # Xây dựng bảng HTML
+    html_content = """
+    <style>
+        table { border-collapse: collapse; text-align: center; font-size: 16px; color: white; width: 100%; border: 1px solid #555; background-color: #0e1117; }
+        td { border-bottom: 1px solid #555; height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; }
+    </style>
+    <table>
+    """
     
+    # Chia mỗi khuông là 16 phách (4 nhịp x 4 phách)
     for khuong in range(0, max_beat + 16, 16):
         html_content += "<tr>"
         for phach in range(khuong, khuong + 16):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
-            border_right = "1px solid #ccc"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #555"
-            if (phach + 1) % 16 == 0: border_right = "4px solid black"
+            # Cấu hình vạch kẻ
+            border_right = "1px solid #555"
+            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa" # Vạch nhịp
+            if (phach + 1) % 16 == 0: border_right = "4px solid white" # Vạch khuông
             
-            # Xử lý nội dung hiển thị an toàn
+            # Xử lý nội dung hiển thị (xếp dọc nốt phụ)
             cell_content = ""
             if vals:
                 cell_content = f"{vals[0]}"
                 if len(vals) > 1:
                     cell_content += "<br>" + "<br>".join(map(str, vals[1:]))
             
-            html_content += f"<td style='border-right: {border_right}; border-bottom: 1px solid #ccc; width: 30px; height: 50px; vertical-align: top;'>{cell_content}</td>"
+            html_content += f"<td style='border-right: {border_right};'>{cell_content}</td>"
         html_content += "</tr>"
         
     html_content += "</table>"
     
-    # Dùng components.html để nhúng trực tiếp, tránh lỗi st.markdown
-    components.html(f"<html><body>{html_content}</body></html>", height=500, scrolling=True)
+    # Nhúng vào Streamlit
+    components.html(f"<html><body>{html_content}</body></html>", height=600, scrolling=True)
