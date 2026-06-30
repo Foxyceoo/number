@@ -59,8 +59,8 @@ if uploaded_file:
 
     td {{ 
         height: 50px !important; 
-        width: 27px !important;
-        min-width: 27px !important;
+        width: 25px !important;
+        min-width: 25px !important;
         vertical-align: top !important; 
         padding: 0; 
         font-weight: bold; 
