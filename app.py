@@ -156,6 +156,9 @@ if uploaded_file:
     # GHÉP HTML VÀ CHÈN DẤU NGẮT TRANG
     display_html = f"<h1 style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>{song_name}</h1>"
 
+    # 1. Định nghĩa số khuông mỗi trang trước khi dùng
+    khuong_moi_trang = 8
+    
     # Thay vì nhóm cố định 8 khuông, bạn hãy thêm class vào mỗi khuông
     display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
 
