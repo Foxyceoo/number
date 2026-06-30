@@ -64,8 +64,14 @@ if uploaded_file :
     
     /* Style cho in PDF */
     @media print {
-        .page-break { page-break-after: always; }
-    }
+            .page-break { 
+                page-break-after: always !important; 
+                break-after: page !important;
+                display: block;
+                height: 0;
+            }
+            .print-btn, .sidebar, header { display: none !important; }
+        }
 </style>
     """
 
@@ -101,15 +107,17 @@ if uploaded_file :
         line_number += 2
 
     # Thay bằng dòng này:
-    # Cập nhật đoạn này với f-string và các biến đã khai báo
-    display_html = f"""
-    <h1 style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>
-        {song_name}
-    </h1>
-    """ + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
-
-    for i in range(8, len(all_khuong_html), 10):
-        display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
+    # 2. GHÉP HTML VÀ CHÈN DẤU NGẮT TRANG (Thay thế đoạn display_html cũ)
+    display_html = f"<h1 style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>{song_name}</h1>"
+    
+    # Định nghĩa số khuông mỗi trang (ví dụ: mỗi trang 8 khuông)
+    khuong_moi_trang = 8
+    
+    for i in range(0, len(all_khuong_html), khuong_moi_trang):
+        # Lấy một cụm khuông nhạc
+        cum_khuong = all_khuong_html[i : i + khuong_moi_trang]
+        # Nối các bảng lại và thêm thẻ ngắt trang
+        display_html += "".join(cum_khuong) + "<div class='page-break'></div>"
 
     # 1. Tính chiều cao động dựa trên tổng số dòng (all_khuong_html)
     # Mỗi dòng cao 60px (theo CSS của bạn) + một chút khoảng đệm
