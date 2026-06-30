@@ -90,7 +90,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
 
     # Nút Tải về PDF dùng FPDF
-    if st.button("Tải về PDF"):
+if st.button("Tải về PDF"):
     # Tạo file PDF
     pdf_filename = f"{song_name}.pdf"
     doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
