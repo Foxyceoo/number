@@ -90,7 +90,19 @@ if uploaded_file:
         #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
         .styles_viewerBadge__1yB5_ {{{{ 
             display: none !important; 
-        }}}}
+            
+        /* Ép ngắt trang sau mỗi phần tử chứa khuông nhạc */
+        .page-break {{
+            page-break-after: always !important; /* Dùng cho trình duyệt cũ */
+            break-after: page !important;        /* Dùng cho trình duyệt hiện đại */
+        }}
+        
+        /* Đảm bảo các bảng không bị cắt ngang giữa chừng */
+        table {{
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            
+        }}}}}
     }}}}
     </style>
     """
@@ -144,12 +156,16 @@ if uploaded_file:
     # GHÉP HTML VÀ CHÈN DẤU NGẮT TRANG
     display_html = f"<h1 style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>{song_name}</h1>"
 
-    # Định nghĩa số khuông mỗi trang (ví dụ: mỗi trang 8 khuông)
-    khuong_moi_trang = 8
+    # Thay vì nhóm cố định 8 khuông, bạn hãy thêm class vào mỗi khuông
+    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
 
-    for i in range(0, len(all_khuong_html), khuong_moi_trang):
-        cum_khuong = all_khuong_html[i : i + khuong_moi_trang]
-        display_html += "".join(cum_khuong) + "<div class='page-break'></div>"
+    for i, khuong_html in enumerate(all_khuong_html):
+        # Thêm class 'page-break' vào mỗi khuông nếu muốn sau mỗi khuông là 1 trang
+        # Hoặc chỉ thêm sau mỗi N khuông như cũ
+        if (i + 1) % khuong_moi_trang == 0:
+            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div><div class='page-break'></div>"
+        else:
+            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
     # --- ĐÂY LÀ ĐOẠN ĐÃ SỬA ---
     # Kết hợp style và nội dung vào biến html_to_render
