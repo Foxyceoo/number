@@ -128,10 +128,10 @@ if uploaded_file:
 
             # Vạch đậm nhất mỗi 16 phách
             if (phach + 1) % 16 == 0:
-                border_right = "1.5px solid #00008c"
+                border_right = "2px solid #00008c"
 
             # Vạch bên trái khuông nhạc
-            border_left = "1.5px solid #00008c" if phach == khuong else "none"
+            border_left = "2px solid #00008c" if phach == khuong else "none"
             # ------------------------
 
             # Trong vòng lặp tạo cell_content:
