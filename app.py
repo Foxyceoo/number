@@ -12,7 +12,7 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     notes = data[0].get("songNotes", [])
     
     # Nhân hệ số * 4 để nốt dàn đều theo nhịp 4/4
-    beat_duration = 60000 / bpm / 4 
+    beat_duration = 60000 / bpm * 4
     
     time_map = {}
     for n in notes:
