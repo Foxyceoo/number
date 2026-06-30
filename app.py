@@ -53,7 +53,7 @@ if uploaded_file :
         min-height: 50px !important;
         max-height: 50px !important;
         
-        vertical-align: middle;     /* Căn giữa số theo chiều dọc để cân đối */
+        vertical-align: top !important;   /* Luôn giữ nội dung ở đỉnh ô */
         padding: 0;                 /* Bỏ padding để không làm đẩy ô */
         
         font-weight: bold; 
