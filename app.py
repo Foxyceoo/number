@@ -54,8 +54,16 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     <script>
         function adjustTheme() {
             const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.body.style.color = isDarkMode ? '#FFFFFF' : '#000000';
+            const textColor = isDarkMode ? '#FFFFFF' : '#000000';
+            
+            document.body.style.color = textColor;
             document.body.style.backgroundColor = 'transparent';
+            
+            // Dòng này sẽ tìm tất cả các ô trong bảng và cập nhật màu cho chúng
+            const cells = document.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.style.color = textColor;
+            });
         }
         window.onload = adjustTheme;
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
