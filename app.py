@@ -128,7 +128,7 @@ if uploaded_file:
 
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0:
-                border_right = "2px solid #ff0000"
+                border_right = "2px solid #00008c"
 
             # Vạch đậm nhất mỗi 16 phách
             if (phach + 1) % 16 == 0:
