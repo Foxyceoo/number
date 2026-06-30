@@ -37,21 +37,16 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
-            # Cấu hình vạch kẻ (vẫn giữ logic vạch nhịp mỗi 4 phách)
+            # Cấu hình vạch kẻ
             border_right = "1px solid #555"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
-            if (phach + 1) % 32 == 0: border_right = "4px solid white" # Vạch khuông tại 32
             
-            border_left = "2px solid #aaa" if phach == khuong else "none"
+            # Vạch nhịp bình thường
+            if (phach + 1) % 4 == 0: 
+                border_right = "2px solid #aaa" 
             
-            cell_content = ""
-            if vals:
-                cell_content = f"{vals[0]}"
-                if len(vals) > 1:
-                    cell_content += "<br>" + "<br>".join(map(str, vals[1:]))
+            # Vạch ngăn cách khuông (vạch cuối) - Đổi màu tại đây
+            if (phach + 1) % 32 == 0: 
+                border_right = "4px solid #f1c40f" # Màu vàng cho vạch cuối
             
-            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
-        html_content += "</tr></table>"
-        all_html += html_content
-    
-    components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
+            # Vạch bắt đầu khuông (vạch đầu) - Đổi màu tại đây
+            border_left = "2px solid #f1c40f" if phach == khuong else "none" # Màu vàng cho vạch đầu
