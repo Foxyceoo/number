@@ -182,16 +182,16 @@ if uploaded_file:
     html_to_render = f"""
     <html>
         <head>
-            {style}
+            {{style}}
             <style>
-                /* Ẩn các thành phần giao diện của Streamlit khi nằm trong iframe */
+                /* Dùng {{ và }} để thoát lệnh f-string */
                 #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
-                .styles_viewerBadge__1yB5_, div[data-testid="stDecoration"] { 
+                .styles_viewerBadge__1yB5_, div[data-testid="stDecoration"] {{ 
                     display: none !important; 
-                }
+                }}
             </style>
         </head>
-        <body>{display_html}</body>
+        <body>{{display_html}}</body>
     </html>
     """
 
