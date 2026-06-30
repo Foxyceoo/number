@@ -52,37 +52,33 @@ if uploaded_file:
         border-collapse: collapse; 
         text-align: center; 
         font-size: 16px; 
-        
-        /* Ép bảng dùng layout cố định, không được phép thay đổi */
-        table-layout: fixed !important; 
-        
-        /* Dùng chiều rộng cố định bằng px thay vì % */
-        width: 1000px !important; 
-        min-width: 1000px !important;
-        max-width: 1000px !important;
-        
-        margin: 0 auto 20px auto !important; 
+        table-layout: fixed;
+        width: {margin_side}; 
+        margin: 0 auto 30px auto; 
+        color: inherit; 
+        /* Thêm chiều cao mặc định cho cả bảng khuông nhạc */
         height: 80px !important;
-        min-height: 80px !important;
-        max-height: 80px !important;
     }}
 
     td {{ 
-        padding: 0 !important;
-        
-        /* Khóa cứng kích thước ô */
-        width: 30px !important; 
-        min-width: 30px !important;
-        max-width: 30px !important;
-        
+        padding-top: 0px !important;     
+
+        /* Thiết lập chiều cao tối thiểu 40px */
         height: 40px !important;
         min-height: 40px !important;
-        max-height: 40px !important;
+        height: 40px !important;
         
-        vertical-align: top !important;
-        border-right: 1px solid #555 !important; 
-        border-left: none !important;
-        overflow: hidden !important;
+        /* QUAN TRỌNG: Ép độ rộng cố định */
+        width: 20px !important;       /* Thay đổi số này theo ý bạn */
+        min-width: 20px !important;
+        max-width: 20px !important;
+        
+        vertical-align: top !important; /* Vẫn giữ căn lề trên */
+        font-weight: bold; 
+        border-right: 1px solid #555; 
+        border-left: none;
+        overflow: hidden;
+        line-height: 1.5; 
         
     }}
 
@@ -128,7 +124,7 @@ if uploaded_file:
 
             # --- CẤU HÌNH VẠCH KẺ ---
             # Vạch mặc định cho mỗi phách
-            border_right = "0.5px solid #d8d8d8"
+            border_right = "0.1px solid #d8d8d8"
 
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0:
