@@ -27,8 +27,8 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     # Xây dựng bảng HTML
     html_content = """
     <style>
-        table { border-collapse: collapse; text-align: center; font-size: 16px; color: white; width: 100%; border: 1px solid #555; background-color: #0e1117; }
-        td { border-bottom: 1px solid #555; height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; }
+        table { border-collapse: collapse; text-align: center; font-size: 16px; color: white; width: 100%; background-color: #0e1117; }
+        td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; }
     </style>
     <table>
     """
