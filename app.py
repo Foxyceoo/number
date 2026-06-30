@@ -67,7 +67,7 @@ if uploaded_file:
     }}
 
     .bottom-row {{ 
-        font-size: 14px !important; 
+        font-size: 16px !important; 
         line-height: 1 !important; 
         margin-top: 2px !important;
     }}
