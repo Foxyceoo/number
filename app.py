@@ -93,7 +93,7 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         line_number += 2
 
     # Thay bằng dòng này:
-    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>" + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
+    display_html = f"<h1 style='text-align: center; margin-top: 40px; margin-bottom: 40px;'>{song_name}</h1>" + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
     for i in range(8, len(all_khuong_html), 10):
         display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
