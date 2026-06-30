@@ -11,15 +11,14 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    # Sử dụng * 4 như bạn đã xác nhận là chạy đúng với nhạc phổ của bạn
-    beat_duration = 60000 / bpm /2
+    # Sử dụng logic mới: beat_duration không chia 4, kết hợp với hiển thị 32 phách
+    beat_duration = 60000 / bpm 
     
     time_map = {}
     for n in notes:
         beat_idx = round(n['time'] / beat_duration)
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     
-    # Phải tính max_beat TRƯỚC khi dùng nó trong vòng lặp
     max_beat = max(time_map.keys()) if time_map else 0
     
     st.subheader(f"Nhạc phổ (BPM: {bpm}) - Nhịp 4/4")
@@ -32,15 +31,16 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     """
     
     all_html = style
-    # Vòng lặp khuông chuẩn (mỗi khuông 16 phách)
-    for khuong in range(0, max_beat + 16, 16):
+    # Hiển thị 32 phách mỗi khuông để nốt không bị nhảy dòng
+    for khuong in range(0, max_beat + 32, 32):
         html_content = "<table><tr>"
-        for phach in range(khuong, khuong + 16):
+        for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
+            # Cấu hình vạch kẻ (vẫn giữ logic vạch nhịp mỗi 4 phách)
             border_right = "1px solid #555"
             if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
-            if (phach + 1) % 16 == 0: border_right = "4px solid white"
+            if (phach + 1) % 32 == 0: border_right = "4px solid white" # Vạch khuông tại 32
             
             border_left = "2px solid #aaa" if phach == khuong else "none"
             
