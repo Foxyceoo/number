@@ -190,4 +190,24 @@ if uploaded_file:
 
     components.html(html_to_render, height=960, scrolling=True)
 
-   
+    # NÚT IN PDF
+    st.markdown("""
+    <style>
+        @media print {
+            .print-btn { display: none !important; }
+        }
+        .print-btn {
+            display: inline-block;
+            padding: 0.5em 1em;
+            background-color: #ffcbcc; /* Màu nền mới */
+            color: #00008c;            /* Màu chữ mới */
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            margin-top: 20px;
+        }
+    </style>
+    <a href="#" class="print-btn" onclick="window.print(); return false;">Mở bảng in</a>
+    """, unsafe_allow_html=True)
