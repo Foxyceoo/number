@@ -111,10 +111,16 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     total_height = (len(all_khuong_html) * 60) + 100 
     
     # 2. Sử dụng scrolling=False để ẩn thanh cuộn nội bộ
+    # 1. Tính chiều cao động dựa trên tổng số dòng (all_khuong_html)
+    # 60px là height của td, 50px là margin-bottom của table, 100px là khoảng đệm an toàn
+    total_height = (len(all_khuong_html) * (60 + 50)) + 200 
+    
+    # 2. Sử dụng scrolling=True để nội dung cuộn bên trong iframe
+    # Lưu ý: In PDF từ iframe yêu cầu iframe phải đủ cao để trình duyệt thấy nội dung
     components.html(
         f"<html><head>{style}</head><body>{display_html}</body></html>", 
         height=total_height, 
-        scrolling=False
+        scrolling=True
     )
 
     # NÚT IN PDF
