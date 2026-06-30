@@ -23,19 +23,29 @@ if uploaded_file is not None:
         html = "<table style='width:100%; border-collapse: collapse; text-align: center; table-layout: fixed; margin-bottom: 30px;'>"
         
         # Hàng hiển thị nốt (chia làm 2 dòng: trên > 7, dưới <= 7)
+        # Hàng hiển thị nốt (chia làm 2 dòng: trên > 7, dưới <= 7)
         for row_idx in range(2): 
             html += "<tr>"
             for group in chunk:
                 vals = [str(get_number_from_key(n['key'])) for n in group]
                 filtered = [v for v in vals if (int(v) > 7 if row_idx == 0 else int(v) <= 7)]
                 
-                # Vẽ vạch kẻ nhịp (giả sử mỗi 4 cột là 1 nhịp)
+                # Vẽ vạch kẻ nhịp (mỗi 4 cột là 1 nhịp)
                 border_right = "1px solid #eee"
+                # Cần dùng chỉ số thực tế trong danh sách gốc để kiểm tra vạch nhịp
                 if (chunk.index(group) + 1) % 4 == 0:
                     border_right = "2px solid black"
+                
+                # Cấu hình style: chữ nhỏ, padding ít, chiều cao thấp
+                cell_style = (
+                    f"border-right: {border_right}; "
+                    f"border-bottom: 1px solid #ddd; "
+                    f"height: 25px; "
+                    f"width: 2.8%; "
+                    f"font-size: 10px; "
+                    f"padding: 1px; "
+                    f"line-height: 1;"
+                )
                     
-                html += f"<td style='border-right: {border_right}; border-bottom: 1px solid #ddd; height: 35px; width: 2.8%;'>{ ' '.join(filtered) }</td>"
+                html += f"<td style='{cell_style}'>{ ' '.join(filtered) }</td>"
             html += "</tr>"
-        
-        html += "</table>"
-        st.markdown(html, unsafe_allow_html=True)
