@@ -61,6 +61,10 @@ if uploaded_file:
     td {{ 
         padding-top: 2px !important;    
         padding-bottom: 2px !important; 
+
+        /* Thiết lập chiều cao tối thiểu 50px */
+        min-height: 50px !important;
+        height: 50px !important;
         
         width: 25px !important;
         min-width: 25px !important;
