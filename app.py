@@ -22,23 +22,17 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
         if m_idx not in measures: measures[m_idx] = []
         measures[m_idx].append(n)
 
-    # Hiển thị 2 Khuông trên 1 hàng (mỗi khuông 4 nhịp)
-    sorted_m = sorted(measures.keys())
-    for i in range(0, len(sorted_m), 8): # Mỗi hàng 8 nhịp (2 khuông x 4 nhịp)
-        # Tạo hàng chứa 2 khuông
-        row = st.columns(2)
-        for col_idx in range(2):
-            with row[col_idx]:
-                st.subheader(f"Khuông {(i // 8) * 2 + col_idx + 1}")
-                # Hiển thị 4 nhịp của khuông này
-                cols_measure = st.columns(4)
-                for m_offset in range(4):
-                    m_idx = i + col_idx * 4 + m_offset
-                    if m_idx in measures:
-                        with cols_measure[m_offset]:
-                            # Hiển thị các nốt trong nhịp theo hàng dọc
-                            st.markdown("<div style='border-left: 1px solid #555; padding-left: 5px;'>", unsafe_allow_html=True)
-                            for time_val, group in groupby(measures[m_idx], key=lambda x: x['time']):
-                                n_vals = " ".join([str(get_number_from_key(n['key'])) for n in group])
-                                st.markdown(f"**{n_vals}**")
-                            st.markdown("</div>", unsafe_allow_html=True)
+    # Thay đoạn hiển thị trong vòng lặp nhịp bằng đoạn này:
+
+    # Giả sử trong một nhịp, các nốt được chia thành 2 dòng (dòng 1: nốt cao, dòng 2: nốt thấp)
+    # Bạn cần một logic phân loại nốt vào dòng 1 hoặc dòng 2 dựa trên cao độ (ví dụ nốt > 7 là dòng 1)
+    
+    st.markdown("<div style='display: flex; gap: 20px; border-left: 2px solid #555; padding-left: 10px;'>", unsafe_allow_html=True)
+    
+    row1 = [str(get_number_from_key(n['key'])) for n in group if get_number_from_key(n['key']) > 7]
+    row2 = [str(get_number_from_key(n['key'])) for n in group if get_number_from_key(n['key']) <= 7]
+    
+    st.markdown(f"<div>{' '.join(row1)}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div>{' '.join(row2)}</div>", unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
