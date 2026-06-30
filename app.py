@@ -26,9 +26,11 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     
     max_beat = max(time_map.keys()) if time_map else 0
+    # ... (các đoạn code xử lý dữ liệu ở trên vẫn giữ nguyên) ...
+    
     st.markdown(f"<h2 style='text-align: center;'>{song_name}</h2>", unsafe_allow_html=True)
     
-    # CSS và JS cho giao diện web (giữ nguyên của bạn)
+    # 1. Đoạn CSS và JS hiển thị bảng trên web
     style = """
     <style>
         table { border-collapse: collapse; text-align: center; font-size: 16px; width: 100%; margin-bottom: 40px; color: inherit; }
@@ -45,6 +47,22 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
     </script>
     """
+    
+    # 2. Vòng lặp hiển thị bảng trên web (CÁI NÀY BẠN ĐANG BỊ THIẾU NÈ)
+    all_html = style
+    for khuong in range(0, max_beat + 32, 32):
+        html_content = "<div class='khuong-nhac'><table><tr>"
+        for phach in range(khuong, khuong + 32):
+            vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
+            cell_content = "<br>".join(map(str, vals)) if vals else ""
+            html_content += f"<td>{cell_content}</td>"
+        html_content += "</tr></table></div>"
+        all_html += html_content
+    components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
+
+    # 3. Nút Tải về PDF
+    if st.button("Tải về PDF (Bảng đẹp)"):
+        # ... (đoạn code reportlab của bạn ở đây) ...
     
     # [Phần hiển thị web của bạn giữ nguyên ở đây...]
     # (Đảm bảo bạn vẫn để đoạn vòng lặp `for khuong...` và `components.html` tại đây)
