@@ -10,10 +10,8 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    # Tính độ dài 1 phách (ms)
     beat_duration = 60000 / bpm / 4 
     
-    # Tạo map nốt theo phách (round để khớp sai số)
     time_map = {}
     for n in notes:
         beat_idx = round(n['time'] / beat_duration)
@@ -24,21 +22,26 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     
     st.subheader(f"Nhạc phổ (BPM: {bpm}) - Nhịp 4/4")
     
-    # Duyệt qua từng phách từ 0 đến max_beat
     html = "<table style='border-collapse: collapse; text-align: center; font-size: 10px;'>"
     
-    # Chia mỗi khuông là 16 phách
     for khuong in range(0, max_beat + 16, 16):
         html += "<tr>"
         for phach in range(khuong, khuong + 16):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
-            # Phân biệt vạch nhịp (sau mỗi 4 phách)
             border_right = "1px solid #ccc"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #555" # Vạch nhịp
-            if (phach + 1) % 16 == 0: border_right = "4px solid black" # Vạch kết khuông
+            if (phach + 1) % 4 == 0: border_right = "2px solid #555"
+            if (phach + 1) % 16 == 0: border_right = "4px solid black"
             
-            content = f"{vals[0]}<br>{'<br>'.join(map(str, vals[1:]))}" if vals else ""
+            # SỬA LỖI Ở ĐÂY: Kiểm tra kỹ vals trước khi truy cập chỉ số
+            if vals:
+                nots_str = f"{vals[0]}"
+                if len(vals) > 1:
+                    nots_str += "<br>" + "<br>".join(map(str, vals[1:]))
+                content = nots_str
+            else:
+                content = ""
+            
             html += f"<td style='border-right: {border_right}; border-bottom: 1px solid #ccc; width: 30px; height: 50px; vertical-align: top;'>{content}</td>"
         html += "</tr>"
         
