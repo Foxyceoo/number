@@ -156,7 +156,7 @@ if uploaded_file:
     # Bỏ đoạn code cũ và thay bằng đoạn này ngay dưới dòng components.html
     
     # Nút in dùng chính chức năng của Streamlit
-    if st.button("🖨️ In bản nhạc"):
+    if st.button("to PDF"):
         # Sử dụng Javascript để kích hoạt in từ cửa sổ chính (không phải từ iframe)
         js_code = """
         <script>
