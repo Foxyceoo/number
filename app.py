@@ -64,9 +64,9 @@ if uploaded_file:
         padding-top: 0px !important;     
 
         /* Thiết lập chiều cao tối thiểu 40px */
-        height: 40px !important;
-        min-height: 40px !important;
-        height: 40px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        height: 35px !important;
         
         /* QUAN TRỌNG: Ép độ rộng cố định */
         width: 20px !important;       /* Thay đổi số này theo ý bạn */
