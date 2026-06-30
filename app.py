@@ -185,8 +185,13 @@ if uploaded_file:
     # Kết hợp style và nội dung vào biến html_to_render
     html_to_render = style + display_html
 
-    # Tính chiều cao động
-    total_height = (len(all_khuong_html) * 110) + 150
+    # Sửa lại công thức tính toán chiều cao cho khớp với 50px
+    # Nếu mỗi khuông là 50px và margin-bottom là 30px như trong CSS:
+    row_height = 50 + 30 
+    total_height = (len(all_khuong_html) * row_height) + 150
+
+    # Và trong vòng lặp tính current_page_height, cũng phải sửa:
+    khuong_height = 80 # (50px table + 30px margin)
 
     # Gọi component với chiều cao đã tính, scrolling=False như bạn muốn
     components.html(html_to_render, height=total_height, scrolling=False)
