@@ -22,23 +22,29 @@ if uploaded_file is not None:
         
         for row_idx in range(2): 
             html += "<tr>"
-            # Dùng enumerate(chunk) để lấy index chính xác cho vạch kẻ nhịp
             for col_idx, group in enumerate(chunk):
-                # Thay đoạn xử lý nốt trong vòng lặp bằng đoạn này:
-            
-            vals = sorted([get_number_from_key(n['key']) for n in group], reverse=True)
-            
-            # Gán nốt đầu tiên (số to nhất) vào hàng 0, các nốt còn lại vào hàng 1
-            row1_val = str(vals[0]) if len(vals) > 0 else ""
-            row2_val = " ".join([str(v) for v in vals[1:]]) if len(vals) > 1 else ""
-            
-            # Nếu là row_idx 0 thì hiển thị row1_val, row_idx 1 hiển thị row2_val
-            content = row1_val if row_idx == 0 else row2_val
-            
-            # Vẽ vạch kẻ nhịp (giữ nguyên logic của bạn)
-            border_right = "1px solid #eee"
-            if (col_idx + 1) % 4 == 0:
-                border_right = "2px solid black"
+                # Lấy tất cả số trong nhóm và sắp xếp từ lớn đến bé
+                vals = sorted([get_number_from_key(n['key']) for n in group], reverse=True, key=lambda x: int(x) if x != "" else 0)
                 
-            cell_style = "border-right: {border_right}; border-bottom: 1px solid #ddd; height: 25px; width: 2.8%; font-size: 10px; padding: 1px; line-height: 1;"
-            html += f"<td style='{cell_style}'>{content}</td>"
+                # Hàng 0: chỉ lấy số to nhất. Hàng 1: lấy các số còn lại.
+                if row_idx == 0:
+                    content = str(vals[0]) if len(vals) > 0 else ""
+                else:
+                    content = " ".join([str(v) for v in vals[1:]]) if len(vals) > 1 else ""
+                
+                # Vẽ vạch kẻ nhịp (mỗi 4 cột là 1 nhịp)
+                border_right = "1px solid #eee"
+                if (col_idx + 1) % 4 == 0:
+                    border_right = "2px solid black"
+                
+                cell_style = (
+                    f"border-right: {border_right}; "
+                    f"border-bottom: 1px solid #ddd; "
+                    f"height: 25px; width: 2.8%; "
+                    f"font-size: 10px; padding: 1px; line-height: 1;"
+                )
+                html += f"<td style='{cell_style}'>{content}</td>"
+            html += "</tr>"
+        
+        html += "</table>"
+        st.markdown(html, unsafe_allow_html=True)
