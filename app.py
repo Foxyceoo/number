@@ -129,7 +129,13 @@ if uploaded_file :
     total_height = (len(all_khuong_html) * (60 + 50)) + 200 
     
     # 2. Sử dụng scrolling=True để nội dung cuộn bên trong iframe
-    # Lưu ý: In PDF từ iframe yêu cầu iframe phải đủ cao để trình duyệt thấy nội dung
+    # 1. TÍNH CHIỀU CAO ĐỘNG (Dựa trên số lượng khuông nhạc)
+    # 60px là chiều cao mỗi khuông, 50px là margin, + 300px khoảng đệm an toàn
+    total_height = (len(all_khuong_html) * 110) + 300 
+    
+    # 2. HIỂN THỊ VỚI THANH CUỘN
+    # scrolling=True sẽ giúp bạn cuộn xem bản nhạc dài, 
+    # và khi bạn cuộn đến đâu, in đến đó sẽ rất tiện!
     components.html(
         f"<html><head>{style}</head><body>{display_html}</body></html>", 
         height=total_height, 
