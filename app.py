@@ -98,10 +98,7 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
     # HIỂN THỊ
-    # Tính chiều cao dựa trên số phách: mỗi dòng có 32 phách, mỗi phách cao ~60px
-    # Thêm một chút khoảng trống (ví dụ 100px) để không bị sát mép
-    calculated_height = ((max_beat // 32) + 1) * 60 + 100
-    components.html(f"<html><body>{all_html}</body></html>", height=calculated_height, scrolling=False)
+    components.html(f"<html><head>{style}</head><body>{display_html}</body></html>", height=1000, scrolling=True)
 
     # NÚT IN PDF
     if st.button("🖨️ Mở bảng in (Để lưu PDF)"):
