@@ -32,7 +32,6 @@ if uploaded_file is not None:
         # Nhóm theo thời điểm (time) bên trong nhịp
         measure_notes = sorted(measures[m_idx], key=lambda x: x['time'])
         
-        # Bắt đầu container cho nhịp
         st.markdown("<div style='border-left: 2px solid #555; padding-left: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
         
         for time_val, group in groupby(measure_notes, key=lambda x: x['time']):
@@ -42,18 +41,11 @@ if uploaded_file is not None:
             row1_vals = [str(get_number_from_key(n['key'])) for n in notes_at_time if get_number_from_key(n['key']) > 7]
             row2_vals = [str(get_number_from_key(n['key'])) for n in notes_at_time if get_number_from_key(n['key']) <= 7]
             
-            # Dùng cột để dàn hàng ngang
-            # Giả sử tối đa 10 nốt trong 1 dòng
-            cols = st.columns(10)
-            
-            # Hiển thị hàng 1
-            for i, val in enumerate(row1_vals):
-                with cols[i]:
-                    st.write(val)
-            # Hiển thị hàng 2
-            for i, val in enumerate(row2_vals):
-                with cols[i]:
-                    st.write(val)
+            # Gộp các nốt lại thành một chuỗi duy nhất để hiển thị trên cùng một dòng
+            if row1_vals:
+                st.markdown(f"**{' '.join(row1_vals)}**")
+            if row2_vals:
+                st.markdown(f"**{' '.join(row2_vals)}**")
             
             st.markdown("<hr style='margin: 5px 0;'>", unsafe_allow_html=True)
             
