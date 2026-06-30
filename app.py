@@ -51,7 +51,7 @@ if uploaded_file:
 
     td {{ 
         padding: 0 !important; 
-        height: 70px !important; 
+        height: 75px !important; 
         width: 20px !important; 
         vertical-align: top !important; 
         border-right: 1px solid #555; 
