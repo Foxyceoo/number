@@ -90,29 +90,36 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
 
     # 3. KHU VỰC XUẤT FILE PDF
     # Tự động tạo file và hiển thị nút tải về ngay khi có dữ liệu
-    pdf_filename = f"{song_name}.pdf"
-    doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
+    if st.button("Tải về PDF (Bản chuẩn lưới)"):
+        pdf_filename = f"{song_name}.pdf"
+        doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
     
-    # Chuẩn bị dữ liệu dạng bảng cho ReportLab
-    table_data = [["Phách", "Nốt"]]
-    for phach, notes_list in time_map.items():
-        table_data.append([str(phach), ", ".join(map(str, notes_list))])
+        # Tạo dữ liệu: Chia theo từng khuông 32 phách giống web
+        # Ta sẽ tạo một list các dòng, mỗi dòng là một phách
+        table_data = [["Phách", "Nốt"]]
+        for phach, notes_list in time_map.items():
+            table_data.append([str(phach), ", ".join(map(str, notes_list))])
     
-    # Thiết lập giao diện bảng PDF
-    t = Table(table_data)
-    t.setStyle(TableStyle([
-        ('GRID', (0,0), (-1,-1), 0.5, colors.grey), # Kẻ lưới mờ hơn cho sang
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'), # In đậm tiêu đề
-    ]))
+        # Thiết lập bảng với đường kẻ dọc (giống lưới web)
+        t = Table(table_data, colWidths=[50, 300]) # Cột phách 50, cột nốt 300
     
-    doc.build([t])
+        style_list = [
+            ('GRID', (0,0), (-1,-1), 0.5, colors.grey), # Kẻ lưới toàn bộ
+            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.lightgrey), # Kẻ dọc mờ
+            ('BOX', (0,0), (-1,-1), 2, colors.black), # Khung ngoài đậm
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ]
     
-    # Nút tải file
-    with open(pdf_filename, "rb") as f:
-        st.download_button(
-            label="Tải file PDF", 
-            data=f, 
-            file_name=pdf_filename, 
-            mime="application/pdf"
-        )
+        # Thêm logic kẻ dọc đậm mỗi 4 phách hoặc 16 phách nếu muốn (giống web)
+        # Ví dụ: Kẻ đậm cột mỗi 4 phách
+        for i in range(len(table_data)):
+            if i % 4 == 0: 
+                style_list.append(('LINEBELOW', (0,i), (-1,i), 1, colors.black))
+            
+        t.setStyle(TableStyle(style_list))
+
+        doc.build([t])
+    
+        with open(pdf_filename, "rb") as f:
+            st.download_button("Tải PDF", f, file_name=pdf_filename, mime="application/pdf")
