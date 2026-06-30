@@ -31,19 +31,27 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     # CSS và JS để tự đổi màu theo theme
     style = """
     <style>
-        table { border-collapse: collapse; text-align: center; font-size: 16px; width: 100%; margin-bottom: 40px; color: inherit; }
-        td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; border: 1px solid #555; }
-    </style>
-    <script>
-        // Tự động kiểm tra màu nền của Streamlit để đổi màu chữ cho khớp
-        function adjustTheme() {
-            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.body.style.color = isDarkMode ? '#FFFFFF' : '#000000';
-            document.body.style.backgroundColor = 'transparent';
+        table { 
+            border-collapse: collapse; 
+            text-align: center; 
+            font-size: 16px; 
+            width: 100%; 
+            margin-bottom: 40px; 
+            color: inherit; 
         }
-        window.onload = adjustTheme;
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
-    </script>
+        td { 
+            height: 60px; 
+            vertical-align: top; 
+            padding-top: 5px; 
+            font-weight: bold; 
+            width: 40px; 
+            /* Chỉ định border trái và phải, bỏ trên và dưới */
+            border-top: none;
+            border-bottom: none;
+            border-right: 1px solid #555;
+            border-left: none;
+        }
+    </style>
     """
     
     all_html = style
