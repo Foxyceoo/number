@@ -52,24 +52,26 @@ if uploaded_file:
         border-collapse: collapse; 
         text-align: center; 
         font-size: 16px; 
-        table-layout: fixed;
+        table-layout: fixed !important; /* Ép layout không co giãn */
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
         color: inherit; 
-        /* Thêm chiều cao mặc định cho cả bảng khuông nhạc */
-        height: 40px !important;
-    }}
+        
+        /* Khóa cứng chiều cao bảng */
+        height: 50px !important; 
+        min-height: 50px !important;
+        max-height: 50px !important;
 
     td {{ 
         padding-top: 0px !important;     
 
-        /* Thiết lập chiều cao tối thiểu 40px */
-        height: 40px !important;
-        min-height: 40px !important;
-        height: 40px !important;
+        /* Khóa cứng chiều cao ô */
+        height: 50px !important;
+        min-height: 50px !important;
+        max-height: 50px !important;
         
-        /* QUAN TRỌNG: Ép độ rộng cố định */
-        width: 20px !important;       /* Thay đổi số này theo ý bạn */
+        /* Ép độ rộng cố định */
+        width: 20px !important; 
         min-width: 20px !important;
         max-width: 20px !important;
         
