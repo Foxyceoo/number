@@ -196,7 +196,7 @@ if uploaded_file:
     </html>
     """
 
-    components.html(html_to_render, height=1123, scrolling=True)
+    components.html(html_to_render, height=1000, scrolling=True)
 
     # NÚT IN PDF
     st.markdown("""
