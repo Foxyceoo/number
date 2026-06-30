@@ -49,7 +49,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             if (phach + 1) % 16 == 0: border_right = "4px solid #f1c40f" # Vạch kết khuông màu vàng
             
             # Vạch đầu khuông màu vàng
-            border_left = "2px solid #f1c40f" if phach == khuong else "none"
+            border_left = "2px solid #00008c" if phach == khuong else "none"
             
             cell_content = ""
             if vals:
