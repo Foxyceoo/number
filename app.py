@@ -61,13 +61,13 @@ if uploaded_file:
     }}
 
     td {{ 
-        padding-top: 2px !important;     
+        padding-top: 0px !important;     
 
         /* Thiết lập chiều cao tối thiểu 40px */
         min-height: 40px !important;
         height: 40px !important;
         
-        * QUAN TRỌNG: Ép độ rộng cố định */
+        /* QUAN TRỌNG: Ép độ rộng cố định */
         width: 50px !important;       /* Thay đổi số này theo ý bạn */
         min-width: 50px !important;
         max-width: 50px !important;
