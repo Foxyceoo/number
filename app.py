@@ -9,13 +9,9 @@ padding_bottom_px = 90
 margin_side = "900px"
 
 def get_number_from_key(key_str):
-    try: 
-        # Thay % 15 thành % 3
-        # Phép tính này sẽ trả về 0, 1, 2. Nếu muốn 1, 2, 3 thì cộng thêm 1.
-        return ((int(key_str.split('Key')[1]) - 1) % 3) + 1
-    except: 
-        return ""
-        
+    try: return (int(key_str.split('Key')[1]) % 15) + 1
+    except: return ""
+
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     st.markdown("---")  # Kẻ vạch ngăn cách cho đẹp
@@ -120,7 +116,7 @@ if uploaded_file:
             # Cập nhật style cho thẻ td với các biến trên
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
         all_khuong_html.append(html_content)
-        line_number += 2
+        line_number += 1
 
     # GHÉP HTML VÀ CHÈN DẤU NGẮT TRANG
     display_html = f"<h1 style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>{song_name}</h1>"
