@@ -1,17 +1,21 @@
 import streamlit as st
 import json
 import streamlit.components.v1 as components
-from fpdf import FPDF
+# Thư viện để vẽ bảng chuyên nghiệp trong PDF
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib import colors
 
 # Cấu hình tên trang
 st.set_page_config(page_title='"Number" one Foxy')
-
 st.title("Bộ chuyển đổi sheet số")
 
+# Hàm lấy số từ key (giữ nguyên logic của bạn)
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
     except: return ""
 
+# 1. KHU VỰC TẢI FILE VÀ XỬ LÝ DỮ LIỆU
 if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     data = json.load(uploaded_file)
     song_name = uploaded_file.name.replace(".json", "")
@@ -28,8 +32,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     
     st.markdown(f"<h2 style='text-align: center;'>{song_name}</h2>", unsafe_allow_html=True)
     
-    # CSS và JS để tự đổi màu theo theme
-    # CSS và JS để tự đổi màu theo theme
+    # 2. KHU VỰC HIỂN THỊ BẢNG TRÊN WEB (CSS & HTML)
     style = """
     <style>
         table { 
@@ -85,27 +88,31 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
 
-    # Nút Tải về PDF dùng FPDF
-    if st.button("Tải về PDF"):
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", 'B', 16)
-        pdf.cell(200, 10, txt=song_name, ln=True, align='C')
-        
-        pdf.set_font("Courier", '', 12)
-        pdf.ln(10) # Khoảng cách dòng
-        
-        # In dữ liệu ra PDF (đơn giản hóa)
-        for phach, notes in time_map.items():
-            line = f"Phach {phach}: {', '.join(map(str, notes))}"
-            pdf.cell(200, 10, txt=line, ln=True)
-            
-        # Xuất PDF dưới dạng byte
-        pdf_output = pdf.output(dest='S').encode('latin-1')
-        
+    # 3. KHU VỰC XUẤT FILE PDF
+    # Tự động tạo file và hiển thị nút tải về ngay khi có dữ liệu
+    pdf_filename = f"{song_name}.pdf"
+    doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
+    
+    # Chuẩn bị dữ liệu dạng bảng cho ReportLab
+    table_data = [["Phách", "Nốt"]]
+    for phach, notes_list in time_map.items():
+        table_data.append([str(phach), ", ".join(map(str, notes_list))])
+    
+    # Thiết lập giao diện bảng PDF
+    t = Table(table_data)
+    t.setStyle(TableStyle([
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey), # Kẻ lưới mờ hơn cho sang
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'), # In đậm tiêu đề
+    ]))
+    
+    doc.build([t])
+    
+    # Nút tải file
+    with open(pdf_filename, "rb") as f:
         st.download_button(
-            label="Tải file PDF (FPDF)",
-            data=pdf_output,
-            file_name=f"{song_name}.pdf",
+            label="Tải file PDF", 
+            data=f, 
+            file_name=pdf_filename, 
             mime="application/pdf"
         )
