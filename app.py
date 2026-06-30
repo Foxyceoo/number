@@ -37,7 +37,8 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             font-size: 16px; 
             width: 100%; 
             margin-bottom: 40px; 
-            color: inherit; 
+            /* Dùng màu xám đậm hoặc trắng tùy vào theme để đảm bảo luôn nổi */
+            color: var(--text-color); 
         }
         td { 
             height: 60px; 
@@ -45,10 +46,11 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             padding-top: 5px; 
             font-weight: bold; 
             width: 40px; 
-            /* Chỉ định border trái và phải, bỏ trên và dưới */
+            /* Chỉ có vạch đứng */
             border-top: none;
             border-bottom: none;
-            border-right: 1px solid #555;
+            /* Thêm độ dày cho vạch đứng để dễ nhìn hơn */
+            border-right: 1px solid var(--text-color);
             border-left: none;
         }
     </style>
