@@ -9,9 +9,12 @@ padding_bottom_px = 90
 margin_side = "900px"
 
 def get_number_from_key(key_str):
-    try: return (int(key_str.split('Key')[1])
-    except: return ""
-
+    try: 
+        # Bỏ % 15 để nó giữ nguyên số thứ tự của phím
+        return int(key_str.split('Key')[1]) 
+    except: 
+        return ""
+        
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     st.markdown("---")  # Kẻ vạch ngăn cách cho đẹp
