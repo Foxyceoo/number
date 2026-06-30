@@ -103,13 +103,18 @@ if uploaded_file :
             border_left = "3px solid #00008c" if phach == khuong else "none"
             # ------------------------
             
+            # Trong vòng lặp tạo cell_content:
             if vals:
-                # Lấy số thứ nhất (hàng trên) và số thứ hai (hàng dưới)
-                top_num = vals[0] if len(vals) > 0 else "&nbsp;"
-                bottom_num = vals[1] if len(vals) > 1 else "&nbsp;"
-    
-                # Ép nó vào 2 cái khung span có chiều cao cố định
-                cell_content = f"<div class='num-wrapper'><span>{top_num}</span><span>{bottom_num}</span></div>"
+                top_num = vals[0]  # Số lớn nhất (đã được sắp xếp bởi reverse=True)
+                # Các số còn lại nối lại với nhau bằng <br> để chúng nằm cùng một hàng dưới
+                bottom_nums = "<br>".join(map(str, vals[1:])) if len(vals) > 1 else ""
+                # Ép vào cấu trúc 2 tầng cố định
+                cell_content = f"""
+                <div class='grid-cell'>
+                    <div class='top-row'>{top_num}</div>
+                    <div class='bottom-row'>{bottom_nums}</div>
+                </div>
+                """
             else:
                 cell_content = ""
             
