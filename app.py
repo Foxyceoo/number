@@ -92,36 +92,34 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
 
     # 3. KHU VỰC XUẤT FILE PDF
     # Trong hàm xử lý nút tải PDF, thay thế phần tạo Table bằng đoạn này:
+    # Thay thế phần tạo PDF bằng cách dùng Bảng ép kiểu Lưới
     if st.button("Tải về PDF (Bố cục Lưới)"):
         pdf_filename = f"{song_name}.pdf"
         doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
-        elements = []
-    
-        # Thiết lập kích thước ô
-        cell_w, cell_h = 20, 40
-        start_x, start_y = 50, 700
-    
-        # Tạo một trang vẽ mới
-        d = Drawing(500, 800)
-    
-        # Vẽ lưới và điền số (mô phỏng theo image_709bc4.png)
-        for phach in range(max_beat + 1):
-            x = start_x + (phach % 16) * cell_w
-            y = start_y - (phach // 16) * cell_h
-           
-            # Vẽ ô
-            d.add(Rect(x, y, cell_w, cell_h, strokeColor=colors.grey, fillColor=None))
         
-            # Điền nốt
-            vals = time_map.get(phach, [])
-            if vals:
-                # Sắp xếp để nốt cao nằm trên, nốt thấp nằm dưới
-                vals_sorted = sorted(vals, reverse=True)
-                for idx, val in enumerate(vals_sorted):
-                    d.add(String(x + 5, y + 25 - (idx * 15), str(val), fontSize=10))
-    
-        elements.append(d)
-        doc.build(elements)
-    
+        # Tạo dữ liệu: Nhóm mỗi 16 phách thành một hàng
+        grid_data = []
+        for i in range(0, max_beat + 1, 16):
+            row = []
+            for j in range(16):
+                phach = i + j
+                if phach <= max_beat:
+                    vals = sorted(time_map.get(phach, []), reverse=True)
+                    row.append("\n".join(map(str, vals)))
+                else:
+                    row.append("")
+            grid_data.append(row)
+        
+        # Định dạng bảng với các ô vuông
+        t = Table(grid_data, colWidths=[30]*16, rowHeights=[40]*len(grid_data))
+        t.setStyle(TableStyle([
+            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('FONTSIZE', (0,0), (-1,-1), 8),
+        ]))
+        
+        doc.build([t])
+        
         with open(pdf_filename, "rb") as f:
-            st.download_button("Tải PDF (Chuẩn Lưới)", f, file_name=pdf_filename, mime="application/pdf")
+            st.download_button("📥 Tải PDF (Chuẩn Lưới)", f, file_name=pdf_filename, mime="application/pdf")
