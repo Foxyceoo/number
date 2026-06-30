@@ -153,23 +153,14 @@ if uploaded_file:
     # --------------------------
 
     # NÚT IN PDF
-    st.markdown("""
-    <style>
-        @media print {
-            .print-btn { display: none !important; }
-        }
-        .print-btn {
-            display: inline-block;
-            padding: 0.5em 1em;
-            background-color: #ffcbcc; /* Màu nền mới */
-            color: #00008c;            /* Màu chữ mới */
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            margin-top: 20px;
-        }
-    </style>
-    <a href="#" class="print-btn" onclick="window.print(); return false;">Mở bảng in</a>
-    """, unsafe_allow_html=True)
+    # Bỏ đoạn code cũ và thay bằng đoạn này ngay dưới dòng components.html
+    
+    # Nút in dùng chính chức năng của Streamlit
+    if st.button("🖨️ In bản nhạc"):
+        # Sử dụng Javascript để kích hoạt in từ cửa sổ chính (không phải từ iframe)
+        js_code = """
+        <script>
+            window.parent.window.print();
+        </script>
+        """
+        components.html(js_code, height=0)
