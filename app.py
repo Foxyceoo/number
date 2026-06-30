@@ -1,12 +1,7 @@
 import streamlit as st
+import pandas as pd
 import json
-import streamlit.components.v1 as components
-# Thư viện để vẽ bảng chuyên nghiệp trong PDF
-from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from reportlab.lib import colors
-from reportlab.graphics.shapes import Drawing, Rect, String
-from reportlab.platypus import PageBreak
+import io
 
 # Cấu hình tên trang
 st.set_page_config(page_title='"Number" one Foxy')
@@ -90,36 +85,44 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
 
-    # 3. KHU VỰC XUẤT FILE PDF
-    # Trong hàm xử lý nút tải PDF, thay thế phần tạo Table bằng đoạn này:
-    # Thay thế phần tạo PDF bằng cách dùng Bảng ép kiểu Lưới
-    if st.button("Tải về PDF (Bố cục Lưới)"):
-        pdf_filename = f"{song_name}.pdf"
-        doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
+    if st.button("Tải về Excel (Bố cục Lưới)"):
+    # 1. Chuẩn bị dữ liệu dạng lưới 16 cột
+    grid_data = []
+    for i in range(0, max_beat + 1, 16):
+        row = []
+        for j in range(16):
+            phach = i + j
+            if phach <= max_beat:
+                # Lấy danh sách nốt và nối lại bằng dấu xuống dòng để hiển thị trong ô
+                vals = sorted(time_map.get(phach, []), reverse=True)
+                row.append("\n".join(map(str, vals)))
+            else:
+                row.append("")
+        grid_data.append(row)
+    
+    # 2. Tạo DataFrame từ dữ liệu lưới
+    df = pd.DataFrame(grid_data)
+    
+    # 3. Xuất file Excel vào bộ nhớ đệm
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, header=False)
+        # Lấy workbook và worksheet để định dạng ô vuông
+        workbook = writer.book
+        worksheet = writer.sheets['Sheet1']
         
-        # Tạo dữ liệu: Nhóm mỗi 16 phách thành một hàng
-        grid_data = []
-        for i in range(0, max_beat + 1, 16):
-            row = []
-            for j in range(16):
-                phach = i + j
-                if phach <= max_beat:
-                    vals = sorted(time_map.get(phach, []), reverse=True)
-                    row.append("\n".join(map(str, vals)))
-                else:
-                    row.append("")
-            grid_data.append(row)
-        
-        # Định dạng bảng với các ô vuông
-        t = Table(grid_data, colWidths=[30]*16, rowHeights=[40]*len(grid_data))
-        t.setStyle(TableStyle([
-            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
-            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('FONTSIZE', (0,0), (-1,-1), 8),
-        ]))
-        
-        doc.build([t])
-        
-        with open(pdf_filename, "rb") as f:
-            st.download_button("📥 Tải PDF (Chuẩn Lưới)", f, file_name=pdf_filename, mime="application/pdf")
+        # Định dạng ô cho giống lưới: độ rộng cột vừa phải, căn giữa
+        format_cell = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
+        for i in range(16):
+            worksheet.set_column(i, i, 5, format_cell) # Độ rộng cột = 5
+        for i in range(len(grid_data)):
+            worksheet.set_row(i, 40, format_cell)      # Chiều cao hàng = 40
+            
+    buffer.seek(0)
+    
+    st.download_button(
+        label="📥 Tải file Excel về máy",
+        data=buffer,
+        file_name=f"{song_name}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
