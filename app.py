@@ -1,7 +1,7 @@
 import streamlit as st
 import json
 import streamlit.components.v1 as components
-# Thư viện để vẽ bảng chuyên nghiệp trong PDF
+# Thư viện để xuất PDF bảng đẹp
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
@@ -32,17 +32,17 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     st.markdown(f"<h2 style='text-align: center;'>{song_name}</h2>", unsafe_allow_html=True)
     
     # 2. KHU VỰC HIỂN THỊ BẢNG TRÊN WEB (CSS & HTML)
-    # Tớ đã để border-top/bottom mờ và border-right đậm theo ý bạn
     style = """
     <style>
         table { border-collapse: collapse; text-align: center; font-size: 16px; width: 100%; color: inherit; }
         td { height: 60px; vertical-align: top; font-weight: bold; width: 40px; 
-             border-top: 1px solid rgba(128, 128, 128, 0.3); 
-             border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+             border-top: 0px solid rgba(128, 128, 128, 0.3); /* SỬA MÀU KẺ NGANG TẠI ĐÂY */
+             border-bottom: 0px solid rgba(128, 128, 128, 0.3);
              border-right: 1px solid #555; border-left: none; }
     </style>
     """
     
+    # Hiển thị bảng trên web
     all_html = style + "<table><tr>"
     for phach in range(max_beat + 1):
         vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
@@ -51,31 +51,25 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     all_html += "</tr></table>"
     components.html(f"<html><body>{all_html}</body></html>", height=500, scrolling=True)
 
-    # 3. KHU VỰC XUẤT FILE PDF (BẢNG ĐẸP)
-    # Tự động tạo file và hiển thị nút tải về ngay khi có dữ liệu
-    pdf_filename = f"{song_name}.pdf"
-    doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
-    
-    # Chuẩn bị dữ liệu dạng bảng cho ReportLab
-    table_data = [["Phách", "Nốt"]]
-    for phach, notes_list in time_map.items():
-        table_data.append([str(phach), ", ".join(map(str, notes_list))])
-    
-    # Thiết lập giao diện bảng PDF
-    t = Table(table_data)
-    t.setStyle(TableStyle([
-        ('GRID', (0,0), (-1,-1), 0.5, colors.grey), # Kẻ lưới mờ hơn cho sang
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'), # In đậm tiêu đề
-    ]))
-    
-    doc.build([t])
-    
-    # Nút tải file
-    with open(pdf_filename, "rb") as f:
-        st.download_button(
-            label="📥 Tải file PDF (Bảng đẹp)", 
-            data=f, 
-            file_name=pdf_filename, 
-            mime="application/pdf"
-        )
+    # NÚT TẢI PDF - Đảm bảo các dòng dưới if phải thụt vào 4 khoảng trắng
+    if st.button("Tải về PDF (Bảng đẹp)"):
+        pdf_filename = f"{song_name}.pdf"
+        doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
+        
+        # Tạo dữ liệu bảng
+        table_data = [["Phách", "Nốt"]]
+        for phach, notes_list in time_map.items():
+            table_data.append([str(phach), ", ".join(map(str, notes_list))])
+        
+        # Định dạng bảng PDF
+        t = Table(table_data)
+        t.setStyle(TableStyle([
+            ('GRID', (0,0), (-1,-1), 1, colors.black), # Kẻ lưới đen
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ]))
+        
+        doc.build([t])
+        
+        # Nút tải file
+        with open(pdf_filename, "rb") as f:
+            st.download_button("Click tải file ngay", f, file_name=pdf_filename, mime="application/pdf")
