@@ -86,43 +86,43 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
 
     if st.button("Tải về Excel (Bố cục Lưới)"):
-    # 1. Chuẩn bị dữ liệu dạng lưới 16 cột
-    grid_data = []
-    for i in range(0, max_beat + 1, 16):
-        row = []
-        for j in range(16):
-            phach = i + j
-            if phach <= max_beat:
-                # Lấy danh sách nốt và nối lại bằng dấu xuống dòng để hiển thị trong ô
-                vals = sorted(time_map.get(phach, []), reverse=True)
-                row.append("\n".join(map(str, vals)))
-            else:
-                row.append("")
-        grid_data.append(row)
+        # 1. Chuẩn bị dữ liệu dạng lưới 16 cột
+        grid_data = []
+        for i in range(0, max_beat + 1, 16):
+            row = []
+            for j in range(16):
+                phach = i + j
+                if phach <= max_beat:
+                    # Lấy danh sách nốt và nối lại bằng dấu xuống dòng để hiển thị trong ô
+                    vals = sorted(time_map.get(phach, []), reverse=True)
+                    row.append("\n".join(map(str, vals)))
+                else:
+                    row.append("")
+            grid_data.append(row)
     
-    # 2. Tạo DataFrame từ dữ liệu lưới
-    df = pd.DataFrame(grid_data)
+        # 2. Tạo DataFrame từ dữ liệu lưới
+        df = pd.DataFrame(grid_data)
     
-    # 3. Xuất file Excel vào bộ nhớ đệm
-    buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False, header=False)
-        # Lấy workbook và worksheet để định dạng ô vuông
-        workbook = writer.book
-        worksheet = writer.sheets['Sheet1']
+        # 3. Xuất file Excel vào bộ nhớ đệm
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, header=False)
+            # Lấy workbook và worksheet để định dạng ô vuông
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
         
-        # Định dạng ô cho giống lưới: độ rộng cột vừa phải, căn giữa
-        format_cell = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
-        for i in range(16):
-            worksheet.set_column(i, i, 5, format_cell) # Độ rộng cột = 5
-        for i in range(len(grid_data)):
-            worksheet.set_row(i, 40, format_cell)      # Chiều cao hàng = 40
+            # Định dạng ô cho giống lưới: độ rộng cột vừa phải, căn giữa
+            format_cell = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
+            for i in range(16):
+                worksheet.set_column(i, i, 5, format_cell) # Độ rộng cột = 5
+            for i in range(len(grid_data)):
+                worksheet.set_row(i, 40, format_cell)      # Chiều cao hàng = 40
             
-    buffer.seek(0)
+        buffer.seek(0)
     
-    st.download_button(
-        label="📥 Tải file Excel về máy",
-        data=buffer,
-        file_name=f"{song_name}.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+        st.download_button(
+            label="📥 Tải file Excel về máy",
+           data=buffer,
+            file_name=f"{song_name}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
