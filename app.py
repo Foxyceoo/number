@@ -108,8 +108,9 @@ if uploaded_file:
                 top_num = vals[0]
                 bottom_nums = "<br>".join(map(str, vals[1:]))
                 # Dùng height: 100% để ép div nằm gọn trong td 50px
+                # Thay đổi justify-content: center -> justify-content: flex-start
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50px;'>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 50px; padding-top: 2px;'>
                     <div class='top-row'>{top_num}</div>
                     <div class='bottom-row'>{bottom_nums}</div>
                 </div>
