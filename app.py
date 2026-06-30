@@ -53,7 +53,7 @@ if uploaded_file:
         padding: 0 !important; 
         height: 50px !important; 
         width: 20px !important; 
-        vertical-align: middle !important; 
+        vertical-align: top !important; 
         border-right: 1px solid #555; 
         border-left: none; 
         overflow: hidden;
