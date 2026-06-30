@@ -160,11 +160,22 @@ if uploaded_file:
     # Bỏ đoạn code cũ và thay bằng đoạn này ngay dưới dòng components.html
     
     # Nút in dùng chính chức năng của Streamlit
-    if st.button("to PDF"):
-        # Sử dụng Javascript để kích hoạt in từ cửa sổ chính (không phải từ iframe)
-        js_code = """
-        <script>
-            window.parent.window.print();
-        </script>
-        """
-        components.html(js_code, height=0)
+    # Thay vì dùng st.button, hãy tạo một nút in bằng HTML/JS có thể hoạt động ổn định hơn
+    print_button_html = """
+    <style>
+    .print-button {
+        background-color: #f0f2f6;
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+    }    
+    .print-button:hover { background-color: #e0e0e0; }
+    </style>
+    <a href="#" class="print-button" onclick="window.print(); return false;">to PDF</a>
+    """
+
+    st.markdown(print_button_html, unsafe_allow_html=True)
