@@ -41,7 +41,6 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         width: 100%; 
         margin-bottom: 50px; /* Tăng khoảng cách giữa các bảng nhạc */
         color: inherit; 
-        border: none !important;
     }
     
     td { 
@@ -51,8 +50,8 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         padding-top: 10px; 
         font-weight: bold; 
         width: 40px; 
-        border-top: none !important;
-        border-bottom: none !important;
+        border-top: 0px solid rgba(128, 128, 128, 0.3);
+        border-bottom: 0px solid rgba(128, 128, 128, 0.3);
         border-right: 1px solid #555; 
         border-left: none;
         color: currentColor; 
@@ -75,18 +74,18 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             
             # --- CẤU HÌNH VẠCH KẺ ---
             # Vạch mặc định cho mỗi phách
-            border_right = "1px solid #555" 
+            border_right = "2px solid #555" 
             
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0: 
-                border_right = "2px solid #ff0000"
+                border_right = "3px solid #ff0000"
             
             # Vạch đậm nhất mỗi 16 phách
             if (phach + 1) % 16 == 0: 
-                border_right = "3px solid #00008c"
+                border_right = "4px solid #00008c"
             
             # Vạch bên trái khuông nhạc
-            border_left = "3px solid #00008c" if phach == khuong else "none"
+            border_left = "4px solid #00008c" if phach == khuong else "none"
             # ------------------------
             
             cell_content = "<br>".join(map(str, vals)) if vals else ""
@@ -112,8 +111,11 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     total_height = (len(all_khuong_html) * 60) + 100 
     
     # 2. Sử dụng scrolling=False để ẩn thanh cuộn nội bộ
-    # Đảm bảo đoạn này sát lề trái, không thụt vào trong
-    st.markdown(f"<html><head>{style}</head><body>{display_html}</body></html>", unsafe_allow_html=True)
+    components.html(
+        f"<html><head>{style}</head><body>{display_html}</body></html>", 
+        height=total_height, 
+        scrolling=False
+    )
 
     # NÚT IN PDF
     # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
