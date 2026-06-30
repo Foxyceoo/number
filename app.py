@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 padding_top_px = 40
 padding_bottom_px = 90
-margin_side = "120%"
+margin_side = "200%"
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
