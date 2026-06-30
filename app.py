@@ -157,9 +157,11 @@ if uploaded_file :
     # 2. HIỂN THỊ VỚI THANH CUỘN
     # scrolling=True sẽ giúp bạn cuộn xem bản nhạc dài, 
     # và khi bạn cuộn đến đâu, in đến đó sẽ rất tiện!
+    # Đảm bảo total_height đủ lớn để nhìn thấy thanh cuộn
+    # Nếu bản nhạc rất dài, đừng để nó quá khít
     components.html(
         f"<html><head>{style}</head><body>{display_html}</body></html>", 
-        height=total_height, 
+        height=800,  # Thử đặt cố định 800px để xem nó có hiện thanh cuộn bên trong không
         scrolling=True
     )
 
