@@ -15,7 +15,8 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     
     time_map = {}
     for n in notes:
-        beat_idx = round(n['time'] / beat_duration)
+        import math
+        beat_idx = math.floor(n['time'] / beat_duration)
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     
     max_beat = max(time_map.keys()) if time_map else 0
