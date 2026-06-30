@@ -68,9 +68,9 @@ if uploaded_file:
         height: 50px !important;
         
         * QUAN TRỌNG: Ép độ rộng cố định */
-        width: 30px !important;       /* Thay đổi số này theo ý bạn */
-        min-width: 30px !important;
-        max-width: 30px !important;
+        width: 40px !important;       /* Thay đổi số này theo ý bạn */
+        min-width: 40px !important;
+        max-width: 40px !important;
         
         vertical-align: top !important; /* Vẫn giữ căn lề trên */
         font-weight: bold; 
