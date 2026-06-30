@@ -109,5 +109,20 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     )
 
     # NÚT IN PDF
-    if st.button("🖨️ Mở bảng in (Để lưu PDF)"):
-        st.markdown("<script>window.print();</script>", unsafe_allow_html=True)
+    # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
+    st.markdown("""
+    <style>
+        .print-btn {
+            display: inline-block;
+            padding: 0.5em 1em;
+            background-color: #ff4b4b;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+    <a href="#" class="print-btn" onclick="window.print(); return false;">🖨️ Mở bảng in (Để lưu PDF)</a>
+    """, unsafe_allow_html=True)
