@@ -165,20 +165,20 @@ if uploaded_file:
     khuong_moi_trang = 8
 
     for i in range(0, len(all_khuong_html), khuong_moi_trang):
-        # Lấy một cụm khuông nhạc
         cum_khuong = all_khuong_html[i : i + khuong_moi_trang]
-        # Nối các bảng lại và thêm thẻ ngắt trang
         display_html += "".join(cum_khuong) + "<div class='page-break'></div>"
 
-    # HIỂN THỊ VỚI THANH CUỘN
-    # Bỏ chữ f ở đầu, dùng dấu + để nối các biến vào
-    # Giả sử bạn đã có danh sách all_khuong_html
-    so_luong_khuong = len(all_khuong_html)
-    # Tính chiều cao: Mỗi khuông 50px + 100px cho tiêu đề và lề
-    tinh_height = (so_luong_khuong * 50) + 150 
+    # --- ĐÂY LÀ ĐOẠN ĐÃ SỬA ---
+    # Kết hợp style và nội dung vào biến html_to_render
+    html_to_render = style + display_html
 
-    # Gọi component với chiều cao đã tính và scrolling=False
+    # Tính chiều cao động
+    so_luong_khuong = len(all_khuong_html)
+    tinh_height = (so_luong_khuong * 50) + 200 
+
+    # Gọi component với chiều cao đã tính, scrolling=False như bạn muốn
     components.html(html_to_render, height=tinh_height, scrolling=False)
+    # --------------------------
 
     # NÚT IN PDF
     st.markdown("""
