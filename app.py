@@ -9,7 +9,7 @@ padding_bottom_px = 90
 margin_side = "900px"
 
 def get_number_from_key(key_str):
-    try: return (int(key_str.split('Key')[1]) % 15) + 1
+    try: return (int(key_str.split('Key')[1])
     except: return ""
 
 with st.sidebar:
