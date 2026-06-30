@@ -51,7 +51,7 @@ if uploaded_file:
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
-        font-size: 16px; 
+        font-size: 18px; 
         table-layout: fixed;
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
@@ -66,8 +66,8 @@ if uploaded_file:
         min-height: 50px !important;
         height: 50px !important;
         
-        width: 25px !important;
-        min-width: 25px !important;
+        width: 22px !important;
+        min-width: 22px !important;
         vertical-align: top !important; /* Vẫn giữ căn lề trên */
         font-weight: bold; 
         border-right: 1px solid #555; 
@@ -105,18 +105,18 @@ if uploaded_file:
 
             # --- CẤU HÌNH VẠCH KẺ ---
             # Vạch mặc định cho mỗi phách
-            border_right = "1px solid #d8d8d8"
+            border_right = "0.5px solid #d8d8d8"
 
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0:
-                border_right = "2px solid #00008c"
+                border_right = "1px solid #00008c"
 
             # Vạch đậm nhất mỗi 16 phách
             if (phach + 1) % 16 == 0:
-                border_right = "2px solid #00008c"
+                border_right = "1.5px solid #00008c"
 
             # Vạch bên trái khuông nhạc
-            border_left = "2px solid #00008c" if phach == khuong else "none"
+            border_left = "1.5px solid #00008c" if phach == khuong else "none"
             # ------------------------
 
             # Trong vòng lặp tạo cell_content:
