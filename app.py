@@ -6,6 +6,8 @@ def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
     except: return ""
 
+st.title("Bộ chuyển đổi sheet số")
+
 # Bạn để trống label hoặc đặt tên mới, sau đó dùng help để hiển thị "- 123 -"
 if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     data = json.load(uploaded_file)
