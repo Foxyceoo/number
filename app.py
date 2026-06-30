@@ -161,7 +161,7 @@ if uploaded_file :
     # Nếu bản nhạc rất dài, đừng để nó quá khít
     components.html(
         f"<html><head>{style}</head><body>{display_html}</body></html>", 
-        height=800,  # Thử đặt cố định 800px để xem nó có hiện thanh cuộn bên trong không
+        height=1123,  # Thử đặt cố định 800px để xem nó có hiện thanh cuộn bên trong không
         scrolling=True
     )
 
