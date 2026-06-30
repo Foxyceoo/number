@@ -71,16 +71,6 @@ if uploaded_file:
         overflow: hidden;
         line-height: 1.5; 
         
-        min-height: 50px !important; 
-        height: 50px !important;
-        width: 25px !important;
-        min-width: 25px !important;
-        
-        padding: 0 !important;
-        font-weight: bold; 
-        border-right: 1px solid #555; 
-        border-left: none;
-        overflow: hidden;
     }}
 
     @media print {{{{
