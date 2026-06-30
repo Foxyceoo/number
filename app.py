@@ -49,17 +49,21 @@ if uploaded_file :
     }
     
     td { 
-        height: 60px; 
-        vertical-align: top; 
-        /* Chỉnh lề trong ô để số cân đối hơn */
-        padding-top: 10px; 
+        height: 50px !important;    /* Ép cứng chiều cao, không phụ thuộc nội dung */
+        min-height: 50px !important;
+        max-height: 50px !important;
+        
+        vertical-align: middle;     /* Căn giữa số theo chiều dọc để cân đối */
+        padding: 0;                 /* Bỏ padding để không làm đẩy ô */
+        
         font-weight: bold; 
         width: 40px; 
-        border-top: 0px solid rgba(128, 128, 128, 0.3);
-        border-bottom: 0px solid rgba(128, 128, 128, 0.3);
         border-right: 1px solid #555; 
         border-left: none;
-        color: currentColor; 
+        
+        /* Đảm bảo số nằm gọn và không đẩy ô */
+        overflow: hidden; 
+        line-height: 1.2;
     }
     
     /* Style cho in PDF */
