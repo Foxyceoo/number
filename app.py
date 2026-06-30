@@ -11,15 +11,22 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    beat_duration = 60000 / bpm /4
+    # Tăng độ dài khuông hoặc tinh chỉnh lại cách tính beat_idx
+    # Thử chia beat_duration cho 4 để mỗi ô là 1 phách chính xác
+    beat_duration = 60000 / bpm  
     
-    # Thay vì dùng floor/round đơn giản, hãy thử chia nhỏ phách hơn nếu cần
-    # Thử tăng độ phân giải lên gấp đôi (mỗi phách chia làm 2) nếu bạn muốn nốt dàn ra
     time_map = {}
     for n in notes:
-        # Nếu muốn nốt dàn ra, hãy thử dùng công thức này để nốt nằm ở các cột khác nhau
-        beat_idx = int(n['time'] / (beat_duration / 2)) 
+        # Làm tròn để nốt nhạc "rơi" đúng vào phách, không bị nhảy dòng
+        beat_idx = round(n['time'] / beat_duration) 
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
+    
+    # Ở phần hiển thị, đảm bảo hiển thị đủ phách trên một hàng
+    # Nếu nốt vẫn bị nhảy, hãy tăng số lượng phách trên một hàng (ví dụ: 32 thay vì 16)
+    for khuong in range(0, max_beat + 32, 32): # Tăng lên 32 phách mỗi hàng
+        html_content = "<table><tr>"
+        for phach in range(khuong, khuong + 32):
+            # ... (phần code hiển thị còn lại giữ nguyên)
     
     max_beat = max(time_map.keys()) if time_map else 0
     
