@@ -102,11 +102,12 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             
         # Thay vì dùng pdf.output(dest='S').encode('latin-1')
         # Hãy dùng cách này cho FPDF phiên bản mới:
-        pdf_output = pdf.output()
-        
+        # Sửa đoạn nút tải về:
+        pdf_output = pdf.output() # Lấy kết quả từ FPDF 2.x
+
         st.download_button(
             label="Tải file PDF (FPDF)",
-            data=pdf_output,
+            data=bytes(pdf_output),  # <--- Ép kiểu sang bytes ở đây
             file_name=f"{song_name}.pdf",
             mime="application/pdf"
         )
