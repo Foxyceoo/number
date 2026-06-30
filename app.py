@@ -118,14 +118,23 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
     st.markdown("""
     <style>
+        /* Ẩn các thành phần Streamlit khi in */
         @media print {
-        .page-break { 
-            page-break-after: always; 
-            break-after: page; /* Cú pháp hiện đại hơn */
+            /* Ẩn tiêu đề trang, menu, và phần upload file */
+            header, div[data-testid="stToolbar"], div[data-testid="stDecoration"], 
+            section[data-testid="stSidebar"], .stFileUploader, h1:not(.song-title) {
+                display: none !important;
+            }
+
+            /* Đảm bảo chỉ hiển thị nội dung sheet nhạc của chúng ta */
+            body { padding: 0; }
         }
-        /* Ẩn các thành phần không cần thiết của Streamlit khi in */
-        header, .stAppToolbar, .stFileUploader, .print-btn { 
-            display: none !important;
+
+        /* Đặt class cho tiêu đề bài hát để dễ quản lý */
+        .song-title {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 30px;
         }
     </style>
     <a href="#" class="print-btn" onclick="window.print(); return false;">Mở bảng in</a>
