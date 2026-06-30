@@ -68,9 +68,27 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle;'>{line_number}</td>"
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True)
+            
+            # --- CẤU HÌNH VẠCH KẺ ---
+            # Vạch mặc định cho mỗi phách
+            border_right = "1px solid #555" 
+            
+            # Vạch đậm hơn mỗi 4 phách
+            if (phach + 1) % 4 == 0: 
+                border_right = "2px solid #aaa"
+            
+            # Vạch đậm nhất mỗi 16 phách
+            if (phach + 1) % 16 == 0: 
+                border_right = "4px solid #00008c"
+            
+            # Vạch bên trái khuông nhạc
+            border_left = "4px solid #00008c" if phach == khuong else "none"
+            # ------------------------
+            
             cell_content = "<br>".join(map(str, vals)) if vals else ""
-            html_content += f"<td>{cell_content}</td>"
-        html_content += "</tr></table>"
+            
+            # Cập nhật style cho thẻ td với các biến trên
+            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
         all_khuong_html.append(html_content)
         line_number += 2
 
