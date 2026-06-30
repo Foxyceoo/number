@@ -51,7 +51,7 @@ if uploaded_file:
     table {{ 
         border-collapse: collapse; 
         text-align: center; 
-        font-size: 18px; 
+        font-size: 17px; 
         table-layout: fixed;
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
