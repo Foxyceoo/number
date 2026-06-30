@@ -93,7 +93,8 @@ if uploaded_file:
     all_khuong_html = []
     line_number = 1
     for khuong in range(0, max_beat + 32, 32):
-        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle;'>{line_number}</td>"
+        # Sửa đoạn này trong vòng lặp tạo khuông nhạc:
+        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True)
 
