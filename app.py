@@ -111,9 +111,8 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     total_height = (len(all_khuong_html) * 60) + 100 
     
     # 2. Sử dụng scrolling=False để ẩn thanh cuộn nội bộ
-    # Thay vì components.html, hãy dùng st.markdown
+    # Đảm bảo đoạn này sát lề trái, không thụt vào trong
     st.markdown(f"<html><head>{style}</head><body>{display_html}</body></html>", unsafe_allow_html=True)
-        )
 
     # NÚT IN PDF
     # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
