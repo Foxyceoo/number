@@ -57,16 +57,16 @@ if uploaded_file:
         margin: 0 auto 30px auto; 
         color: inherit; 
         /* Thêm chiều cao mặc định cho cả bảng khuông nhạc */
-        height: 35px !important;
+        height: 40px !important;
     }}
 
     td {{ 
         padding-top: 0px !important;     
 
         /* Thiết lập chiều cao tối thiểu 40px */
-        height: 35px !important;
-        min-height: 35px !important;
-        height: 35px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        height: 40px !important;
         
         /* QUAN TRỌNG: Ép độ rộng cố định */
         width: 20px !important;       /* Thay đổi số này theo ý bạn */
