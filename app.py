@@ -31,11 +31,12 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     # CSS với quy định kích thước A4 cho PDF
     style = """
     <style>
-        @media print {
-            .khuong-nhac { page-break-after: always; }
-        }
-        table { border-collapse: collapse; text-align: center; font-size: 16px; width: 100%; margin-bottom: 40px; }
+        /* Dùng 'color: inherit' để số tự động đổi màu theo nền của Streamlit */
+        table { border-collapse: collapse; text-align: center; font-size: 16px; color: inherit; width: 100%; margin-bottom: 40px; }
         td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; border: 1px solid #ddd; }
+        
+        /* Đảm bảo khung bảng luôn hiển thị tốt trên cả 2 nền */
+        tr { background-color: transparent !important; }
     </style>
     """
     
@@ -50,7 +51,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
             if (phach + 1) % 16 == 0: border_right = "4px solid #00008c"
             
-            border_left = "2px solid #00008c" if phach == khuong else "none"
+            border_left = "4px solid #00008c" if phach == khuong else "none"
             
             cell_content = "<br>".join(map(str, vals)) if vals else ""
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
