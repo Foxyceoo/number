@@ -57,7 +57,7 @@ if uploaded_file:
         margin: 0 auto 30px auto; 
         color: inherit; 
         /* Thêm chiều cao mặc định cho cả bảng khuông nhạc */
-        height: 110px !important;
+        height: 90px !important;
     }}
 
     td {{ 
