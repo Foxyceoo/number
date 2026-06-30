@@ -13,7 +13,12 @@ def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
     except: return ""
 
-if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
+with st.sidebar:
+    st.header("Công cụ")
+    uploaded_file = st.file_uploader("Tải lên file JSON", type=["json"])
+    st.info("Sau khi tải file, sheet nhạc sẽ tự động hiển thị ở khu vực chính.")
+
+if uploaded_file :
     data = json.load(uploaded_file)
     song_name = uploaded_file.name.replace(".json", "")
     bpm = data[0].get("bpm", 320)
