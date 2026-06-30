@@ -89,7 +89,7 @@ if uploaded_file:
         padding: 0;                   /* Bỏ padding để không làm đẩy ô */
 
         font-weight: bold; 
-        width: 40px; 
+        width: 100px; 
         border-right: 1px solid #555; 
         border-left: none;
 
