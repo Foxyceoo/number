@@ -166,7 +166,7 @@ if uploaded_file:
     PAGE_HEIGHT_LIMIT = 800
     current_page_height = 0
     # Sửa lại phần này, giảm margin-bottom xuống (ví dụ 10px hoặc 5px)
-    display_html = f"<h1 style='text-align: center; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
+    display_html = f"<h1 style='text-align: center; font-size: 50px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
 
     for khuong_html in all_khuong_html:
         # Giả định mỗi khuông nhạc có chiều cao khoảng 110px (cần khớp với tính toán của bạn)
