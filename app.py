@@ -112,6 +112,9 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
     st.markdown("""
     <style>
+        @media print {
+            .print-btn { display: none !important; }
+        }
         .print-btn {
             display: inline-block;
             padding: 0.5em 1em;
@@ -122,6 +125,7 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             font-weight: bold;
             cursor: pointer;
             border: none;
+            margin-top: 20px;
         }
     </style>
     <a href="#" class="print-btn" onclick="window.print(); return false;">🖨️ Mở bảng in (Để lưu PDF)</a>
