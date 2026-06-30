@@ -64,13 +64,13 @@ if uploaded_file:
 
         /* Tăng size cho số ở trên */
         .top-row {{
-            font-size: 16px !important; 
+            font-size: 14px !important; 
             font-weight: bold;
     }}
 
         /* Tăng size cho các số ở dưới, đừng để nó quá nhỏ */
         .bottom-row {{
-            font-size: 16px !important; 
+            font-size: 14px !important; 
             line-height: 1.2 !important;
     }}
 
