@@ -5,6 +5,9 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 st.title("Bộ chuyển đổi sheet số")
+# Tùy chỉnh khoảng cách tên bài hát (thay số 40 theo ý bạn)
+padding_top_px = 40
+padding_bottom_px = 40
 
 def get_number_from_key(key_str):
     try: return (int(key_str.split('Key')[1]) % 15) + 1
@@ -93,7 +96,13 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         line_number += 2
 
     # Thay bằng dòng này:
-    display_html = f"<h1 style='text-align: center; margin-top: 40px; margin-bottom: 40px;'>{song_name}</h1>" + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
+    # Cập nhật đoạn này với f-string và các biến đã khai báo
+    display_html = f"""
+    <h1 style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>
+        {song_name}
+    </h1>
+    """ + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
+
     for i in range(8, len(all_khuong_html), 10):
         display_html += "".join(all_khuong_html[i:i+10]) + "<div class='page-break'></div>"
 
