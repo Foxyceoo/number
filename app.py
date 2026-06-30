@@ -118,8 +118,10 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         .print-btn {
             display: inline-block;
             padding: 0.5em 1em;
-            background-color: #ff4b4b;
-            color: white;
+            /* CHỈNH 2 DÒNG DƯỚI ĐÂY LÀ ĐƯỢC */
+            background-color: #ffcbcc; /* Màu nền mới */
+            color: #00008c;             /* Màu chữ mới */
+            /* ----------------------------- */
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
@@ -128,5 +130,5 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             margin-top: 20px;
         }
     </style>
-    <a href="#" class="print-btn" onclick="window.print(); return false;">🖨️ Mở bảng in (Để lưu PDF)</a>
+    <a href="#" class="print-btn" onclick="window.print(); return false;">Mở bảng in</a>
     """, unsafe_allow_html=True)
