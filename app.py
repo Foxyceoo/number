@@ -11,8 +11,8 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    # Sử dụng logic mới: beat_duration không chia 4, kết hợp với hiển thị 32 phách
-    beat_duration = 60000 / bpm 
+    # Nhân hệ số * 4 để nốt dàn đều theo nhịp 4/4
+    beat_duration = 60000 / bpm * 4 
     
     time_map = {}
     for n in notes:
@@ -23,6 +23,7 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     
     st.subheader(f"Nhạc phổ (BPM: {bpm}) - Nhịp 4/4")
     
+    # CSS với màu sắc chủ đạo
     style = """
     <style>
         table { border-collapse: collapse; text-align: center; font-size: 16px; color: white; width: 100%; background-color: #0e1117; margin-bottom: 40px; }
@@ -31,7 +32,7 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     """
     
     all_html = style
-    # Hiển thị 32 phách mỗi khuông để nốt không bị nhảy dòng
+    # Hiển thị 32 phách mỗi khuông
     for khuong in range(0, max_beat + 32, 32):
         html_content = "<table><tr>"
         for phach in range(khuong, khuong + 32):
@@ -39,14 +40,20 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
             
             # Cấu hình vạch kẻ
             border_right = "1px solid #555"
+            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa" # Vạch nhịp
+            if (phach + 1) % 32 == 0: border_right = "4px solid #f1c40f" # Vạch kết khuông màu vàng
             
-            # Vạch nhịp bình thường
-            if (phach + 1) % 4 == 0: 
-                border_right = "2px solid #aaa" 
+            # Vạch đầu khuông màu vàng
+            border_left = "2px solid #f1c40f" if phach == khuong else "none"
             
-            # Vạch ngăn cách khuông (vạch cuối) - Đổi màu tại đây
-            if (phach + 1) % 32 == 0: 
-                border_right = "4px solid #f1c40f" # Màu vàng cho vạch cuối
+            cell_content = ""
+            if vals:
+                cell_content = f"{vals[0]}"
+                if len(vals) > 1:
+                    cell_content += "<br>" + "<br>".join(map(str, vals[1:]))
             
-            # Vạch bắt đầu khuông (vạch đầu) - Đổi màu tại đây
-            border_left = "2px solid #f1c40f" if phach == khuong else "none" # Màu vàng cho vạch đầu
+            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
+        html_content += "</tr></table>"
+        all_html += html_content
+    
+    components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
