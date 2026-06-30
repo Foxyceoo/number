@@ -111,32 +111,21 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     total_height = (len(all_khuong_html) * 60) + 100 
     
     # 2. Sử dụng scrolling=False để ẩn thanh cuộn nội bộ
-    components.html(
-        f"<html><head>{style}</head><body>{display_html}</body></html>", 
-        height=total_height, 
-        scrolling=False
-    )
+    # Thay vì dùng components.html, hãy dùng st.markdown với unsafe_allow_html=True
+    st.markdown(f"<html><head>{style}</head><body>{display_html}</body></html>", unsafe_allow_html=True)
 
     # NÚT IN PDF
     # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
     st.markdown("""
     <style>
         @media print {
-            .print-btn { display: none !important; }
+        .page-break { 
+            page-break-after: always; 
+            break-after: page; /* Cú pháp hiện đại hơn */
         }
-        .print-btn {
-            display: inline-block;
-            padding: 0.5em 1em;
-            /* CHỈNH 2 DÒNG DƯỚI ĐÂY LÀ ĐƯỢC */
-            background-color: #ffcbcc; /* Màu nền mới */
-            color: #00008c;             /* Màu chữ mới */
-            /* ----------------------------- */
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            margin-top: 20px;
+        /* Ẩn các thành phần không cần thiết của Streamlit khi in */
+        header, .stAppToolbar, .stFileUploader, .print-btn { 
+            display: none !important;
         }
     </style>
     <a href="#" class="print-btn" onclick="window.print(); return false;">Mở bảng in</a>
