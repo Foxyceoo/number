@@ -179,19 +179,20 @@ if uploaded_file:
         display_html += "".join(cum_khuong) + "<div class='page-break'></div>"
 
     # HIỂN THỊ VỚI THANH CUỘN
-    html_to_render = f"""
+    # Bỏ chữ f ở đầu, dùng dấu + để nối các biến vào
+    html_to_render = """
     <html>
         <head>
-            {{style}}
+            """ + style + """
             <style>
-                /* Dùng {{ và }} để thoát lệnh f-string */
+                /* Bây giờ bạn có thể dùng dấu { } thoải mái mà không bị lỗi */
                 #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
-                .styles_viewerBadge__1yB5_, div[data-testid="stDecoration"] {{ 
+                .styles_viewerBadge__1yB5_, div[data-testid="stDecoration"] { 
                     display: none !important; 
-                }}
+                }
             </style>
         </head>
-        <body>{{display_html}}</body>
+        <body>""" + display_html + """</body>
     </html>
     """
 
