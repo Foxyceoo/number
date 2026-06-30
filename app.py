@@ -114,6 +114,10 @@ if uploaded_file :
         table {
             page-break-inside: avoid;
         }
+        /* Ẩn footer, nút "Manage app" và số trang mặc định */
+    #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
+    .styles_viewerBadge__1yB5_ { 
+        display: none !important; 
     }
 </style>
     """
