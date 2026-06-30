@@ -65,22 +65,26 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         }
     </style>
     <script>
-        function adjustTheme() {
-            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const textColor = isDarkMode ? '#FFFFFF' : '#000000';
-            
-            document.body.style.color = textColor;
-            document.body.style.backgroundColor = 'transparent';
-            
-            // Dòng này sẽ tìm tất cả các ô trong bảng và cập nhật màu cho chúng
-            const cells = document.querySelectorAll('td');
-            cells.forEach(cell => {
-                cell.style.color = textColor;
-            });
-        }
-        window.onload = adjustTheme;
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', adjustTheme);
-    </script>
+    function updateColors() {
+        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // Ép màu: Sáng thì đen, Tối thì trắng
+        const newColor = isDarkMode ? '#FFFFFF' : '#000000';
+        
+        // Tìm tất cả các thẻ td chứa số
+        const cells = document.querySelectorAll('td');
+        cells.forEach(cell => {
+            // Chỉ đổi màu những ô có chứa số (không đổi màu vạch kẻ)
+            if (cell.innerText.trim() !== "") {
+                cell.style.setProperty("color", newColor, "important");
+            }
+        });
+    }
+
+    // Chạy khi trang web vừa tải xong
+    window.onload = updateColors;
+    // Chạy khi bạn chuyển đổi theme trên máy tính
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColors);
+</script>
     """
 
     # Tạo danh sách các dòng nhạc
