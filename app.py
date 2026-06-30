@@ -56,25 +56,20 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     
     /* Style cho in PDF */
     @media print {
-        /* Ẩn mọi thứ của trang web Streamlit */
-        body * {
-            visibility: hidden;
+        /* 1. Ẩn các thành phần không cần thiết của Streamlit */
+        header, .stAppToolbar, [data-testid="stSidebar"], [data-testid="stFileUploadDropzone"], .stButton {
+            display: none !important;
         }
 
-        /* Chỉ hiển thị các khuông nhạc và nội dung bên trong */
-        .khuong-nhac, .khuong-nhac * {
-            visibility: visible;
+        /* 2. Ẩn tiêu đề và các phần khác nếu bạn muốn */
+        h1 {
+            display: none !important;
         }
 
-        /* Đưa các khuông nhạc lên đầu trang */
-        .khuong-nhac {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-        }
-
-        /* Đảm bảo màu sắc hiển thị đúng khi in */
+        /* 3. Cho phép nội dung bên trong iframe (sheet nhạc) hiển thị */
+        /* Không dùng visibility: hidden trên body nữa */
+        
+        /* 4. Đảm bảo màu sắc vẫn là đen trắng */
         body, table, td {
             color: #000000 !important;
             background-color: #ffffff !important;
