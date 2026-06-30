@@ -85,22 +85,18 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
 
+    #3. TẢI VỀ
     if st.button("Tải về Excel (Bố cục Lưới)"):
-        # 1. Chuẩn bị dữ liệu dạng lưới 16 cột
-        grid_data = []
-        for i in range(0, max_beat + 1, 16):
-            row = []
-            for j in range(16):
-                phach = i + j
-                if phach <= max_beat:
-                    vals = sorted(time_map.get(phach, []), reverse=True)
-                    row.append("\n".join(map(str, vals)))
-                else:
-                    row.append("")
-            grid_data.append(row)
+        # 1. Tổ chức lại dữ liệu: Phách ở cột A, các nốt trải dài sang các cột tiếp theo
+        rows = []
+        for phach in range(max_beat + 1):
+            vals = sorted(time_map.get(phach, []), reverse=True)
+            # Dòng: [Phách, Nốt1, Nốt2, Nốt3...]
+            row = [f"{phach}"] + vals
+            rows.append(row)
         
         # 2. Tạo DataFrame
-        df = pd.DataFrame(grid_data)
+        df = pd.DataFrame(rows)
         
         # 3. Xuất file Excel
         buffer = io.BytesIO()
@@ -109,16 +105,18 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             workbook = writer.book
             worksheet = writer.sheets['Sheet1']
             
+            # Định dạng ô: kẻ bảng, căn giữa
             format_cell = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
-            for i in range(16):
-                worksheet.set_column(i, i, 5, format_cell)
-            for i in range(len(grid_data)):
-                worksheet.set_row(i, 40, format_cell)
+            
+            # Chỉnh độ rộng cột (đủ cho số nốt) và chiều cao hàng
+            worksheet.set_column(0, df.shape[1]-1, 8, format_cell)
+            for i in range(len(rows)):
+                worksheet.set_row(i, 30, format_cell)
             
         buffer.seek(0)
         
         st.download_button(
-            label="📥 Tải file Excel về máy",
+            label="📥 Tải file Excel (Đã tách ô)",
             data=buffer,
             file_name=f"{song_name}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
