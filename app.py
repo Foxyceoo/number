@@ -1,11 +1,10 @@
 import streamlit as st
-import pandas as pd
 import json
-import streamlit.components.v1 as components
 
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 st.title("Bộ chuyển đổi sheet số")
-# Tùy chỉnh khoảng cách tên bài hát (thay số 40 theo ý bạn)
+
+# Tùy chỉnh khoảng cách tên bài hát
 padding_top_px = 40
 padding_bottom_px = 90
 
@@ -25,114 +24,57 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     max_beat = max(time_map.keys()) if time_map else 0
 
-    # CSS của bạn được giữ nguyên
+    # CSS cải tiến: ép cứng chiều rộng ô và xóa sạch viền thừa
     style = """
     <style>
-    /* Chỉnh lề body để bảng không bị dính sát mép trình duyệt */
-    body { 
-        font-family: sans-serif; 
-        padding: 40px 20px; /* Cách trên dưới 40px, trái phải 20px */
-    }
-    
+    body { font-family: sans-serif; padding: 20px; }
     table { 
-        border-collapse: collapse; 
-        text-align: center; 
-        font-size: 16px; 
-        width: 100%; 
-        margin-bottom: 50px; /* Tăng khoảng cách giữa các bảng nhạc */
-        color: inherit; 
+        border-collapse: collapse; text-align: center; font-size: 14px; 
+        width: 100%; margin-bottom: 40px; table-layout: fixed; /* Ép bảng đều */
     }
-    
     td { 
-        height: 60px; 
-        vertical-align: top; 
-        /* Chỉnh lề trong ô để số cân đối hơn */
-        padding-top: 10px; 
-        font-weight: bold; 
-        width: 40px; 
-        border-top: 0px solid rgba(128, 128, 128, 0.3);
-        border-bottom: 0px solid rgba(128, 128, 128, 0.3);
-        border-right: 1px solid #555; 
-        border-left: none;
-        color: currentColor; 
+        height: 50px; vertical-align: top; padding-top: 5px; 
+        font-weight: bold; width: 30px; min-width: 30px; /* Cố định ô */
+        border: none !important; border-right: 1px solid #ccc; 
     }
+    .song-title { text-align: center; margin-bottom: 40px; }
+    .page-break { page-break-after: always; }
     
-    /* Style cho in PDF */
     @media print {
-        .page-break { page-break-after: always; }
+        header, section[data-testid="stSidebar"], .stFileUploader, .print-btn { display: none !important; }
+        body { padding: 0 !important; }
     }
-</style>
+    </style>
     """
 
-    # Tạo danh sách các dòng nhạc
     all_khuong_html = []
     line_number = 1
     for khuong in range(0, max_beat + 32, 32):
-        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle;'>{line_number}</td>"
+        html_content = f"<table><tr><td style='color: red; border: none !important; width: 30px;'>{line_number}</td>"
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True)
-            
-            # --- CẤU HÌNH VẠCH KẺ ---
-            # Vạch mặc định cho mỗi phách
             border_right = "1px solid #555" 
+            if (phach + 1) % 4 == 0: border_right = "2px solid #ff0000"
+            if (phach + 1) % 16 == 0: border_right = "3px solid #00008c"
             
-            # Vạch đậm hơn mỗi 4 phách
-            if (phach + 1) % 4 == 0: 
-                border_right = "2px solid #ff0000"
-            
-            # Vạch đậm nhất mỗi 16 phách
-            if (phach + 1) % 16 == 0: 
-                border_right = "3px solid #00008c"
-            
-            # Vạch bên trái khuông nhạc
-            border_left = "3px solid #00008c" if phach == khuong else "none"
-            # ------------------------
+            style_td = f"border-right: {border_right};"
+            if phach == khuong: style_td += "border-left: 3px solid #00008c;"
             
             cell_content = "<br>".join(map(str, vals)) if vals else ""
-            
-            # Cập nhật style cho thẻ td với các biến trên
-            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
-        all_khuong_html.append(html_content)
+            html_content += f"<td style='{style_td}'>{cell_content}</td>"
+        all_khuong_html.append(html_content + "</tr></table>")
         line_number += 2
 
-    # Thay bằng dòng này:
-    # Cập nhật đoạn này với f-string và các biến đã khai báo
-    display_html = f"""
-    <h1 class='song-title' style='text-align: center; margin-top: {padding_top_px}px; margin-bottom: {padding_bottom_px}px;'>
-        {song_name}
-    </h1>
-    """ + "".join(all_khuong_html[0:8]) + "<div class='page-break'></div>"
+    # Ghép nội dung in nhiều trang
+    display_html = f"<h1 class='song-title' style='margin-top: {padding_top_px}px;'>{song_name}</h1>"
+    for i in range(0, len(all_khuong_html), 8):
+        display_html += "".join(all_khuong_html[i:i+8]) + "<div class='page-break'></div>"
 
-    # 1. Tính chiều cao động dựa trên tổng số dòng (all_khuong_html)
-    # Mỗi dòng cao 60px (theo CSS của bạn) + một chút khoảng đệm
-    total_height = (len(all_khuong_html) * 60) + 100 
-    
-    # 2. Sử dụng scrolling=False để ẩn thanh cuộn nội bộ
-    # Thay vì dùng components.html, hãy dùng st.markdown với unsafe_allow_html=True
-    st.markdown(f"<html><head>{style}</head><body>{display_html}</body></html>", unsafe_allow_html=True)
+    # Render trực tiếp vào trang để in được nhiều trang
+    st.markdown(f"{style}<body>{display_html}</body>", unsafe_allow_html=True)
 
-    # NÚT IN PDF
-    # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
+    # Nút in
     st.markdown("""
-    <style>
-        /* Ẩn các thành phần Streamlit khi in */
-        @media print {
-            /* Ẩn tiêu đề trang, menu, và phần upload file */
-            header, div[data-testid="stToolbar"], div[data-testid="stDecoration"], 
-            section[data-testid="stSidebar"], .stFileUploader, h1:not(.song-title) {
-                display: none !important;
-            }
-
-            /* Đảm bảo chỉ hiển thị nội dung sheet nhạc của chúng ta */
-            body { padding: 0; }
-        }
-
-        /* Đặt class cho tiêu đề bài hát để dễ quản lý */
-        .song-title {
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-    </style>
+    <style>.print-btn { padding: 10px 20px; background: #ffcbcc; color: #00008c; text-decoration: none; border-radius: 5px; font-weight: bold; }</style>
     <a href="#" class="print-btn" onclick="window.print(); return false;">Mở bảng in</a>
     """, unsafe_allow_html=True)
