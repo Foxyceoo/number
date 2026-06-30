@@ -58,29 +58,18 @@ if uploaded_file:
         color: inherit; 
     }}
 
-    td {{
-        /* Bỏ display: flex và flex-direction ở đây */
-        vertical-align: top !important; 
-        text-align: center !important;
+    td {{ 
+        padding-top: 2px !important;    
+        padding-bottom: 2px !important; 
         
-        min-height: 50px !important; 
-        height: 50px !important;
         width: 25px !important;
         min-width: 25px !important;
-        
-        padding: 0 !important;
+        vertical-align: top !important; /* Vẫn giữ căn lề trên */
         font-weight: bold; 
         border-right: 1px solid #555; 
         border-left: none;
         overflow: hidden;
-    }}
-
-    /* Thêm đoạn này để các số không bị giãn quá mức */
-    .grid-cell {{
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        text-align: center;
+        line-height: 1.5; 
     }}
 
     @media print {{{{
@@ -126,13 +115,17 @@ if uploaded_file:
             # ------------------------
 
             # Trong vòng lặp tạo cell_content:
-            # Phần này nằm trong vòng lặp for phach
             if vals:
-                # Dùng flex cho div này để các số chồng lên nhau đẹp
+                top_num = vals[0]
+                # Nối các số còn lại
+                bottom_nums = "<br>".join(map(str, vals[1:]))
+                
+                # Tăng chiều cao nội dung dựa trên số lượng nốt (len(vals))
+                # Cột càng nhiều nốt thì các thẻ div càng đẩy cột dài ra
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;'>
-                    <div style='font-size: 14px;'>{vals[0]}</div>
-                    <div style='font-size: 12px; color: #555;'>{"<br>".join(map(str, vals[1:]))}</div>
+                <div class='grid-cell' style='min-height: {len(vals) * 20}px;'>
+                    <div class='top-row'>{top_num}</div>
+                    <div class='bottom-row'>{bottom_nums}</div>
                 </div>
                 """
             else:
