@@ -63,7 +63,7 @@ if uploaded_file:
     .note-number {{ 
         font-size: 15px !important; 
         font-weight: bold !important; 
-        line-height: 1.5 !important; 
+        line-height: 2 !important; 
         display: block;
     }}
 
@@ -84,11 +84,11 @@ if uploaded_file:
 
             # --- CẤU HÌNH VẠCH KẺ ---
             # Vạch mặc định cho mỗi phách
-            border_right = "0.1px solid #d8d8d8"
+            border_right = "0.5px solid #d8d8d8"
 
             # Vạch đậm hơn mỗi 4 phách
             if (phach + 1) % 4 == 0:
-                border_right = "1px solid #00008c"
+                border_right = "2px solid #00008c"
 
             # Vạch đậm nhất mỗi 16 phách
             if (phach + 1) % 16 == 0:
