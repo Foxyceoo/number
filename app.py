@@ -25,6 +25,18 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
     # CSS của bạn được giữ nguyên
     style = """
     <style>
+        :root {
+            /* Mặc định là màu đen (theme sáng) */
+            --cell-color: #000000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Tự động đổi thành màu trắng khi sang theme tối */
+                --cell-color: #FFFFFF;
+            }
+        }
+
         body { font-family: sans-serif; padding: 20px; }
         table { 
             border-collapse: collapse; 
@@ -44,7 +56,8 @@ if uploaded_file := st.file_uploader("Tải lên file JSON", type=["json"]):
             border-bottom: 0px solid rgba(128, 128, 128, 0.3);
             border-right: 1px solid #555; 
             border-left: none;
-            color: currentColor; /* Dòng này quan trọng: tự theo màu của body */
+            /* Con số sẽ dùng biến --cell-color để tự đổi màu */
+            color: var(--cell-color); 
         }
         /* Style cho in PDF */
         @media print {
