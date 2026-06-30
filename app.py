@@ -37,17 +37,23 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
         for phach in range(khuong, khuong + 16):
             vals = sorted(time_map.get(phach, []), reverse=True, key=lambda x: int(x) if x != "" else 0)
             
+            # Cấu hình vạch kẻ phải
             border_right = "1px solid #555"
-            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa"
-            if (phach + 1) % 16 == 0: border_right = "4px solid white"
+            if (phach + 1) % 4 == 0: border_right = "2px solid #aaa" # Vạch nhịp
+            if (phach + 1) % 16 == 0: border_right = "4px solid white" # Vạch khuông
             
+            # Cấu hình vạch kẻ trái (thêm viền cho cột đầu tiên mỗi khuông)
+            border_left = "2px solid #aaa" if phach == khuong else "none"
+            
+            # Xử lý nội dung hiển thị
             cell_content = ""
             if vals:
                 cell_content = f"{vals[0]}"
                 if len(vals) > 1:
                     cell_content += "<br>" + "<br>".join(map(str, vals[1:]))
             
-            html_content += f"<td style='border-right: {border_right};'>{cell_content}</td>"
+            # Gộp border-left và border-right vào style của td
+            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
         html_content += "</tr></table>"
         all_html += html_content
     
