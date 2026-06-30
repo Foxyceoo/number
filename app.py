@@ -11,7 +11,7 @@ if uploaded_file := st.file_uploader("Tải file JSON", type=["json"]):
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    beat_duration = 60000 / bpm / 4
+    beat_duration = 60000 / bpm / 2
     
     time_map = {}
     for n in notes:
