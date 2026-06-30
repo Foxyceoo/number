@@ -100,8 +100,9 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
             line = f"Phach {phach}: {', '.join(map(str, notes))}"
             pdf.cell(200, 10, txt=line, ln=True)
             
-        # Xuất PDF dưới dạng byte
-        pdf_output = pdf.output(dest='S').encode('latin-1')
+        # Thay vì dùng pdf.output(dest='S').encode('latin-1')
+        # Hãy dùng cách này cho FPDF phiên bản mới:
+        pdf_output = pdf.output()
         
         st.download_button(
             label="Tải file PDF (FPDF)",
