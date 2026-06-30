@@ -11,13 +11,15 @@ def get_number_from_key(key_str):
 
 st.title("Bộ chuyển đổi sheet số")
 
-# Bạn để trống label hoặc đặt tên mới, sau đó dùng help để hiển thị "- 123 -"
+# ... (phần trên giữ nguyên)
 if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     data = json.load(uploaded_file)
+    # Lấy tên bài hát từ tên file (bỏ đuôi .json)
+    song_name = uploaded_file.name.replace(".json", "")
+    
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
     
-    # Sử dụng logic mới: beat_duration không chia 4, kết hợp với hiển thị 32 phách
     beat_duration = 60000 / bpm 
     
     time_map = {}
@@ -27,7 +29,8 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     
     max_beat = max(time_map.keys()) if time_map else 0
     
-    st.subheader(f"Nhạc phổ (BPM: {bpm}) - Nhịp 4/4")
+    # HIỂN THỊ TÊN BÀI HÁT CĂN GIỮA (THAY CHO DÒNG ST.SUBHEADER CŨ)
+    st.markdown(f"<h2 style='text-align: center;'>{song_name}</h2>", unsafe_allow_html=True)
     
     style = """
     <style>
@@ -35,6 +38,7 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
         td { height: 60px; vertical-align: top; padding-top: 5px; font-weight: bold; width: 40px; }
     </style>
     """
+    # ... (phần code còn lại giữ nguyên)
     
     all_html = style
     # Hiển thị 32 phách mỗi khuông để nốt không bị nhảy dòng
