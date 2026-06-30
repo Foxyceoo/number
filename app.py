@@ -140,18 +140,15 @@ if uploaded_file:
             border_left = "2px solid #00008c" if phach == khuong else "none"
             # ------------------------
 
-            # Trong vòng lặp tạo cell_content:
+            # Sửa lại phần này để bỏ min-height động
             if vals:
                 top_num = vals[0]
-                # Nối các số còn lại
                 bottom_nums = "<br>".join(map(str, vals[1:]))
-                
-                # Tăng chiều cao nội dung dựa trên số lượng nốt (len(vals))
-                # Cột càng nhiều nốt thì các thẻ div càng đẩy cột dài ra
+                # Dùng height: 100% để ép div nằm gọn trong td 50px
                 cell_content = f"""
-                <div class='grid-cell' style='min-height: {len(vals) * 20}px;'>
-                    <div class='top-row'>{top_num}</div>
-                    <div class='bottom-row'>{bottom_nums}</div>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50px;'>
+                    <div style='line-height: 1; font-weight: bold;'>{top_num}</div>
+                    <div style='line-height: 1; font-size: 10px;'>{bottom_nums}</div>
                 </div>
                 """
             else:
