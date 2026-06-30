@@ -44,26 +44,25 @@ if uploaded_file :
         text-align: center; 
         font-size: 16px; 
         width: 100%; 
-        margin-bottom: 50px; /* Tăng khoảng cách giữa các bảng nhạc */
-        color: inherit; 
+        margin-bottom: 50px;
+        /* THÊM 2 DÒNG NÀY ĐỂ ÉP BẢNG THẲNG TẮP */
+        table-layout: fixed; 
+        width: 100%;
     }
     
     td { 
-        height: 50px !important;    /* Ép cứng chiều cao, không phụ thuộc nội dung */
-        min-height: 50px !important;
-        max-height: 50px !important;
-        
-        vertical-align: middle;     /* Căn giữa số theo chiều dọc để cân đối */
-        padding: 0;                 /* Bỏ padding để không làm đẩy ô */
-        
+        height: 50px !important; 
+        vertical-align: middle; 
+        padding: 0 !important; 
         font-weight: bold; 
-        width: 40px; 
+        
+        /* ÉP CỨNG CHIỀU RỘNG CỦA MỌI CỘT */
+        width: 30px !important; 
+        min-width: 30px !important;
+        
         border-right: 1px solid #555; 
         border-left: none;
-        
-        /* Đảm bảo số nằm gọn và không đẩy ô */
-        overflow: hidden; 
-        line-height: 1.2;
+        overflow: hidden; /* Cắt bỏ phần dư thừa nếu số quá to */
     }
     
     /* Style cho in PDF */
