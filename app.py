@@ -59,14 +59,12 @@ if uploaded_file:
     }}
 
     td {{
-        /* Cấu hình để các ô cùng hàng có chiều cao bằng nhau */
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start; /* Căn từ trên xuống */
+        align-items: center;        /* Căn giữa theo chiều ngang */
         
-        /* Chiều cao mặc định là 50px, nếu nốt nhiều hơn sẽ tự giãn */
         min-height: 50px; 
-        
         width: 25px !important;
         min-width: 25px !important;
         padding: 5px 0;
@@ -74,7 +72,14 @@ if uploaded_file:
         border-right: 1px solid #555; 
         border-left: none;
         overflow: hidden;
-        line-height: 1.2; 
+    }}
+
+    /* Thêm đoạn này để các số không bị giãn quá mức */
+    .grid-cell {{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
     }}
 
     @media print {{{{
@@ -128,9 +133,9 @@ if uploaded_file:
                 # Tăng chiều cao nội dung dựa trên số lượng nốt (len(vals))
                 # Cột càng nhiều nốt thì các thẻ div càng đẩy cột dài ra
                 cell_content = f"""
-                <div class='grid-cell' style='min-height: {len(vals) * 20}px;'>
-                    <div class='top-row'>{top_num}</div>
-                    <div class='bottom-row'>{bottom_nums}</div>
+                <div class='grid-cell'>
+                    <div class='top-row'>{vals[0] if vals else ''}</div>
+                    <div class='bottom-row'>{"<br>".join(map(str, vals[1:]))}</div>
                 </div>
                 """
             else:
