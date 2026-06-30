@@ -53,7 +53,7 @@ if uploaded_file:
         font-size: 16px; 
         table-layout: fixed;
         width: {margin_side}; 
-        margin: 0 auto 50px auto; 
+        margin: 0 auto 20px auto; 
         color: inherit; 
     }}
 
