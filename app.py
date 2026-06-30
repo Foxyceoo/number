@@ -1,7 +1,7 @@
 import streamlit as st
 import json
 import streamlit.components.v1 as components
-from weasyprint import HTML
+from fpdf import FPDF
 
 # Cấu hình tên trang
 st.set_page_config(page_title='"Number" one Foxy')
@@ -59,13 +59,27 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
 
-    # Nút tải PDF
+    # Nút Tải về PDF dùng FPDF
     if st.button("Tải về PDF"):
-        # Định nghĩa kích thước A4 cho WeasyPrint
-        pdf_file = HTML(string=all_html).write_pdf()
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", 'B', 16)
+        pdf.cell(200, 10, txt=song_name, ln=True, align='C')
+        
+        pdf.set_font("Courier", '', 12)
+        pdf.ln(10) # Khoảng cách dòng
+        
+        # In dữ liệu ra PDF (đơn giản hóa)
+        for phach, notes in time_map.items():
+            line = f"Phach {phach}: {', '.join(map(str, notes))}"
+            pdf.cell(200, 10, txt=line, ln=True)
+            
+        # Xuất PDF dưới dạng byte
+        pdf_output = pdf.output(dest='S').encode('latin-1')
+        
         st.download_button(
-            label="Nhấn để tải file PDF (A4)",
-            data=pdf_file,
+            label="Tải file PDF (FPDF)",
+            data=pdf_output,
             file_name=f"{song_name}.pdf",
             mime="application/pdf"
         )
