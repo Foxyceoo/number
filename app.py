@@ -194,15 +194,24 @@ if uploaded_file :
     total_height = (len(all_khuong_html) * 110) + 300 
     
     # 2. HIỂN THỊ VỚI THANH CUỘN
-    # scrolling=True sẽ giúp bạn cuộn xem bản nhạc dài, 
-    # và khi bạn cuộn đến đâu, in đến đó sẽ rất tiện!
-    # Đảm bảo total_height đủ lớn để nhìn thấy thanh cuộn
-    # Nếu bản nhạc rất dài, đừng để nó quá khít
-    components.html(
-        f"<html><head>{style}</head><body>{display_html}</body></html>", 
-        height=1123,  # Thử đặt cố định 800px để xem nó có hiện thanh cuộn bên trong không
-        scrolling=True
-    )
+    # Tích hợp CSS ẩn "Manage app" vào trong chuỗi HTML luôn
+    html_to_render = f"""
+    <html>
+        <head>
+            {style}
+            <style>
+                /* Ẩn các thành phần giao diện của Streamlit khi nằm trong iframe */
+                #root footer, .stAppDeployButton, .viewerBadge_container__1QSob, 
+                .styles_viewerBadge__1yB5_, div[data-testid="stDecoration"] { 
+                    display: none !important; 
+                }
+            </style>
+        </head>
+        <body>{display_html}</body>
+    </html>
+    """
+    
+    components.html(html_to_render, height=1123, scrolling=True)
 
     # NÚT IN PDF
     # 3. NÚT IN PDF (Dùng HTML để gọi lệnh in)
