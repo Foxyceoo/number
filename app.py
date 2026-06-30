@@ -5,6 +5,8 @@ import streamlit.components.v1 as components
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
+from reportlab.graphics.shapes import Drawing, Rect, String
+from reportlab.platypus import PageBreak
 
 # Cấu hình tên trang
 st.set_page_config(page_title='"Number" one Foxy')
@@ -89,37 +91,37 @@ if uploaded_file := st.file_uploader("Sheet số (123)", type=["json"]):
     components.html(f"<html><body>{all_html}</body></html>", height=800, scrolling=True)
 
     # 3. KHU VỰC XUẤT FILE PDF
-    # Tự động tạo file và hiển thị nút tải về ngay khi có dữ liệu
-    if st.button("Tải về PDF"):
+    # Trong hàm xử lý nút tải PDF, thay thế phần tạo Table bằng đoạn này:
+    if st.button("Tải về PDF (Bố cục Lưới)"):
         pdf_filename = f"{song_name}.pdf"
         doc = SimpleDocTemplate(pdf_filename, pagesize=A4)
+        elements = []
     
-        # Tạo dữ liệu: Chia theo từng khuông 32 phách giống web
-        # Ta sẽ tạo một list các dòng, mỗi dòng là một phách
-        table_data = [["Phách", "Nốt"]]
-        for phach, notes_list in time_map.items():
-            table_data.append([str(phach), ", ".join(map(str, notes_list))])
+        # Thiết lập kích thước ô
+        cell_w, cell_h = 20, 40
+        start_x, start_y = 50, 700
     
-        # Thiết lập bảng với đường kẻ dọc (giống lưới web)
-        t = Table(table_data, colWidths=[50, 300]) # Cột phách 50, cột nốt 300
+        # Tạo một trang vẽ mới
+        d = Drawing(500, 800)
     
-        style_list = [
-            ('GRID', (0,0), (-1,-1), 0.5, colors.grey), # Kẻ lưới toàn bộ
-            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.lightgrey), # Kẻ dọc mờ
-            ('BOX', (0,0), (-1,-1), 2, colors.black), # Khung ngoài đậm
-            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ]
+        # Vẽ lưới và điền số (mô phỏng theo image_709bc4.png)
+        for phach in range(max_beat + 1):
+            x = start_x + (phach % 16) * cell_w
+            y = start_y - (phach // 16) * cell_h
+           
+            # Vẽ ô
+            d.add(Rect(x, y, cell_w, cell_h, strokeColor=colors.grey, fillColor=None))
+        
+            # Điền nốt
+            vals = time_map.get(phach, [])
+            if vals:
+                # Sắp xếp để nốt cao nằm trên, nốt thấp nằm dưới
+                vals_sorted = sorted(vals, reverse=True)
+                for idx, val in enumerate(vals_sorted):
+                    d.add(String(x + 5, y + 25 - (idx * 15), str(val), fontSize=10))
     
-        # Thêm logic kẻ dọc đậm mỗi 4 phách hoặc 16 phách nếu muốn (giống web)
-        # Ví dụ: Kẻ đậm cột mỗi 4 phách
-        for i in range(len(table_data)):
-            if i % 4 == 0: 
-                style_list.append(('LINEBELOW', (0,i), (-1,i), 1, colors.black))
-            
-        t.setStyle(TableStyle(style_list))
-
-        doc.build([t])
+        elements.append(d)
+        doc.build(elements)
     
         with open(pdf_filename, "rb") as f:
-            st.download_button("Tải PDF", f, file_name=pdf_filename, mime="application/pdf")
+            st.download_button("Tải PDF (Chuẩn Lưới)", f, file_name=pdf_filename, mime="application/pdf")
