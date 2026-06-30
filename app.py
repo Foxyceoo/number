@@ -33,6 +33,7 @@ if uploaded_file:
 
     # CSS của bạn được giữ nguyên
     # Nhân đôi {{ }} cho những đoạn CSS không phải biến Python
+    # Sửa lại đoạn style, xóa các dòng chú thích /*...*/ bên trong f-string
     style = f"""
     <style>
     ::-webkit-scrollbar {{
@@ -57,20 +58,19 @@ if uploaded_file:
         color: inherit; 
     }}
 
-    td { 
-        /* Bỏ height cố định, dùng padding để tạo độ dài cho cột */
+    td {{ 
         padding-top: 15px !important;    
         padding-bottom: 15px !important; 
         
         width: 25px !important;
         min-width: 25px !important;
-        vertical-align: middle !important; /* Căn giữa nội dung theo chiều dọc */
+        vertical-align: middle !important;
         font-weight: bold; 
         border-right: 1px solid #555; 
         border-left: none;
         overflow: hidden;
-        line-height: 1.5; /* Khoảng cách giữa các dòng số */
-    }
+        line-height: 1.5; 
+    }}
 
     @media print {{{{
         body, html {{{{
