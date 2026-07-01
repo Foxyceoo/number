@@ -48,7 +48,6 @@ if uploaded_file:
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
         height: 60px !important; 
-        margin: 0 auto 30px auto;
         
     }}
 
@@ -77,8 +76,10 @@ if uploaded_file:
         table {{
             page-break-inside: avoid !important; 
             break-inside: avoid !important; 
-            margin-bottom: 60px !important; /* Tạo khoảng trống giữa các dòng */
-            display: table !important; /* Đảm bảo hiển thị đúng dạng bảng */
+            margin-bottom: 60px !important;
+            display: table !important;
+        }}
+        
         body {{
             overflow: visible !important;
         }}
