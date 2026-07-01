@@ -25,7 +25,7 @@ if uploaded_file:
     song_name = uploaded_file.name.replace(".json", "")
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
-    beat_duration = 60000 / bpm /2               #BPM
+    beat_duration = 60000 / bpm                #BPM
     time_map = {}
     for n in notes:
         beat_idx = math.floor(n['time'] / beat_duration)
