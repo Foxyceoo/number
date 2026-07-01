@@ -144,17 +144,35 @@ if uploaded_file:
             else:
                 cell_content = ""
 
-            footer_link = """
-            <div class='print-footer' style='text-align: left; font-size: 12px; color: gray; margin-top: 20px;'>
-                https://foxynumber.streamlit.app
-            </div>
-            """
-            display_html += footer_link
-
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
         all_khuong_html.append(html_content)
         line_number += 1
+        
+    # Khởi tạo display_html trước khi vòng lặp sử dụng nó
+    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
 
+    PAGE_HEIGHT_LIMIT = 800
+    current_page_height = 0
+
+    for khuong_html in all_khuong_html:
+        khuong_height = 110 
+        
+        if current_page_height + khuong_height > PAGE_HEIGHT_LIMIT:
+            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div><div class='page-break'></div>"
+            current_page_height = khuong_height
+        else:
+            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+            current_page_height += khuong_height
+
+    # Thêm footer_link vào sau vòng lặp, ngoài khu vực lặp lại không cần thiết
+    footer_link = """
+    <div class='print-footer' style='text-align: left; font-size: 12px; color: gray; margin-top: 20px;'>
+        https://foxynumber.streamlit.app
+    </div>
+    """
+    display_html += footer_link
+
+    html_to_render = style + display_html
     PAGE_HEIGHT_LIMIT = 800
     current_page_height = 0
     display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
