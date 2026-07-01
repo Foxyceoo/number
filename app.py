@@ -76,9 +76,9 @@ if uploaded_file:
         }}
 
         td {{
-            width: 15px !important;       /* Cố định độ rộng ô khi in */
-            min-width: 15px !important;   /* Đảm bảo ô không bị co lại nhỏ hơn mức này */
-            max-width: 15px !important;   /* Đảm bảo ô không bị phình ra */
+            width: 14px !important;       /* Cố định độ rộng ô khi in */
+            min-width: 14px !important;   /* Đảm bảo ô không bị co lại nhỏ hơn mức này */
+            max-width: 14px !important;   /* Đảm bảo ô không bị phình ra */
             padding: 0 !important;
             overflow: hidden !important;
             white-space: nowrap !important;
