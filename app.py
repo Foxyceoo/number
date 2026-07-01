@@ -151,7 +151,7 @@ if uploaded_file:
             current_page_height += khuong_height
 
     html_to_render = style + display_html
-    row_height = 50 + 30
+    row_height = 50 + 50
     total_height = (len(all_khuong_html) * row_height) + 100
     components.html(html_to_render, height=total_height, scrolling=False)
 
