@@ -94,8 +94,10 @@ if uploaded_file:
             white-space: nowrap !important;
         }}
 
-        div[data-testid="stButton"] {{
-            display: none !important;
+        .khuong-wrapper:last-child {{
+            padding-bottom: 250mm !important; /* 300mm gần bằng chiều dài một tờ A4 */
+        }}
+    
         }}
         
         body {{
