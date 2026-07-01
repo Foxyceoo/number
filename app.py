@@ -46,12 +46,12 @@ if uploaded_file:
         table-layout: fixed !important; 
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
-        height: 40px !important; 
+        height: 50px !important; 
     }}
 
     td {{ 
         padding: 0 !important; 
-        height: 40px !important; 
+        height: 50px !important; 
         width: 20px !important; 
         vertical-align: top !important; 
         border-right: 1px solid #555; 
