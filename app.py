@@ -71,6 +71,17 @@ if uploaded_file:
             break-inside: avoid !important; 
             margin-bottom: 56px !important; 
             display: table !important; 
+            table-layout: fixed !important; /* Quan trọng: Ép bảng theo chiều rộng cố định */
+            width: 100% !important;
+        }}
+
+        td {{
+            width: 25px !important;       /* Cố định độ rộng ô khi in */
+            min-width: 25px !important;   /* Đảm bảo ô không bị co lại nhỏ hơn mức này */
+            max-width: 25px !important;   /* Đảm bảo ô không bị phình ra */
+            padding: 0 !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
         }}
         
         body {{
