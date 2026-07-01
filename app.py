@@ -69,7 +69,7 @@ if uploaded_file:
         table {{
             page-break-inside: avoid !important; 
             break-inside: avoid !important; 
-            margin-bottom: 38px !important; 
+            margin-bottom: 37px !important; 
             display: table !important; 
         }}
         
