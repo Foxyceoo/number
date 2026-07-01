@@ -68,13 +68,12 @@ if uploaded_file:
 
         @page {{
         size: A4;
-        margin: 1cm 1cm 1cm 1cm; /* Lề: trên, phải, dưới, trái */
+        margin: 1cm 1.2cm 1cm 0.8cm; /* Lề: trên, phải, dưới, trái */
         }}
         
         /* Điều chỉnh cỡ chữ cho nốt nhạc khi in */
         .note-number {{
-            font-size: 12px !important; /* Giảm size nếu bị tràn hoặc tăng nếu muốn to rõ */
-        }}
+            font-size: 11px !important; /*Giảm size nếu bị tràn hoặc tăng nếu muốn to rõ*/
         
         table {{
             page-break-inside: avoid !important; 
