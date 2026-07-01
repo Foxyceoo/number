@@ -159,6 +159,14 @@ if uploaded_file:
     total_height = (len(all_khuong_html) * row_height) + 100
     components.html(html_to_render, height=total_height, scrolling=False)
 
+    st.markdown("""
+        <style>
+        div[data-testid="stButton"] {
+            margin-top: 100px !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     if st.button("to PDF"):
         js_code = """
         <script>
