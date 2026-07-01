@@ -120,9 +120,9 @@ if uploaded_file:
             if (phach + 1) % 4 == 0:
                 border_right = "0.5px solid #00008c"
             if (phach + 1) % 16 == 0:
-                border_right = "2px solid #00008c"
+                border_right = "0.5px solid #00008c"
 
-            border_left = "2px solid #00008c" if phach == khuong else "none"
+            border_left = "0.5px solid #00008c" if phach == khuong else "none"
 
             if vals:
                 top_num = vals[0]
