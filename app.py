@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import json
+import math
 import streamlit.components.v1 as components
 
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
@@ -24,10 +25,10 @@ if uploaded_file:
     song_name = uploaded_file.name.replace(".json", "")
     bpm = data[0].get("bpm", 320)
     notes = data[0].get("songNotes", [])
-    beat_duration = 60000 / bpm /4                #BPM
+    beat_duration = 60000 / bpm /2               #BPM
     time_map = {}
     for n in notes:
-        beat_idx = round(n['time'] / beat_duration)
+        beat_idx = math.floor(n['time'] / beat_duration)
         time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
     max_beat = max(time_map.keys()) if time_map else 0
 
