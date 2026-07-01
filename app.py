@@ -89,7 +89,7 @@ if uploaded_file:
 
             border_right = "0.5px solid #d8d8d8"
             if (phach + 1) % 4 == 0:
-                border_right = "2px solid #00008c"
+                border_right = "0.5px solid #00008c"
             if (phach + 1) % 16 == 0:
                 border_right = "2px solid #00008c"
 
