@@ -48,7 +48,7 @@ if uploaded_file:
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
         height: 60px !important; 
-        margin: 0 auto 30px auto;
+        margin: 0 auto 50px auto;
         
     }}
 
