@@ -110,7 +110,12 @@ if uploaded_file:
     all_khuong_html = []
     line_number = 1
     for khuong in range(0, max_beat + 32, 32):
-        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
+        html_content = f"""
+        <table>
+            <tr>
+                <td style='border: none; width: 10px; font-size: 40px; vertical-align: middle;'>&#123;</td>
+                <td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>
+        """
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True)
 
