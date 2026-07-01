@@ -112,7 +112,7 @@ if uploaded_file:
     for khuong in range(0, max_beat + 32, 32):
         # Đoạn code MỚI (đã bỏ ngoặc)
         html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
-        for phach in range(khuong, khuong + 32):
+        for phach in range(khuong, khuong + 16):
             vals = sorted(time_map.get(phach, []), reverse=True)
 
             border_right = " 0px solid #d8d8d8"
