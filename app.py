@@ -46,7 +46,7 @@ if uploaded_file:
         table-layout: fixed !important; 
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
-        height: 50px !important; 
+        height: 40px !important; 
     }}
 
     td {{ 
