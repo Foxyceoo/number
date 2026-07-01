@@ -129,11 +129,13 @@ if uploaded_file:
 
             if vals:
                 top_num = vals[0]
-                bottom_nums = "<br>".join(map(str, vals[1:]))
+                # Thay vì dùng <br>, ta dùng list comprehension để bọc mỗi nốt vào một div
+                bottom_nums_html = "".join([f"<div style='margin-top: 5px;'>{n}</div>" for n in vals[1:]])
+                
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 50px; padding-top: 2px;'>
-                    <div class='top-row'>{top_num}</div>
-                    <div class='bottom-row'>{bottom_nums}</div>
+                    <div class='top-row' style='font-size: 15px;'>{top_num}</div>
+                    <div class='bottom-rows'>{bottom_nums_html}</div>
                 </div>
                 """
             else:
