@@ -76,7 +76,7 @@ if uploaded_file:
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         /* Điều chỉnh con số 50px này để tăng/giảm khoảng cách khi in */
-        margin-bottom: 50px !important;
+        margin-bottom: 60px !important;
     }}
     </style>
     """
