@@ -114,7 +114,7 @@ if uploaded_file:
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True)
 
-            border_right = "0.5px solid #d8d8d8"
+            border_right = " 0px solid #d8d8d8"
             if (phach + 1) % 4 == 0:
                 border_right = "0.5px solid #00008c"
             if (phach + 1) % 16 == 0:
