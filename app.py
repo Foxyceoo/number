@@ -152,7 +152,7 @@ if uploaded_file:
 
     html_to_render = style + display_html
     row_height = 50 + 50
-    total_height = (len(all_khuong_html) * row_height) + 500
+    total_height = (len(all_khuong_html) * row_height) + 100
     components.html(html_to_render, height=total_height, scrolling=False)
 
     if st.button("to PDF"):
