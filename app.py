@@ -195,7 +195,7 @@ if uploaded_file:
     st.markdown("""
         <style>
         div[data-testid="stButton"] {
-            margin-top: 1000px !important;
+            margin-top: 700px !important;
         }
         </style>
     """, unsafe_allow_html=True)
