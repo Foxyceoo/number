@@ -93,6 +93,10 @@ if uploaded_file:
             overflow: hidden !important;
             white-space: nowrap !important;
         }}
+
+        div[data-testid="stButton"] {{
+            display: none !important;
+        }}
         
         body {{
             overflow: visible !important;
@@ -148,7 +152,7 @@ if uploaded_file:
 
     html_to_render = style + display_html
     row_height = 50 + 50
-    total_height = (len(all_khuong_html) * row_height) + 1300
+    total_height = (len(all_khuong_html) * row_height) + 500
     components.html(html_to_render, height=total_height, scrolling=False)
 
     if st.button("to PDF"):
