@@ -99,6 +99,14 @@ if uploaded_file:
             padding-bottom: 250mm !important; /* 300mm gần bằng chiều dài một tờ A4 */
         }}
     
+        .print-footer {{
+            display: block !important;
+            position: fixed !important;
+            bottom: 10px !important; /* Cách mép dưới giấy 10px */
+            left: 10px !important;
+            width: 100% !important;
+            text-align: left !important;
+            z-index: 9999 !important;
         }}
         
         body {{
@@ -135,6 +143,13 @@ if uploaded_file:
                 """
             else:
                 cell_content = ""
+
+            footer_link = """
+            <div class='print-footer' style='text-align: left; font-size: 12px; color: gray; margin-top: 20px;'>
+                https://foxynumber.streamlit.app
+            </div>
+            """
+            display_html += footer_link
 
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
         all_khuong_html.append(html_content)
