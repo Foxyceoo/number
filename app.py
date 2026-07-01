@@ -86,7 +86,7 @@ if uploaded_file:
     for khuong in range(0, max_beat + 32, 32):
         # Sửa đoạn này trong vòng lặp tạo khuông nhạc:
         # Thêm </td> vào sau biến {line_number}
-html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
+        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
         for phach in range(khuong, khuong + 32):
             vals = sorted(time_map.get(phach, []), reverse=True)
 
