@@ -74,6 +74,7 @@ if uploaded_file:
         /* Điều chỉnh cỡ chữ cho nốt nhạc khi in */
         .note-number {{
             font-size: 11px !important; /*Giảm size nếu bị tràn hoặc tăng nếu muốn to rõ*/
+        }}
         
         table {{
             page-break-inside: avoid !important; 
