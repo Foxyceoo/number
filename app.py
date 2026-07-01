@@ -41,12 +41,15 @@ if uploaded_file:
     html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
 
     table {{ 
+        
         border-collapse: collapse; 
         text-align: center; 
         table-layout: fixed !important; 
         width: {margin_side}; 
         margin: 0 auto 30px auto; 
         height: 60px !important; 
+        margin: 0 auto 30px auto;
+        
     }}
 
     td {{ 
