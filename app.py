@@ -71,12 +71,17 @@ if uploaded_file:
     }}
 
     @media print {{
-        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-        table {{ page-break-inside: avoid !important; margin-bottom: 20px !important; }}
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        /* Điều chỉnh con số 50px này để tăng/giảm khoảng cách khi in */
-        margin-bottom: 60px !important;
+        .sidebar, header, .stAppDeployButton, footer { display: none !important; }
+        
+        /* Ép mỗi dòng nhạc (table) là một khối không bị cắt */
+        table {{
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important; 
+            margin-bottom: 60px !important; /* Tạo khoảng trống giữa các dòng */
+            display: table !important; /* Đảm bảo hiển thị đúng dạng bảng */
+        body {{
+            overflow: visible !important;
+        }}
     }}
     </style>
     """
