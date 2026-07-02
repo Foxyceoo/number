@@ -132,9 +132,22 @@ def get_symbol(value, mode):
 
 # 2. Thêm nút chọn chế độ vào Sidebar
 
+if 'uploaded_data' not in st.session_state:
+    st.session_state.uploaded_data = None
+
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
+    file = st.file_uploader("**Nhập file của bạn**", type=["json"])
+    if file is not None:
+        # Nếu có file mới, lưu vào session_state
+        st.session_state.uploaded_data = json.load(file)
+        st.session_state.file_name = file.name
+    
+    # Nếu file bị xóa ở widget (bấm x), thì xóa cả trong session_state
+    if file is None and st.session_state.uploaded_data is not None:
+        if st.button("Xóa dữ liệu hiện tại"):
+            st.session_state.uploaded_data = None
+            st.rerun()
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
