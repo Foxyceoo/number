@@ -103,7 +103,7 @@ if uploaded_file:
                 # Dùng join để nối các số bằng thẻ <br>, tất cả dùng cùng cỡ chữ 12px
                 all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50px;'>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 50px; padding-top: 2px;'>
                     <div style='font-size: 12px; font-weight: bold; line-height: 1.2;'>{all_nums}</div>
                 </div>
                 """
