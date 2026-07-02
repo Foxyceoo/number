@@ -282,7 +282,7 @@ if uploaded_file:
             box-shadow: none !important;
             border: none !important;
             margin: 0 auto !important;
-            padding: 60px 0px !important; /* Giữ nguyên lề trên dưới bạn vừa chỉnh */
+            padding: 50px 0px !important; /* Giữ nguyên lề trên dưới bạn vừa chỉnh */
             
             /* Ép trình duyệt BẮT BUỘC phải ngắt trang sau khi hết 1 khối .sheet-page */
             page-break-after: always !important;
@@ -351,7 +351,7 @@ if uploaded_file:
     # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN ĐÃ ĐƯỢC CĂN GIỮA
     # =========================================================================
     display_html = ""
-    lines_per_page = 5
+    lines_per_page = 10
     
     # Danh sách chứa HTML của từng trang sau khi gom đủ 5 dòng
     pages_list = []
