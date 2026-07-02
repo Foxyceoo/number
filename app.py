@@ -72,7 +72,7 @@ if uploaded_file:
         @page {{ size: A4; margin: 1cm 1.2cm 1cm 0.8cm; }}
         
         /* Ẩn các thứ không cần thiết */
-        .sidebar, header, .stAppDeployButton, footer { display: none !important; }
+        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
         
         .note-number {{ font-size: 11px !important; }}
         table {{ page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 56px !important; width: 100% !important; }}
