@@ -219,21 +219,24 @@ if uploaded_file:
         width: 100%;
     }
     
-    /* Trang A4 chuẩn Web */
+    /* Trang A4 chuẩn Web - Đã thêm căn giữa trên/dưới */
     .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
         width: 794px;
         min-height: 1123px;
-        
-        /* CŨ: padding: 40px 0px !important; */
-        /* MỚI: Tăng lề trên và lề dưới lên 60px để tạo khoảng trống thoáng đãng */
-        padding: 100px 0px !important; 
-        
+        padding: 60px 0px !important; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
         margin-bottom: 25px;
+
+        /* ========================================================================= */
+        /* MỚI: Biến trang giấy thành Flexbox để căn giữa nội dung theo chiều dọc */
+        /* ========================================================================= */
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important; /* Căn giữa tất cả các dòng nhạc theo chiều dọc */
     }
 
     /* Bảng nhạc co giãn ăn trọn 100% không gian còn lại sau khi đã trừ lề */
