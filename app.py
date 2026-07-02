@@ -243,7 +243,7 @@ if uploaded_file:
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
             # --- TÍCH HỢP CHUYỂN ĐỔI ---
-            if display_mode == "1. 1.. 1..." or display_mode == "abc"
+            if display_mode == "1. 1.. 1..." or display_mode == "abc":
                 vals = [get_symbol(v) for v in raw_vals]
             else:
                 vals = raw_vals
