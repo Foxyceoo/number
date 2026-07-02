@@ -278,8 +278,8 @@ if uploaded_file:
     
     # Render HTML
     for khuong_html in all_khuong_html:
-        # Bọc mỗi table vào một thẻ div có class cố định
-        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+    # Bọc mỗi table vào một thẻ div có class cố định
+    display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
     html_to_render = style + display_html
     
