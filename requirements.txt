@@ -6,3 +6,4 @@ streamlit-authenticator
 pyrebase4
 streamlit-google-auth
 streamlit-cookies-manager
+EncryptedCookiesManager
