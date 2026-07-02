@@ -223,10 +223,6 @@ with st.sidebar:
             background: transparent !important;
         }
 
-        [data-testid="stSidebar"] {
-        min-width: 700px !important;
-        max-width: 700px !important;
-        
         </style>
     """, unsafe_allow_html=True)
 
