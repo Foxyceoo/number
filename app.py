@@ -196,39 +196,44 @@ with st.sidebar:
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
-    # --- Danh sách bài hát (Đọc từ thư mục cố định) ---
-st.write("**Danh sách bài hát:**")
+    # --- Danh sách bài hát (Đọc từ thư mục cố định - SỬA LỖI) ---
+    st.write("**Danh sách bài hát:**")
 
-# Lấy danh sách file .json từ thư mục
-all_files = []
-if not os.path.exists(SHEET_DIR):
-    os.makedirs(SHEET_DIR)
-    # Tự tạo một file mẫu để app không bị báo lỗi trống
-    with open(os.path.join(SHEET_DIR, "Huong_dan.json"), "w", encoding="utf-8") as f:
-        f.write('[{"note": "Chào mừng cậu đến với sheetkynber!"}]')
+    # 1. Đọc file từ thư mục và gán vào biến all_files
+    all_files = [f for f in os.listdir(SHEET_DIR) if f.endswith('.json')]
 
-if not all_files:
-    st.info("Thư mục trống hoặc chưa tồn tại.")
-else:
+    # 2. Kiểm tra nếu thư mục trống thì tạo file hướng dẫn
+    if not all_files:
+        if not os.path.exists(os.path.join(SHEET_DIR, "Huong_dan.json")):
+            with open(os.path.join(SHEET_DIR, "Huong_dan.json"), "w", encoding="utf-8") as f:
+                f.write('[{"note": "Chào mừng cậu đến với sheetkynber!"}]')
+        all_files = ["Huong_dan.json"] # Cập nhật lại list sau khi tạo file
+        st.info("Thư mục trống, đã tạo file hướng dẫn.")
+
+    # 3. Hiển thị danh sách
     if "selected_song" not in st.session_state:
         st.session_state.selected_song = all_files[0]
 
     for file_name in all_files:
         display_name = file_name.replace(".json", "").replace("_", " ")
         is_current = (st.session_state.selected_song == file_name)
-        button_label = f"**{display_name}**" if is_current else f"**{display_name}**"
+        # In đậm tên bài hát
+        button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
         
+        # Nút bấm bài hát
         if st.button(button_label, key=f"btn_{file_name}", use_container_width=True):
             st.session_state.selected_song = file_name
             st.rerun()
 
-# --- Logic đọc dữ liệu cho bài được chọn ---
+# --- Logic đọc dữ liệu cho bài được chọn (Đặt ở ngoài block with st.sidebar) ---
 if "selected_song" in st.session_state:
     file_path = os.path.join(SHEET_DIR, st.session_state.selected_song)
-    with open(file_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        song_data = data[0]
-        song_name = st.session_state.selected_song.replace(".json", "")
+    # Thêm check tồn tại file để tránh crash khi vừa xóa/di chuyển file
+    if os.path.exists(file_path):
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            song_data = data[0]
+            song_name = st.session_state.selected_song.replace(".json", "")
     
  
     raw_columns = song_data.get("columns", [])
