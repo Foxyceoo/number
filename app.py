@@ -211,7 +211,7 @@ if uploaded_file:
     song_name = uploaded_file.name.rsplit('.', 1)[0]
     columns = []
 
-    # 1. Xử lý logic đọc file
+    # Xử lý logic đọc file
     if file_ext == "json":
         data = json.load(uploaded_file)
         if isinstance(data, list) and len(data) > 0:
@@ -226,27 +226,17 @@ if uploaded_file:
     elif file_ext == "txt":
         content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
         for line in content.strip().split('\n'):
-            if ',' in line:
-                parts = line.split(',')
+            parts = line.split(',')
             if len(parts) == 2:
                 t, k = parts
                 pitch = int(k.split("Key")[1]) - 1
                 columns.append([int(t), [[pitch, k]]])
 
     if not columns:
-        st.error("Không thể đọc được dữ liệu từ file này!")
+        st.error("Không thể đọc được dữ liệu từ file này! Hãy kiểm tra lại format.")
     else:
+        # Bắt đầu phần hiển thị
         bits_per_page = 32
-        style = f"""
-        <style>
-            ::-webkit-scrollbar {{ display: none !important; }}
-            html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
-            table {{ border-collapse: collapse; text-align: center; table-layout: fixed !important; width: 100%; margin: 0 auto 30px auto; height: 60px !important; }}
-            td {{ padding: 2px !important; width: 20px !important; vertical-align: top !important; border-right: 1px solid #555; border-left: none; overflow: hidden; }}
-            .khuong-wrapper {{ page-break-inside: avoid !important; margin-bottom: 20px !important; }}
-        </style>
-        """
-        
         all_khuong_html = []
         line_number = 1
         
