@@ -134,17 +134,52 @@ def get_symbol(value, mode):
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
+    # Thay đổi cấu hình để nhận nhiều file cùng lúc
+    uploaded_files = st.file_uploader(
+        "Nhập file của bạn", 
+        type=["json"], 
+        accept_multiple_files=True  # Thêm dòng này nha cậu
+    )
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-if uploaded_file:
-    data = json.load(uploaded_file)
+if uploaded_files:
+    # 1. Khởi tạo bài hát được chọn trong session_state nếu chưa có
+    if "selected_song_index" not in st.session_state:
+        st.session_state.selected_song_index = 0
+        
+    # Tạo một vùng sidebar hoặc main tùy thuộc vị trí cậu đặt uploader trước đó
+    # Ở đây Yaoyao tạo các nút bấm xếp dọc sát nhau y hệt ảnh 2
+    for index, file in enumerate(uploaded_files):
+        display_name = file.name.replace(".json", "")
+        
+        # Nếu là file đang được chọn, nút bấm sẽ có màu xanh/đỏ nổi bật (primary)
+        is_selected = st.session_state.selected_song_index == index
+        btn_type = "primary" if is_selected else "secondary"
+        
+        # Tạo nút bấm cho từng file
+        if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
+            st.session_state.selected_song_index = index
+            st.rerun()
+            
+    # 2. Lấy dữ liệu của file đang được lựa chọn để vẽ sheet nhạc
+    # Nếu lỡ xóa file làm index vượt quá số lượng hiện tại, đưa về 0
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
+        
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
+    
+    # Tiếp tục luồng xử lý JSON của cậu
+    data = json.load(current_selected_file)
     song_data = data[0]
-    song_name = uploaded_file.name.replace(".json", "")
+    song_name = current_selected_file.name.replace(".json", "")
+    
+    # =========================================================================
+    # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN...
+    # =========================================================================
     
     # =========================================================================
     # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
