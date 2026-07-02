@@ -227,7 +227,6 @@ if uploaded_file:
     """
     
     all_khuong_html = []
-    line_number = 1
     
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
@@ -238,7 +237,7 @@ if uploaded_file:
             for _ in range(needed):
                 khuong_columns.append([0, []])
 
-        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
+        html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse;'><tr>"
         
         for col_idx, col in enumerate(khuong_columns):
             notes_in_col = col[1]
@@ -272,7 +271,6 @@ if uploaded_file:
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
-        line_number += 2
         
     # === THAY THẾ TỪ ĐÂY ĐỂ CHUYỂN SANG DẠNG LẬT TRANG ===
     
