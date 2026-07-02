@@ -5,12 +5,11 @@ import math
 import time
 import pyrebase
 import streamlit.components.v1 as components
-from streamlit_google_oauth import authenticate_google
 
-# Đường dẫn đến file CSV của bạn (đã xuất bản từ Google Sheets)
+# Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
-# 1. Khởi tạo kết nối với Firebase
+# Sát lề trái
 config = {
     "apiKey": st.secrets["FIREBASE_API_KEY"],
     "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
@@ -21,25 +20,28 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
+# Sát lề trái
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# 2. Quản lý trạng thái đăng nhập
+# Sát lề trái
 if 'user' not in st.session_state:
     st.session_state.user = None
 
+# Hàm đăng nhập không dùng thư viện ngoài để tránh lỗi
 def login_form():
-    user_info = authenticate_google(
-        client_id=st.secrets["GOOGLE_CLIENT_ID"], 
-        client_secret=st.secrets["GOOGLE_CLIENT_SECRET"]
-    )
-
-    if user_info:
-        st.write(f"Chào {user_info['name']}!")
-        st.session_state.user = user_info
-    else:
-        st.write("Vui lòng đăng nhập bằng Google bên dưới:")
-        # Ở đây thư viện sẽ tự vẽ ra cái nút Google cho bạn
+    st.title("Đăng nhập")
+    email = st.text_input("Email")
+    password = st.text_input("Mật khẩu", type="password")
+    if st.button("Đăng nhập"):
+        try:
+            user = auth.sign_in_with_email_and_password(email, password)
+            st.session_state.user = user
+            st.session_state.user_name = user['email'].split('@')[0]
+            st.session_state.logged_in = True
+            st.rerun()
+        except:
+            st.error("Sai email hoặc mật khẩu!")
 
 # 3. Luồng chính của app
 if st.session_state.user is None:
