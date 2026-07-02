@@ -189,12 +189,25 @@ with st.sidebar:
     # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
     
-# --- Cấu hình File Uploader cho phép tải nhiều bài ---
+    # --- Cấu hình File Uploader cho phép tải nhiều bài ---
     uploaded_files = st.file_uploader(
         "Chọn nhiều file JSON cùng lúc!",
         type=["json"],
         accept_multiple_files=True,
         label_visibility="collapsed"
+    )
+
+    # --- CSS ẨN DANH SÁCH MẶC ĐỊNH ---
+    # Đoạn này sẽ ẩn khối mặc định mà cậu thấy ở image_a5ff57.png
+    st.markdown("""
+        <style>
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section ~ div,
+        [data-testid="stSidebar"] [data-testid="stFileUploaderFilesContainer"],
+        [data-testid="stSidebar"] .uploadedFiles {
+            display: none !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
         
     st.markdown(
         """
@@ -263,7 +276,8 @@ with st.sidebar:
                 st.session_state.selected_song_index = idx
                 st.rerun()
 
-if uploaded_files:
+# --- Hiển thị danh sách nút bấm bài hát (Dùng uploaded_files) ---
+    if uploaded_files:
         # Cập nhật index nếu danh sách thay đổi
         if "selected_song_index" not in st.session_state or st.session_state.selected_song_index >= len(uploaded_files):
             st.session_state.selected_song_index = 0
