@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import math
+import time
 import streamlit.components.v1 as components
 
 # Đường dẫn đến file CSV của bạn (đã xuất bản từ Google Sheets)
