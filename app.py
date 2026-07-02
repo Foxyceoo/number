@@ -176,16 +176,6 @@ with st.sidebar:
     if "current_song" not in st.session_state:
         st.session_state.current_song = None
 
-    st.write("### Nhập file của bạn")
-    
-    # 1. Trả về nút đen cũ: Nhận nhiều file cùng lúc, cực nhạy, không lo bấm 2 lần
-    uploaded_files = st.file_uploader(
-        "Chọn file JSON của bạn để bắt đầu!",
-        type=["json"],
-        accept_multiple_files=True,
-        label_visibility="collapsed"
-    )
-
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
     st.write("**Chế độ hiển thị:**")
