@@ -170,7 +170,38 @@ with st.sidebar:
     if "current_song" not in st.session_state:
         st.session_state.current_song = None
 
-    st.write
+    st.write("### Nhập file của bạn")
+    
+    # 1. Khởi tạo key trong session_state nếu chưa có để kiểm soát dữ liệu nạp vào
+    if "file_uploader_val" not in st.session_state:
+        st.session_state.file_uploader_val = None
+
+    # 2. Ô uploader sử dụng một key động để có thể reset dễ dàng
+    uploaded_file = st.file_uploader(
+        "Chọn file JSON của bạn để bắt đầu!",
+        type=["json"],
+        accept_multiple_files=False,
+        label_visibility="collapsed",
+        key="file_uploader_key"
+    )
+    
+    # 3. Logic xử lý nạp file và tự động reset trạng thái ô nhập an toàn
+    if uploaded_file is not None:
+        file_name = uploaded_file.name
+        if file_name not in st.session_state.playlist_files:
+            st.session_state.playlist_files[file_name] = uploaded_file.getvalue()
+            st.session_state.current_song = file_name
+            st.toast(f"Đã nạp bài: {file_name.replace('.json', '')}", icon="✅")
+            
+            # Thay vì dùng 'del' gây lỗi docstring, ta dùng rerun để reset widget sạch sẽ
+            st.rerun()
+    
+    # Tự động nạp file vào danh sách lưu trữ tạm thời khi người dùng chọn file
+    if uploaded_file is not None:
+        file_name = uploaded_file.name
+        if file_name not in st.session_state.playlist_files:
+            st.session_state.playlist_files[file_name] = uploaded_file.getvalue()
+            st.toast(f"Đã nạp bài: {file_name.replace('.json', '')}", icon="✅")
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
