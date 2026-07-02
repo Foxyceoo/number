@@ -292,6 +292,7 @@ with st.sidebar:
                 st.rerun()
 
     # Kiểm tra nếu đã có dữ liệu bài hát mới thực hiện xử lý
+# Kiểm tra nếu đã có dữ liệu bài hát mới thực hiện xử lý
 if 'song_data' in locals() or 'song_data' in globals():
     raw_columns = song_data.get("columns", [])
     bits_per_page = 32
@@ -305,9 +306,9 @@ if 'song_data' in locals() or 'song_data' in globals():
     else:
         columns = []
 else:
-     
-    raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
+    # Nếu chưa có bài hát, khởi tạo các giá trị mặc định để tránh lỗi
+    columns = []
+    bits_per_page = 32
     
     if raw_columns:
         max_bit_index = max([col[0] for col in raw_columns])
