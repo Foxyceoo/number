@@ -52,7 +52,7 @@ if uploaded_file:
     }}
 
     td {{ 
-        padding: 5px !important;  
+        padding: 2px !important;  
         width: 20px !important; 
         vertical-align: top !important; 
         border-right: 1px solid #555; 
@@ -100,13 +100,14 @@ if uploaded_file:
             border_left = "0.5px solid #00008c" if is_new_line else "none"
 
             if vals:
-                # Dùng join để nối các số bằng thẻ <br>, tất cả dùng cùng cỡ chữ 12px
+                # Dùng join để nối các số bằng thẻ <br>
                 all_nums = "<br>".join(map(str, vals))
-                max_note = max(vals) if vals else 1
-                dynamic_padding = 5 + (max_note * 2)
+                
+                # Sửa lại: Dùng display: flex và bỏ dynamic_padding dựa trên giá trị nốt
+                # Chỉ để padding-top cố định một chút để tránh dính sát mép trên
                 cell_content = f"""
-                <div style='padding-top: {dynamic_padding}px; flex-direction: column; align-items: center; padding-top: 2px;'>
-                    <div style='font-size: 12px; font-weight: bold; line-height: 1.5;'>{all_nums}</div>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
+                    <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
                 </div>
                 """
             else:
