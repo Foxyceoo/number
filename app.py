@@ -351,7 +351,7 @@ if uploaded_file:
     # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN ĐÃ ĐƯỢC CĂN GIỮA
     # =========================================================================
     display_html = ""
-    lines_per_page = 10
+    lines_per_page = 8
     
     # Danh sách chứa HTML của từng trang sau khi gom đủ 5 dòng
     pages_list = []
