@@ -124,12 +124,11 @@ def get_symbol(value):
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
+    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
+    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["Số thuần", "Sheet 1-15"])
-    st.markdown("---")
-    uploaded_file = st.file_uploader("**Sheet 123**", type=["json"])
-    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
 
 if uploaded_file:
