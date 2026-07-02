@@ -39,6 +39,10 @@ def check_login():
 # Gọi hàm kiểm tra
 check_login()
 
+#Lời chào sau đăng nhập
+if st.session_state.get('logged_in'):
+    st.title(f"Hello {st.session_state.user_name}!")
+
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 padding_top_px = 40
 padding_bottom_px = 90
