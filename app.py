@@ -10,6 +10,13 @@ import streamlit.components.v1 as components
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
+from weasyprint import HTML
+
+def generate_pdf(html_content):
+    # Tạo PDF từ HTML string
+    pdf_file = HTML(string=html_content).write_pdf()
+    return pdf_file
+    
 # Sát lề trái
 config = {
     "apiKey": st.secrets["FIREBASE_API_KEY"],
@@ -185,6 +192,10 @@ if uploaded_file:
         overflow: hidden;
     }}
 
+    .table-spacer {{
+        break-inside: avoid; /* Không để nội dung bị cắt giữa chừng */
+        page-break-inside: avoid;
+    }}
     .note-number {{ 
         font-size: 15px !important; 
         font-weight: bold !important; 
@@ -285,6 +296,15 @@ if uploaded_file:
     
     # Tạo khoảng cách cố định 50px
     st.write('<div style="height: 700px;"></div>', unsafe_allow_html=True)    
-    if st.button("to PDF"):
-        js_code = "<script>window.parent.window.print();</script>"
-        components.html(js_code, height=0)
+    if st.button("Tải PDF xịn"):
+    # Tạo nội dung HTML hoàn chỉnh (CSS + Body)
+    full_html = style + display_html 
+    
+    pdf_data = generate_pdf(full_html)
+    
+    st.download_button(
+        label="Tải về máy",
+        data=pdf_data,
+        file_name=f"{song_name}.pdf",
+        mime="application/pdf"
+    )
