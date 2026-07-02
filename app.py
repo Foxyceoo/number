@@ -159,10 +159,10 @@ with st.sidebar:
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-if uploaded_file:
-    data = json.load(uploaded_file)
+if file:
+    data = json.load(file)
     song_data = data[0]
-    song_name = uploaded_file.name.replace(".json", "")
+    song_name = file.name.replace(".json", "")
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
