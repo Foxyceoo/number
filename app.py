@@ -150,8 +150,8 @@ with st.sidebar:
             st.rerun()
 
     if st.session_state.uploaded_data is not None:
-    data = st.session_state.uploaded_data
-    song_name = st.session_state.file_name.replace(".json", "")
+        data = st.session_state.uploaded_data
+        song_name = st.session_state.file_name.replace(".json", "")
 
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
