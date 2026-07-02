@@ -351,10 +351,10 @@ if uploaded_file:
         all_khuong_html.append(html_content)
         
     # =========================================================================
-    # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN ĐÃ ĐƯỢC CĂN GIỮA
+    # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN ĐỂ ĐỦ 5 DÒNG
     # =========================================================================
     display_html = ""
-    lines_per_page = 8
+    lines_per_page = 9
     
     # Danh sách chứa HTML của từng trang sau khi gom đủ 5 dòng
     pages_list = []
@@ -363,10 +363,27 @@ if uploaded_file:
         chunk = all_khuong_html[idx : idx + lines_per_page]
         
         page_content = "<div class='sheet-page'>"
+        
+        # 1. Chèn các khuông nhạc có dữ liệu thực tế vào trước
         for khuong_html in chunk:
             page_content += f"<div class='khuong-wrapper'>{khuong_html}</div>"
-        page_content += "</div>"
         
+        # 2. TRƯỜNG HỢP TRANG CUỐI THIẾU DÒNG: Tự động bù các khuông nhạc ẩn
+        if len(chunk) < lines_per_page:
+            needed_lines = lines_per_page - len(chunk)
+            
+            # Tạo một khung bảng trống có kích thước y hệt khuông thật để giữ dáng hàng
+            cell_width_pct = 100.0 / bits_per_page
+            empty_table = "<table style='table-layout: fixed; width: 94% !important; border-collapse: collapse; margin: 0 auto !important; padding: 0;'><tr>"
+            for _ in range(bits_per_page):
+                empty_table += f"<td style='width: {cell_width_pct}%; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'><div style='min-height: 60px;'></div></td>"
+            empty_table += "</tr></table>"
+            
+            # Bù thêm số dòng ẩn cần thiết bằng cách ẩn visibility (vẫn chiếm không gian nhưng không hiện hình)
+            for _ in range(needed_lines):
+                page_content += f"<div class='khuong-wrapper' style='visibility: hidden; margin-bottom: 35px !important;'>{empty_table}</div>"
+        
+        page_content += "</div>"
         pages_list.append(page_content)
         
     # Chuỗi HTML đầy đủ để hiển thị trên Web xem trước
