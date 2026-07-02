@@ -147,70 +147,44 @@ if uploaded_file:
     song_name = uploaded_file.name.replace(".json", "")
     
     # =========================================================================
-    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
-    # =========================================================================
-    raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
-    
-    if raw_columns:
-        max_bit_index = max([col[0] for col in raw_columns])
-        columns = [[i, []] for i in range(max_bit_index + 1)]
-        for col in raw_columns:
-            bit_pos = col[0]
-            columns[bit_pos] = col
-    else:
-        columns = []
-
-    # =========================================================================
     # TỰ ĐỘNG TÍNH SỐ DÒNG MỖI TRANG DỰA VÀO HỢP ÂM DÀY NHẤT
     # =========================================================================
-    # Tìm số lượng số (nốt) lớn nhất xuất hiện trong cùng một cột
     max_notes_in_col = 1
     if raw_columns:
         max_notes_in_col = max([len(col[1]) for col in raw_columns if len(col) > 1])
 
-    # Thiết lập số dòng mỗi trang dựa theo độ dày của cột (Như ảnh 2 và ảnh 3)
     if max_notes_in_col <= 3:
-        lines_per_page = 10  # 3 số 1 cột -> 10 dòng/trang (ảnh 2)
-        min_cell_height = 50 # Chiều cao ô nhỏ hơn vì ít nốt xếp chồng
+        lines_per_page = 10  
+        min_cell_height = 50 
         margin_bottom_val = "12px"
     elif max_notes_in_col == 4:
-        lines_per_page = 8   # 4 số 1 cột -> 8 dòng/trang (ảnh 3)
-        min_cell_height = 65 
+        lines_per_page = 8   
+        min_cell_height = 65  
         margin_bottom_val = "15px"
     else:
-        # Dự phòng nếu hợp âm dày hơn nữa (5 nốt trở lên)
         lines_per_page = 5   
         min_cell_height = 80
         margin_bottom_val = "25px"
-  
 
     # Hàm lấy số thuần (cũ)
     def get_number_from_key(note_data):
         pitch = int(note_data[0])
         return pitch + 1
-    
 
-    # Lấy danh sách các cột và số bit mỗi trang từ file
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
-    
+    # YAOYAO: ĐÃ XÓA DÒNG GHI ĐÈ columns VÀ bits_per_page Ở ĐÂY!
 
     def get_number_from_data(note_data):
-        # note_data là list [pitch, key]
         return int(note_data[1])
 
     st.markdown(
         """
         <style>
-        /* Mở rộng tối đa container chính của Streamlit */
         .block-container {
             max-width: 100% !important;
             padding-left: 1rem !important;
             padding-right: 1rem !important;
             padding-top: 2rem !important;
         }
-        /* Căn giữa thành phần iframe */
         iframe {
             display: block;
             margin: 0 auto !important;
@@ -220,11 +194,9 @@ if uploaded_file:
         """,
         unsafe_allow_html=True
     )
-
         
-    #CSS
     # =========================================================================
-    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 (Đã thêm lề trang trái/phải 20px)
+    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4
     # =========================================================================
     page_style = """
     <style>
@@ -242,7 +214,6 @@ if uploaded_file:
         width: 100%;
     }
     
-    /* Trang A4 chuẩn Web - Đã thêm căn giữa trên/dưới */
     .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
@@ -253,22 +224,17 @@ if uploaded_file:
         border-radius: 4px;
         page-break-after: always;
         margin-bottom: 25px;
-
-        /* ========================================================================= */
-        /* MỚI: Biến trang giấy thành Flexbox để căn giữa nội dung theo chiều dọc */
-        /* ========================================================================= */
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important; /* Căn giữa tất cả các dòng nhạc theo chiều dọc */
+        justify-content: center !important; 
     }
 
-    /* Bảng nhạc co giãn ăn trọn 100% không gian còn lại sau khi đã trừ lề */
     table { 
         border-collapse: collapse !important; 
         text-align: center; 
         table-layout: fixed !important; 
-        width: 94% !important; /* Đồng bộ độ rộng co vào tại đây */
-        margin: 0 auto !important; /* Luôn luôn nằm chính giữa trang giấy */
+        width: 94% !important; 
+        margin: 0 auto !important; 
         padding: 0 !important;
     }
 
@@ -288,41 +254,79 @@ if uploaded_file:
     }
     
     @media print {
-        /* 1. Ẩn toàn bộ giao diện thừa của Streamlit */
         header, footer, .sidebar, [data-testid="stSidebar"], .stAppDeployButton, button {
             display: none !important;
         }
-        
-        /* 2. Đưa body về trạng thái in chuẩn, xóa sạch nền xám và khoảng cách thừa */
         html, body {
             background-color: #ffffff !important;
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
         }
-
-        /* 3. Ép các trang giấy A4 hiển thị chuẩn xác khi xuất file */
         .sheet-page {
             width: 100% !important;
             max-width: 794px !important;
             box-shadow: none !important;
             border: none !important;
             margin: 0 auto !important;
-            padding: 50px 0px !important; /* Giữ nguyên lề trên dưới bạn vừa chỉnh */
-            
-            /* Ép trình duyệt BẮT BUỘC phải ngắt trang sau khi hết 1 khối .sheet-page */
+            padding: 50px 0px !important; 
             page-break-after: always !important;
             break-after: page !important;
         }
-
-        /* 4. Cấu hình cài đặt trang in của trình duyệt */
         @page {
             size: A4 portrait;
-            margin: 0; /* Xóa lề mặc định của trình duyệt để không bị lệch */
+            margin: 0; 
         }
     }
     </style>
     """
+    
+    # =========================================================================
+    # 4. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU TỶ LỆ %
+    # =========================================================================
+    all_khuong_html = []
+    
+    for i in range(0, len(columns), bits_per_page):
+        khuong_columns = columns[i : i + bits_per_page]
+        
+        if len(khuong_columns) < bits_per_page:
+            needed = bits_per_page - len(khuong_columns)
+            for _ in range(needed):
+                khuong_columns.append([0, []])
+
+        html_content = "<table style='table-layout: fixed; width: 94% !important; border-collapse: collapse; margin: 0 auto !important; padding: 0;'><tr>"
+        cell_width_pct = 100.0 / bits_per_page
+
+        for col_idx, col in enumerate(khuong_columns):
+            notes_in_col = col[1] if len(col) > 1 else []
+            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+            
+            if display_mode == "1. 1.. 1..." or display_mode == "abc":
+                vals = [get_symbol(v, display_mode) for v in raw_vals]
+            else:
+                vals = raw_vals
+            
+            is_new_line = (col_idx == 0)
+            is_beat_4 = ((col_idx + 1) % 8 == 0)
+            
+            border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
+            border_left = "1.5px solid #00008c" if is_new_line else "none"
+
+            if vals:
+                all_nums = "<br>".join(map(str, vals))
+                cell_content = f"""
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: {min_cell_height}px;'>
+                    <div style='font-size: 15px; font-weight: bold; line-height: 1.3; text-align: center; font-family: monospace, sans-serif;'>{all_nums}</div>
+                </div>
+                """
+            else:
+                # YAOYAO: ĐÃ SỬA THÀNH F-STRING ĐỂ NHẬN GIÁ TRỊ min_cell_height BIẾN ĐỘNG
+                cell_content = f"<div style='min-height: {min_cell_height}px;'></div>"
+
+            html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
+        
+        html_content += "</tr></table>"
+        all_khuong_html.append(html_content)
     
     # =========================================================================
     # 4. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU TỶ LỆ %
