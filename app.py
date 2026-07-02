@@ -165,9 +165,16 @@ if uploaded_file:
             # Logic kẻ bảng
             is_new_line = (col_idx == 0)
             is_beat_4 = ((col_idx + 1) % 4 == 0)
-            border_right = "2px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #d8d8d8"
-            border_left = "0.5px solid #00008c" if is_new_line else "none"
+            border_right = " 0px solid #d8d8d8"
 
+            if (phach + 1) % 4 == 0:
+                border_right = "0.5px solid #00008c"
+
+            if (phach + 1) % 16 == 0:
+                border_right = "0.5px solid #00008c"
+
+            border_left = "0.5px solid #00008c" if phach == khuong else "none"
+            
             # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
             # Kiểm tra xem khuông cuối cùng có thiếu nhịp không
             if len(khuong_columns) < bits_per_page:
