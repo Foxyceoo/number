@@ -217,13 +217,34 @@ with st.sidebar:
     """, unsafe_allow_html=True)
     st.write("**Danh sách bài hát:**")
     
+    # Thêm CSS để biến nút xóa thành text thuần, không viền, không nền
+    st.markdown("""
+        <style>
+        div[data-testid="stColumn"] button {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            line-height: 40px !important; /* Cân bằng chiều cao với nút bài hát */
+            color: #ff4b4b !important;
+            font-size: 16px !important;
+        }
+        div[data-testid="stColumn"] button:hover {
+            color: #ff1a1a !important;
+            background: transparent !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     if not st.session_state.playlist_files:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
         for name in list(st.session_state.playlist_files.keys()):
             display_name = name.replace(".json", "").replace("_", " ")
             is_current = (st.session_state.current_song == name)
-            button_label = f"🎵 {display_name}" if is_current else display_name
+            
+            # ĐƯỢC CẬP NHẬT: Thêm dấu ** để tên bài hát luôn được IN ĐẬM
+            button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
             
             # Chia cột: Cột nút bài hát chiếm 90%, cột nút xóa chiếm 10%
             col_btn, col_del = st.columns([0.9, 0.1])
