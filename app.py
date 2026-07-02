@@ -195,10 +195,10 @@ with st.sidebar:
         st.rerun()
     
     # =========================================================================
-    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
+    # THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Phải thụt lề vào trong lệnh IF này)
     # =========================================================================
     raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
+    bits_per_page = 32  
     
     if raw_columns:
         max_bit_index = max([col[0] for col in raw_columns])
