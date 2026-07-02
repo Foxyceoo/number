@@ -229,9 +229,17 @@ if uploaded_file:
     
     all_khuong_html = []
     line_number = 1
+    line_count = 0
     
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
+
+        line_count += 1
+        if line_count % 10 == 0:
+            # Thêm một div ép ngắt trang ngay sau dòng thứ 10
+            html_content += "</div><div style='page-break-after: always !important;'></div><div class='khuong-wrapper'>"
+    
+        all_khuong_html.append(html_content)
         
         # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
         if len(khuong_columns) < bits_per_page:
