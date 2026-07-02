@@ -97,29 +97,21 @@ if st.session_state.user is not None:
                 response = requests.post(api_url, json=payload)
                 
                 # Kiểm tra kết quả
-                if response.status_code == 200:
-                    st.success("Đổi mật khẩu thành công!")
-                    st.session_state.show_change_password = False
-                    st.rerun()
-                else:
-                    st.error(f"Lỗi: {response.json().get('error', {}).get('message', 'Không xác định')}")
-                    
-            except Exception as e:
-                # Khối này bắt buộc phải có để hoàn thiện câu lệnh try
-                st.error(f"Đã xảy ra lỗi hệ thống: {e}")
-        
-        if response.status_code == 200:
-            st.success("Đổi mật khẩu thành công!")
-            st.session_state.show_change_password = False
-            st.rerun()
-        else:
-            error_data = response.json()
-            st.error(f"Lỗi từ Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                try:
+                    if response.status_code == 200:
+                        st.success("Đổi mật khẩu thành công!")
+                        st.session_state.show_change_password = False
+                        st.rerun()
+                    else:
+                        # Xử lý khi Firebase trả về lỗi
+                        error_data = response.json()
+                        st.error(f"Lỗi từ Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                except Exception as e:
+                    # Xử lý khi có lỗi kết nối hoặc lỗi xử lý dữ liệu
+                    st.error(f"Lỗi kết nối hoặc xử lý: {e}")
+
+                st.markdown("---")
             
-            except Exception as e:
-                    st.error(f"Lỗi kết nối: {e}")
-        
-                    st.markdown("---")
         # Nút đăng xuất để bảo mật hơn
         if st.button("Đăng xuất"):
             st.session_state.user = None
