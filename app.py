@@ -131,41 +131,38 @@ def get_symbol(value, mode):
     return mapping.get(value, str(value))
 
 # 1. Khởi tạo session_state (phải đồng nhất tên)
+if 'uploaded_data' not in st.session_state:
+    st.session_state.uploaded_data = None
 if 'song_data' not in st.session_state:
     st.session_state.song_data = None
+if 'file_name' not in st.session_state:
+    st.session_state.file_name = None
 if 'song_name' not in st.session_state:
     st.session_state.song_name = None
+
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     
-    # 1. Widget tải file
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
     
-    # 2. Cập nhật session_state
     if uploaded_file is not None:
+        # Lưu dữ liệu vào state
         st.session_state.uploaded_data = json.load(uploaded_file)
         st.session_state.file_name = uploaded_file.name
-    
-    # 3. Chỉ thực hiện các logic hiển thị khi đã có dữ liệu
-    if st.session_state.uploaded_data is not None:
-        data = st.session_state.uploaded_data # Gán giá trị tại đây!
         
+        # Lưu cả 'song_data' nếu cần (đồng bộ hóa)
+        # st.session_state.song_data = st.session_state.uploaded_data[0] 
+        
+    elif uploaded_file is None:
+        # Nếu không có file (người dùng bấm x), reset dữ liệu
+        st.session_state.uploaded_data = None
+        
+    # --- RENDER DANH SÁCH ---
+    if st.session_state.uploaded_data is not None:
         st.markdown("---")
         st.write("### Danh sách dữ liệu")
-        
-        # Hiển thị tên file
         st.info(f"Đang xem: {st.session_state.file_name}")
-        
-        # Hiển thị danh sách nếu dữ liệu là list
-        if isinstance(data, list):
-            for i, item in enumerate(data):
-                # Thay 'name' bằng key thực tế trong JSON của bạn
-                song_name = item.get("name", f"Bài hát {i+1}")
-                st.write(f"- {song_name}")
-    
-    # Hoặc nếu bạn muốn hiển thị nhanh thông tin file
-    st.info(f"Đang xem: {st.session_state.file_name}")
     
     st.markdown("---")
     # Nút chọn chế độ
