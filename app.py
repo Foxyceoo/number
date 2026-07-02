@@ -170,22 +170,7 @@ with st.sidebar:
     if "current_song" not in st.session_state:
         st.session_state.current_song = None
 
-    st.write("### Nhập file của bạn")
-    
-    # Ô uploader cấu hình chỉ nhận 1 file mỗi lần chọn để giao diện cực kỳ thanh thoát
-    uploaded_file = st.file_uploader(
-        "Chọn file JSON của bạn để bắt đầu!",
-        type=["json"],
-        accept_multiple_files=False,
-        label_visibility="collapsed"
-    )
-    
-    # Tự động nạp file vào danh sách lưu trữ tạm thời khi người dùng chọn file
-    if uploaded_file is not None:
-        file_name = uploaded_file.name
-        if file_name not in st.session_state.playlist_files:
-            st.session_state.playlist_files[file_name] = uploaded_file.getvalue()
-            st.toast(f"Đã nạp bài: {file_name.replace('.json', '')}", icon="✅")
+    st.write
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
