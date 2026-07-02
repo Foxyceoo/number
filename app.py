@@ -189,29 +189,6 @@ with st.sidebar:
         label_visibility="collapsed"
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
-    
-    # 3. Logic xử lý nạp file và tự động reset trạng thái ô nhập an toàn
-    # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
-if uploaded_files:
-    if st.session_state.selected_song_index >= len(uploaded_files):
-        st.session_state.selected_song_index = 0
-        
-    current_selected_file = uploaded_files[st.session_state.selected_song_index]
-    
-    # Tiếp tục luồng xử lý JSON của cậu
-    data = json.load(current_selected_file)
-    song_data = data[0]
-    song_name = current_selected_file.name.replace(".json", "")
-
-    # --- Cấu hình chế độ hiển thị ---
-    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
-    st.write("**Chế độ hiển thị:**")
-    display_mode = st.radio(
-        "Chọn chế độ hiển thị",
-        options=["1-15", "1. 1.. 1...", "abc"],
-        label_visibility="collapsed"
-    )
-    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
     # --- Danh sách bài hát Custom (Nút đen cũ, chỉ có x là text thuần) ---
     st.write("**Danh sách bài hát:**")
@@ -282,28 +259,19 @@ if uploaded_files:
                     st.rerun()
 # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
 # # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
-if st.session_state.get("current_song") is not None:
-    current_song_name = st.session_state.current_song
+# Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
+if uploaded_files:
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
+        
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
-    # Lấy dữ liệu bytes đã lưu trong session_state ra
-    file_bytes = st.session_state.playlist_files[current_song_name]
-    
-    # Giải mã bytes thành chuỗi JSON và ép kiểu về dict/list
-    data = json.loads(file_bytes.decode("utf-8"))
+    # Tiếp tục luồng xử lý JSON của cậu
+    data = json.load(current_selected_file)
     song_data = data[0]
-    song_name = current_song_name.replace(".json", "")
+    song_name = current_selected_file.name.replace(".json", "")
     
-    # =========================================================================
-    # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN... (Bắt đầu chạy tiếp từ đây)
-    # =========================================================================
-    
-    # =========================================================================
-    # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN...
-    # =========================================================================
-    
-    # =========================================================================
-    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
-    # =========================================================================
+ 
     raw_columns = song_data.get("columns", [])
     bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
     
