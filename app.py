@@ -147,8 +147,86 @@ if uploaded_file:
     song_name = uploaded_file.name.replace(".json", "")
     columns = song_data.get("columns", [])
     bits_per_page = 32
+    
+    # Hàm lấy số thuần (cũ)
+    def get_number_from_key(note_data):
+        pitch = int(note_data[0])
+        return pitch + 1
+    
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+    columns = song_data.get("columns", [])
+    bits_per_page = 32
+    
+    def get_number_from_data(note_data):
+        # note_data là list [pitch, key]
+        return int(note_data[1])
+        
+    #CSS
+    style = f"""
+    <style>
+    ::-webkit-scrollbar {{ display: none !important; }}
+    html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
 
-     all_khuong_html = []
+    table {{ 
+        border-collapse: collapse; 
+        text-align: center; 
+        table-layout: fixed !important; 
+        width: {{margin_side}}; 
+        margin: 0 auto 30px auto; 
+        height: 60px !important; 
+    }}
+
+    td {{ 
+        padding: 2px !important;  
+        width: 20px !important; 
+        vertical-align: top !important; 
+        border-right: 1px solid #555; 
+        border-left: none; 
+        overflow: hidden;
+    }}
+
+    .note-number {{ 
+        font-size: 15px !important; 
+        font-weight: bold !important; 
+        line-height: 2 !important; 
+        display: block;
+    }}
+
+    @media print {{
+        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
+        @page {{ size: A4; margin: 1cm 2cm 1cm 0.8cm; }}
+        
+        /* Ẩn các thứ không cần thiết */
+        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
+        
+        .note-number {{ font-size: 11px !important; }}
+        table {{ page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 56px !important; width: 100% !important; }}
+        td {{ width: 14px !important; min-width: 14px !important; max-width: 14px !important; padding: 0 !important; overflow: hidden !important; white-space: nowrap !important; }}
+        
+        /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
+        .khuong-wrapper {{
+            display: block !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            margin-bottom: 15px !important;
+         }}
+         
+        /* Ép bảng luôn nằm trọn vẹn */
+        table {{ 
+            width: 100% !important; 
+            table-layout: fixed !important; 
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important;
+        }}
+
+        /* Giữ số ở cỡ nhỏ vừa đọc */
+        .note-number {{ font-size: 10px !important; }}
+         
+       }}
+    </style>
+    """
+    
+    all_khuong_html = []
     line_number = 1
     
     for i in range(0, len(columns), bits_per_page):
@@ -195,112 +273,6 @@ if uploaded_file:
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
         line_number += 2
-    
-    # Hàm lấy số thuần (cũ)
-    def get_number_from_key(note_data):
-        pitch = int(note_data[0])
-        return pitch + 1
-    
-    # Lấy danh sách các cột và số bit mỗi trang từ file
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
-    
-    def get_number_from_data(note_data):
-        # note_data là list [pitch, key]
-        return int(note_data[1])
-
-        
-    #CSS
-    style = f"""
-    <style>
-    ::-webkit-scrollbar {{ display: none !important; }}
-    html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
-
-    table {{ 
-        border-collapse: collapse; 
-        text-align: center; 
-        table-layout: fixed !important; 
-        width: {{margin_side}}; 
-        margin: 0 auto 30px auto; 
-        height: 60px !important; 
-    }}
-
-    td {{ 
-        padding: 2px !important;  
-        width: 20px !important; 
-        vertical-align: top !important; 
-        border-right: 1px solid #555; 
-        border-left: none; 
-        overflow: hidden;
-    }}
-
-    .note-number {{ 
-        font-size: 15px !important; 
-        font-weight: bold !important; 
-        line-height: 2 !important; 
-        display: block;
-    }}
-
-    @media print {{
-        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-        @page {{ size: A4; margin: margin: 1cm; }}
-        
-        /* Ẩn các thứ không cần thiết */
-        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-        
-        .note-number {{ font-size: 11px !important; }}
-        table {{ page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 56px !important; width: 100% !important; }}
-        td {{ width: 14px !important; min-width: 14px !important; max-width: 14px !important; padding: 0 !important; overflow: hidden !important; white-space: nowrap !important; }}
-        
-        /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
-        .khuong-wrapper {{
-            display: block !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-         }}
-
-         div {{
-            page-break-after: auto !important;
-         }}
-         
-         /* Ép bảng luôn nằm trọn vẹn */
-         table {{ 
-            width: 100% !important; 
-            table-layout: fixed !important; 
-            break-inside: avoid !important;
-            page-break-inside: avoid !important;
-        }}
-
-        /* Giữ số ở cỡ nhỏ vừa đọc */
-        .note-number {{ font-size: 10px !important; }}
-         
-       }}
-    </style>
-    """
-
-     PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
-    current_page_height = 0
-    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
-
-    # 2. Xử lý từng khuông nhạc
-    for khuong_html in all_khuong_html:
-        # Giả sử mỗi khuông có chiều cao cố định (ví dụ 120px)
-        khuong_height = 120 
-    
-        # Kiểm tra xem có đủ chỗ không
-        if current_page_height + khuong_height > PAGE_HEIGHT:
-            # Hết chỗ -> Cắt trang
-            display_html += "<div style='page-break-before: always;'></div>"
-            current_page_height = 0 # Reset chiều cao trang mới
-    
-        # Cộng dồn chiều cao
-        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
-        current_page_height += khuong_height
-
-    # 3. Render
-    html_to_render = style + display_html
-    components.html(html_to_render, height=2000, scrolling=True)
-
         
     display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
     
