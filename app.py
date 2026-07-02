@@ -377,26 +377,24 @@ if uploaded_file:
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
     # =========================================================================
-    # 6. XỬ LÝ LỌC TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
+    # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
     # =========================================================================
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
-    if st.button("Xuất PDF / In Sheet nhạc (Bỏ trang đầu & cuối) 🖨️", key="btn_to_pdf_layout"):
-        if len(pages_list) <= 2:
-            st.error(f"Bản nhạc quá ngắn (chỉ có {len(pages_list)} trang), không thể bỏ trang đầu và cuối!")
+    if st.button("Xuất PDF / In Toàn Bộ Sheet nhạc 🖨️", key="btn_to_pdf_layout"):
+        if not pages_list:
+            st.error("Không có dữ liệu trang để in!")
         else:
-            # Python tự động cắt bỏ trang đầu (index 0) và trang cuối cùng
-            filtered_pages = pages_list[1:-1]
-            html_for_print = page_style + "".join(filtered_pages)
+            # Giữ nguyên toàn bộ tất cả các trang, không trừ trang nào cả
+            html_for_print = page_style + "".join(pages_list)
             
-            # Sử dụng json.dumps để biến chuỗi HTML thành chuỗi JSON an toàn cho JavaScript
+            # Sử dụng json.dumps để mã hóa an toàn tuyệt đối, không lo lỗi ký tự đặc biệt
             import json
             safe_html_json = json.dumps(html_for_print)
             
-            # Đoạn lệnh JS mở cửa sổ mới và kích hoạt lệnh in của trình duyệt
+            # Đoạn lệnh JS mở cửa sổ mới chứa trọn vẹn nội dung và kích hoạt lệnh in
             js_code_print = f"""
             <script>
             (function() {{
-                // Giải mã dữ liệu an toàn từ Python truyền sang
                 var htmlContent = {safe_html_json};
                 
                 // Mở cửa sổ in mới
@@ -406,11 +404,11 @@ if uploaded_file:
                     return;
                 }}
                 
-                printWindow.document.write('<html><head><title>In Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
+                printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
                 printWindow.document.close();
                 printWindow.focus();
                 
-                // Chờ một chút để trình duyệt load hết CSS rồi gọi hộp thoại In
+                // Chờ 500ms để trình duyệt tải xong CSS rồi tự động gọi hộp thoại In
                 setTimeout(function() {{
                     printWindow.print();
                     printWindow.close();
