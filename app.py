@@ -200,6 +200,7 @@ with st.sidebar:
 st.write("**Danh sách bài hát:**")
 
 # Lấy danh sách file .json từ thư mục
+all_files = []
 if not os.path.exists(SHEET_DIR):
     os.makedirs(SHEET_DIR)
     # Tự tạo một file mẫu để app không bị báo lỗi trống
@@ -215,7 +216,7 @@ else:
     for file_name in all_files:
         display_name = file_name.replace(".json", "").replace("_", " ")
         is_current = (st.session_state.selected_song == file_name)
-        button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
+        button_label = f"**{display_name}**" if is_current else f"**{display_name}**"
         
         if st.button(button_label, key=f"btn_{file_name}", use_container_width=True):
             st.session_state.selected_song = file_name
