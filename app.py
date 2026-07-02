@@ -197,6 +197,17 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
+    st.markdown("""
+    <style>
+    /* Ẩn hoàn toàn khối danh sách file mặc định của Streamlit */
+    [data-testid="stFileUploader"] section ~ div,
+    [data-testid="stFileUploaderFilesContainer"],
+    .uploadedFiles {
+        display: none !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
     # 2. Khởi tạo trạng thái chọn bài
     if "selected_song_index" not in st.session_state:
         st.session_state.selected_song_index = 0
