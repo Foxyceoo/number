@@ -163,32 +163,57 @@ if uploaded_file:
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
+
+    st.markdown(
+        """
+        <style>
+        /* Mở rộng tối đa container chính của Streamlit */
+        .block-container {
+            max-width: 100% !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-top: 2rem !important;
+        }
+        /* Căn giữa thành phần iframe */
+        iframe {
+            display: block;
+            margin: 0 auto !important;
+            width: 100% !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
         
     #CSS
     page_style = """
     <style>
     ::-webkit-scrollbar { display: none !important; }
+    
     body { 
         background-color: #f0f2f6; 
         margin: 0; 
-        padding: 20px;
+        padding: 20px 0;
         font-family: sans-serif;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 25px;
+        align-items: center; /* Giữ trang giấy luôn nằm ở trung tâm */
+        justify-content: center;
+        width: 100%;
     }
     
-    /* Khung trang A4 Web chuẩn: Rộng đúng 794px, KHÔNG CĂN LỀ TRÁI PHẢI */
+    /* Trang A4 chuẩn Web: Rộng cố định 794px, tràn viền bảng */
     .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
         width: 794px;
         min-height: 1123px;
-        padding: 40px 0px !important; 
+        padding: 40px 0px !important; /* Tuyệt đối không để lề trái phải đè bảng nhạc */
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
+        margin-bottom: 25px;
     }
 
     table { 
@@ -196,7 +221,7 @@ if uploaded_file:
         text-align: center; 
         table-layout: fixed !important; 
         width: 100% !important; 
-        margin: 0;
+        margin: 0 !important;
         padding: 0 !important;
     }
 
@@ -225,23 +250,20 @@ if uploaded_file:
     """
     
     # =========================================================================
-    # 3. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU % THEO PHÁCH THỰC TẾ
+    # 4. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU TỶ LỆ %
     # =========================================================================
     all_khuong_html = []
     
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
         
-        # Điền nốt trống cho đủ số lượng bit quy định ở khuông cuối cùng của bài
         if len(khuong_columns) < bits_per_page:
             needed = bits_per_page - len(khuong_columns)
             for _ in range(needed):
                 khuong_columns.append([0, []])
 
-        # Khởi tạo bảng sát mép
+        # Tạo bảng co giãn 100% theo container
         html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse; margin: 0; padding: 0;'><tr>"
-        
-        # Chia đều 100% chiều rộng trang cho số bit phách nhạc
         cell_width_pct = 100.0 / bits_per_page
 
         for col_idx, col in enumerate(khuong_columns):
@@ -254,9 +276,8 @@ if uploaded_file:
                 vals = raw_vals
             
             is_new_line = (col_idx == 0)
-            is_beat_4 = ((col_idx + 1) % 4 == 0)
+            is_beat_4 = ((col_idx + 1) % 8 == 0)
             
-            # Vạch ngăn nhịp dọc màu xanh
             border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
             border_left = "1.5px solid #00008c" if is_new_line else "none"
 
@@ -270,14 +291,13 @@ if uploaded_file:
             else:
                 cell_content = "<div style='min-height: 45px;'></div>"
 
-            # Ép cứng phần trăm width sát sạt vào mép trang theo tỷ lệ thực tế
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
         
     # =========================================================================
-    # 4. CHIA 5 DÒNG NHẠC VÀO TRANG GIẤY A4 (Loại bỏ hoàn toàn lật sách)
+    # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN ĐÃ ĐƯỢC CĂN GIỮA
     # =========================================================================
     display_html = ""
     lines_per_page = 5
@@ -290,17 +310,17 @@ if uploaded_file:
             display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
         display_html += "</div>"
         
-    # Hợp nhất CSS sạch và nội dung HTML chính thức
+    # Hợp nhất CSS và nội dung
     html_to_render = page_style + display_html
     
-    # Tính toán chiều cao hợp lý cho iframe components của Streamlit
+    # Tính chiều cao cho cấu trúc lặp trang
     total_pages = math.ceil(len(all_khuong_html) / lines_per_page)
     calculated_height = total_pages * 1150 + 100
     
-    # Đẩy HTML sạch lên giao diện (Chỉ gọi DUY NHẤT một lần ở cuối file)
+    # Render nội dung chính lên Streamlit
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
-    # Nút bấm in ấn / Xuất PDF dưới chân trang
+    # Nút bấm in ấn / Xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
     if st.button("Xuất PDF / In Sheet nhạc 🖨️", key="btn_to_pdf_layout"):
         js_code_print = "<script>window.parent.window.print();</script>"
