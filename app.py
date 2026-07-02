@@ -17,6 +17,7 @@ config = {
     "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
     "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
     "appId": st.secrets["FIREBASE_APP_ID"]
+    "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
 firebase = pyrebase.initialize_app(config)
