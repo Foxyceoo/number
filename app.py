@@ -139,25 +139,30 @@ if 'song_name' not in st.session_state:
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     
-    # 2. Widget tải file
+    # 1. Widget tải file
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
     
-    # 2. Logic cập nhật dữ liệu vào session_state
+    # 2. Cập nhật session_state
     if uploaded_file is not None:
-        # Cập nhật khi có file mới
-        st.session_state.song_data = json.load(uploaded_file)
-        st.session_state.song_name = uploaded_file.name.replace(".json", "")
-    elif uploaded_file is None:
-        # Tự động xóa dữ liệu khỏi session_state khi người dùng bấm dấu 'x'
-        st.session_state.song_data = None
-        st.session_state.song_name = None
-
-    # 3. Hiển thị thông tin file nếu đang có dữ liệu
-    if st.session_state.song_data is not None:
+        st.session_state.uploaded_data = json.load(uploaded_file)
+        st.session_state.file_name = uploaded_file.name
+    
+    # 3. Chỉ thực hiện các logic hiển thị khi đã có dữ liệu
+    if st.session_state.uploaded_data is not None:
+        data = st.session_state.uploaded_data # Gán giá trị tại đây!
+        
         st.markdown("---")
         st.write("### Danh sách dữ liệu")
-        st.write(f"Đang tải: **{st.session_state.song_name}**")
-        st.markdown("---")
+        
+        # Hiển thị tên file
+        st.info(f"Đang xem: {st.session_state.file_name}")
+        
+        # Hiển thị danh sách nếu dữ liệu là list
+        if isinstance(data, list):
+            for i, item in enumerate(data):
+                # Thay 'name' bằng key thực tế trong JSON của bạn
+                song_name = item.get("name", f"Bài hát {i+1}")
+                st.write(f"- {song_name}")
     
     # Giả sử cấu trúc file JSON của bạn là một danh sách các bài hát
     # hoặc bạn muốn liệt kê tên các cột/thông tin trong file
