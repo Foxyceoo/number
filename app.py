@@ -7,7 +7,7 @@ import pyrebase
 import requests
 import streamlit.components.v1 as components
 # 1. Thêm thư viện quản lý Cookie
-from streamlit_cookies_manager import EncryptedCookiesManager
+import extra_streamlit_components as stx
 
 # Khởi tạo bộ quản lý Cookie
 cookies = EncryptedCookiesManager(prefix="my_sheet_app_", password="thay_doi_mat_ma_bao_mat_o_day_nhe_123456")
@@ -32,9 +32,11 @@ auth = firebase.auth()
 
 # 2. KHÔI PHỤC TRẠNG THÁI ĐĂNG NHẬP TỪ COOKIE (NẾU CÓ)
 if 'user' not in st.session_state:
-    if "user_token" in cookies and "user_name" in cookies:
-        st.session_state.user = {"idToken": cookies["user_token"]}
-        st.session_state.user_name = cookies["user_name"]
+    user_token = cookie_manager.get(cookie="user_token")
+    user_name = cookie_manager.get(cookie="user_name")
+    if user_token and user_name:
+        st.session_state.user = {"idToken": user_token}
+        st.session_state.user_name = user_name
     else:
         st.session_state.user = None
 
