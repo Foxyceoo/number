@@ -136,6 +136,30 @@ def get_symbol(value, mode):
 # =========================================================================
 # 2. QUẢN LÝ SIDEBAR (Giao diện mới: Siêu gọn - Không lặp - Có nút xóa)
 # =========================================================================
+st.markdown(
+    """
+    <style>
+    /* Mở rộng tối đa container chính của Streamlit */
+    .block-container {
+        max-width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 2rem !important;
+    }
+    /* Căn giữa thành phần iframe hiển thị sheet nhạc */
+    iframe {
+        display: block;
+        margin: 0 auto !important;
+        width: 90% !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# =========================================================================
+# 2. QUẢN LÝ SIDEBAR (Giao diện mới: Siêu gọn - Không lặp - Có nút xóa)
+# =========================================================================
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     
@@ -248,27 +272,6 @@ if uploaded_files:
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
-
-    st.markdown(
-    """
-    <style>
-    /* Mở rộng tối đa container chính của Streamlit */
-    .block-container {
-        max-width: 100% !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-        padding-top: 2rem !important;
-    }
-    /* Căn giữa thành phần iframe hiển thị sheet nhạc */
-    iframe {
-        display: block;
-        margin: 0 auto !important;
-        width: 90% !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
         
     #CSS
     # =========================================================================
