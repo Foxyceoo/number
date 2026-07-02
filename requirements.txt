@@ -3,3 +3,4 @@ pandas
 weasyprint
 pypdf
 streamlit-authenticator
+pyrebase4
