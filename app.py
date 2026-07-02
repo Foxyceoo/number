@@ -274,11 +274,12 @@ if uploaded_file:
         all_khuong_html.append(html_content)
         line_number += 2
         
-    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
+    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
     
     # Render HTML
     for khuong_html in all_khuong_html:
-        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+    # Bọc mỗi table vào một thẻ div có class cố định
+    display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
     html_to_render = style + display_html
     
