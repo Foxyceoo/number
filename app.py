@@ -41,7 +41,18 @@ check_login()
 
 #Lời chào sau đăng nhập
 if st.session_state.get('logged_in'):
-    st.toast(f"Hello {st.session_state.user_name}!", icon="👋")
+    # Tạo vùng chứa trống
+    placeholder = st.empty()
+    
+    # Hiển thị chữ to, căn giữa
+    placeholder.markdown(f"<h1 style='text-align: center;'>Hello {st.session_state.user_name}!</h1>", unsafe_allow_html=True)
+    
+    # Đợi "n" giây
+    import time
+    time.sleep(2)
+    
+    # Xóa sạch cả vùng chứa đó (chữ Hello to ở giữa sẽ biến mất)
+    placeholder.empty()
 
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
