@@ -148,7 +148,7 @@ if uploaded_file:
     columns = song_data.get("columns", [])
     bits_per_page = 32
 
-     all_khuong_html = []
+    all_khuong_html = []
     line_number = 1
     
     for i in range(0, len(columns), bits_per_page):
