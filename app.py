@@ -207,7 +207,7 @@ if uploaded_file:
     )
         
     # =========================================================================
-    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 (Đã sửa lỗi nuốt trang do justify-content)
+    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 
     # =========================================================================
     raw_page_style = """
     <style>
@@ -221,7 +221,7 @@ if uploaded_file:
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start; /* Thay đổi từ center thành flex-start để không bị nuốt trang */
+        justify-content: flex-start; 
         width: 100%;
     }
     
@@ -300,6 +300,9 @@ if uploaded_file:
     }
     </style>
     """
+    
+    # THÊM DÒNG NÀY NGAY DƯỚI RAW_PAGE_STYLE ĐỂ ĐỊNH NGHĨA BIẾN PAGE_STYLE
+    page_style = raw_page_style.replace("__MARGIN_BOTTOM__", margin_bottom_val)
     
     # =========================================================================
     # 4. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU TỶ LỆ %
