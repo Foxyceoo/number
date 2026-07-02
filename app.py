@@ -160,6 +160,31 @@ if uploaded_file:
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
+
+    # 1. Định nghĩa giới hạn trang
+    PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
+    current_page_height = 0
+    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
+
+    # 2. Xử lý từng khuông nhạc
+    for khuong_html in all_khuong_html:
+        # Giả sử mỗi khuông có chiều cao cố định (ví dụ 120px)
+        khuong_height = 120 
+    
+        # Kiểm tra xem có đủ chỗ không
+        if current_page_height + khuong_height > PAGE_HEIGHT:
+            # Hết chỗ -> Cắt trang
+            display_html += "<div style='page-break-before: always;'></div>"
+            current_page_height = 0 # Reset chiều cao trang mới
+    
+        # Cộng dồn chiều cao
+        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+        current_page_height += khuong_height
+
+    # 3. Render
+    html_to_render = style + display_html
+    components.html(html_to_render, height=2000, scrolling=True)
+
         
     #CSS
     style = f"""
@@ -194,7 +219,7 @@ if uploaded_file:
 
     @media print {{
         .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-        @page {{ size: A4; margin: 1cm 2cm 1cm 0.8cm; }}
+        @page {{ size: A4; margin: margin: 1cm; }}
         
         /* Ẩn các thứ không cần thiết */
         .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
@@ -206,14 +231,16 @@ if uploaded_file:
         /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
         .khuong-wrapper {{
             display: block !important;
-            break-inside: avoid !important; /* Quan trọng */
             page-break-inside: avoid !important;
-            margin-bottom: 20px !important;
-            width: 100% !important;
+            break-inside: avoid !important;
+         }}
+
+         div {{
+            page-break-after: auto !important;
          }}
          
-        /* Ép bảng luôn nằm trọn vẹn */
-        table {{ 
+         /* Ép bảng luôn nằm trọn vẹn */
+         table {{ 
             width: 100% !important; 
             table-layout: fixed !important; 
             break-inside: avoid !important;
