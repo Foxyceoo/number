@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_firebase_auth import FirebaseAuth
 import pandas as pd
 import json
 import math
@@ -25,28 +26,18 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
 # Sát lề trái
-if 'user' not in st.session_state:
-    st.session_state.user = None
+auth = FirebaseAuth(firebase_config)
 
-# Hàm đăng nhập không dùng thư viện ngoài để tránh lỗi
-def login_form():
-    st.title("Đăng nhập")
-    email = st.text_input("Email")
-    password = st.text_input("Mật khẩu", type="password")
-    if st.button("Đăng nhập"):
-        try:
-            user = auth.sign_in_with_email_and_password(email, password)
-            st.session_state.user = user
-            st.session_state.user_name = user['email'].split('@')[0]
-            st.session_state.logged_in = True
-            st.rerun()
-        except:
-            st.error("Sai email hoặc mật khẩu!")
+# Hiển thị nút đăng nhập Google
+user = auth.login()
 
-# 3. Luồng chính của app
-if st.session_state.user is None:
-    login_form()
-    st.stop()  # Dừng app nếu chưa đăng nhập
+if user:
+    st.write(f"Chào {user['displayName']}!")
+    st.session_state.user_name = user['displayName']
+    st.session_state.logged_in = True
+else:
+    st.write("Vui lòng đăng nhập để bắt đầu.")
+
 
 #Lời chào sau đăng nhập
 if st.session_state.get('logged_in'):
