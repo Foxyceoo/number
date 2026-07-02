@@ -11,11 +11,11 @@ margin_side = "900px"
 
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(key_str):
-    try: 
-        # Ví dụ: "2Key7" -> lấy số 7 sau chữ Key -> tính toán % 15 + 1
-        return (int(key_str.split('Key')[1]) % 15) + 1
-    except: 
-        return ""
+
+    try: return (int(key_str.split('Key')[1]) % 15) + 1
+
+    except: return ""
+
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
