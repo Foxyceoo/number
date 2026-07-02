@@ -307,7 +307,7 @@ if 'song_data' in locals() or 'song_data' in globals():
         columns = []
 else:
     # Nếu chưa có bài hát, khởi tạo các giá trị mặc định để tránh lỗi
-    columns = []
+    raw_columns = []
     bits_per_page = 32
     
     if raw_columns:
