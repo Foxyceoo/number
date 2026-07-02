@@ -9,10 +9,6 @@ padding_top_px = 40
 padding_bottom_px = 90
 margin_side = "900px"
 
-def get_number_from_key(key_str):
-    try: return (int(key_str.split('Key')[1]) % 15) + 1
-    except: return ""
-
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     st.markdown("---")
@@ -22,20 +18,20 @@ with st.sidebar:
 
 if uploaded_file:
     data = json.load(uploaded_file)
+    song_data = data[0]
     song_name = uploaded_file.name.replace(".json", "")
-    bpm = data[0].get("bpm", 320)
-    notes = data[0].get("songNotes", [])
-    beat_duration = 60000 / bpm                #BPM
-    time_map = {}
-    for n in notes:
-        beat_idx = math.floor(n['time'] / beat_duration)
-        time_map.setdefault(beat_idx, []).append(get_number_from_key(n['key']))
-    max_beat = max(time_map.keys()) if time_map else 0
+    
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+    columns = song_data.get("columns", [])
+    bits_per_page = song_data.get("bitsPerPage", 16)
+    
+    def get_number_from_data(note_data):
+        # note_data là list [pitch, key]
+        return int(note_data[1])
 
     style = f"""
     <style>
     ::-webkit-scrollbar {{ display: none !important; }}
-    
     html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
 
     table {{ 
@@ -66,144 +62,66 @@ if uploaded_file:
 
     @media print {{
         .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-
-        @page {{
-        size: A4;
-        margin: 1cm 1.2cm 1cm 0.8cm; /* Lề: trên, phải, dưới, trái */
-        }}
-        
-        /* Điều chỉnh cỡ chữ cho nốt nhạc khi in */
-        .note-number {{
-            font-size: 11px !important; /*Giảm size nếu bị tràn hoặc tăng nếu muốn to rõ*/
-        }}
-        
-        table {{
-            page-break-inside: avoid !important; 
-            break-inside: avoid !important; 
-            margin-bottom: 56px !important; 
-            display: table !important; 
-            table-layout: fixed !important; /* Quan trọng: Ép bảng theo chiều rộng cố định */
-            width: 100% !important;
-        }}
-
-        td {{
-            width: 14px !important;       /* Cố định độ rộng ô khi in */
-            min-width: 14px !important;   /* Đảm bảo ô không bị co lại nhỏ hơn mức này */
-            max-width: 14px !important;   /* Đảm bảo ô không bị phình ra */
-            padding: 0 !important;
-            overflow: hidden !important;
-            white-space: nowrap !important;
-        }}
-
-        .khuong-wrapper:last-child {{
-            padding-bottom: 250mm !important; /* 300mm gần bằng chiều dài một tờ A4 */
-        }}
-    
-        .print-footer {{
-            display: block !important;
-            position: fixed !important;
-            bottom: 10px !important; /* Cách mép dưới giấy 10px */
-            left: 10px !important;
-            width: 100% !important;
-            text-align: left !important;
-            z-index: 9999 !important;
-        }}
-        
-        body {{
-            overflow: visible !important;
-        }}
+        @page {{ size: A4; margin: 1cm 1.2cm 1cm 0.8cm; }}
+        .note-number {{ font-size: 11px !important; }}
+        table {{ page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 56px !important; width: 100% !important; }}
+        td {{ width: 14px !important; min-width: 14px !important; max-width: 14px !important; padding: 0 !important; overflow: hidden !important; white-space: nowrap !important; }}
+        .khuong-wrapper:last-child {{ padding-bottom: 250mm !important; }}
+        .print-footer {{ display: block !important; position: fixed !important; bottom: 10px !important; left: 10px !important; width: 100% !important; }}
     }}
     </style>
     """
     
     all_khuong_html = []
     line_number = 1
-    for khuong in range(0, max_beat + 32, 32):
-        # Đoạn code MỚI (đã bỏ ngoặc)
+    
+    # Duyệt theo từng trang (bits_per_page)
+    for i in range(0, len(columns), bits_per_page):
+        khuong_columns = columns[i : i + bits_per_page]
+        
         html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
-        for phach in range(khuong, khuong + 16):
-            vals = sorted(time_map.get(phach, []), reverse=True)
+        
+        for col_idx, col in enumerate(khuong_columns):
+            # col là [time, [[pitch, key], ...]]
+            notes_in_col = col[1]
+            vals = sorted([get_number_from_data(n) for n in notes_in_col], reverse=True)
 
-            border_right = " 0px solid #d8d8d8"
-            if (phach + 1) % 4 == 0:
-                border_right = "0.5px solid #00008c"
-            if (phach + 1) % 16 == 0:
-                border_right = "0.5px solid #00008c"
-
-            border_left = "0.5px solid #00008c" if phach == khuong else "none"
+            # Logic kẻ bảng
+            is_new_line = (col_idx == 0)
+            is_beat_4 = ((col_idx + 1) % 4 == 0)
+            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #d8d8d8"
+            border_left = "0.5px solid #00008c" if is_new_line else "none"
 
             if vals:
                 top_num = vals[0]
                 bottom_nums = "<br>".join(map(str, vals[1:]))
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 50px; padding-top: 2px;'>
-                    <div class='top-row'>{top_num}</div>
-                    <div class='bottom-row'>{bottom_nums}</div>
+                    <div class='top-row' style='font-size: 15px; font-weight: bold;'>{top_num}</div>
+                    <div class='bottom-row' style='font-size: 10px; line-height: 1;'>{bottom_nums}</div>
                 </div>
                 """
             else:
                 cell_content = ""
 
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
+        
+        html_content += "</tr></table>"
         all_khuong_html.append(html_content)
         line_number += 1
         
-    # Khởi tạo display_html trước khi vòng lặp sử dụng nó
     display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
-
-    PAGE_HEIGHT_LIMIT = 800
-    current_page_height = 0
-
+    
+    # Render HTML
     for khuong_html in all_khuong_html:
-        khuong_height = 110 
-        
-        if current_page_height + khuong_height > PAGE_HEIGHT_LIMIT:
-            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div><div class='page-break'></div>"
-            current_page_height = khuong_height
-        else:
-            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
-            current_page_height += khuong_height
+        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
-    # Thêm footer_link vào sau vòng lặp, ngoài khu vực lặp lại không cần thiết
-    footer_link = """
-    <div class='print-footer' style='text-align: left; font-size: 12px; color: gray; margin-top: 20px;'>
-        https://foxynumber.streamlit.app
-    </div>
-    """
-    display_html += footer_link
-
-    html_to_render = style + display_html
-    PAGE_HEIGHT_LIMIT = 800
-    current_page_height = 0
-    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
-
-    for khuong_html in all_khuong_html:
-        khuong_height = 110 
-        
-        if current_page_height + khuong_height > PAGE_HEIGHT_LIMIT:
-            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div><div class='page-break'></div>"
-            current_page_height = khuong_height
-        else:
-            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
-            current_page_height += khuong_height
-
-    html_to_render = style + display_html
-    row_height = 50 + 50
-    total_height = (len(all_khuong_html) * row_height) + 100
+    footer_link = "<div class='print-footer' style='text-align: left; font-size: 12px; color: gray;'>https://foxynumber.streamlit.app</div>"
+    html_to_render = style + display_html + footer_link
+    
+    total_height = (len(all_khuong_html) * 110) + 200
     components.html(html_to_render, height=total_height, scrolling=False)
 
-    st.markdown("""
-        <style>
-        div[data-testid="stButton"] {
-            margin-top: 700px !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
     if st.button("to PDF"):
-        js_code = """
-        <script>
-            window.parent.window.print();
-        </script>
-        """
+        js_code = "<script>window.parent.window.print();</script>"
         components.html(js_code, height=0)
