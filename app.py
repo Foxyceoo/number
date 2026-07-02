@@ -141,11 +141,27 @@ with st.sidebar:
     st.markdown("---")
 
 if uploaded_file:
-    data = json.load(uploaded_file)
-    song_data = data[0]
-    song_name = uploaded_file.name.replace(".json", "")
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
+    file_extension = uploaded_file.name.split('.')[-1].lower()
+    
+    if file_extension == "json":
+        data = json.load(uploaded_file)
+        song_data = data[0]
+        columns = song_data.get("columns", [])
+    
+    elif file_extension == "txt":
+        # Đọc nội dung file txt
+        string_data = uploaded_file.getvalue().decode("utf-8")
+        # Logic này giả định file txt của bạn có dạng: time,key
+        # Hãy sửa lại nếu file txt của bạn có format khác!
+        columns = []
+        for line in string_data.strip().split('\n'):
+            if ',' in line:
+                t, k = line.split(',')
+                # Giả sử "1Key4" -> pitch = 4-1 = 3
+                pitch = int(k.split("Key")[1]) - 1
+                columns.append([int(t), [[pitch, k]]])
+        
+    song_name = uploaded_file.name.rsplit('.', 1)[0]
     
     # Hàm lấy số thuần (cũ)
     def get_number_from_key(note_data):
