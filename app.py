@@ -86,7 +86,7 @@ if st.session_state.user is not None:
                     
                     # Sử dụng hàm update_profile hoặc update_email_or_password tùy phiên bản pyrebase
                     # Với pyrebase4, dùng:
-                    auth.update_profile(id_token, password=new_password)
+                    auth.update_password(id_token, new_password)
                     
                     st.success("Đổi mật khẩu thành công!")
                     st.session_state.show_change_password = False
