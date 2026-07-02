@@ -226,32 +226,22 @@ def get_number_from_key(note_data):
 
 #Hiển thị
 
-def get_symbol(value):
-
-    if mode == "abc":
-
+def get_symbol(value, mode):
+    if mode == "1. 1.. 1...":
         mapping = {
-
-            1: "a1", 2: "a2", 3: "a3", 4: "a4", 5: "a5",
-
-            6: "b1", 7: "b2", 8: "b3", 9: "b4", 10: "b5",
-
-            11: "c1", 12: "c2", 13: "c3", 14: "c4", 15: "c5"
-
-        }
-
-    else: # Chế độ Sheet 1. 1.. 1...
-
-        mapping = {
-
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
-
             6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
-
             11: "4.", 12: "5.", 13: "6.", 14: "7.", 15: "1.."
-
         }
-
+    elif mode == "abc":
+        mapping = {
+            1: "a1", 2: "a2", 3: "a3", 4: "a4", 5: "a5",
+            6: "b1", 7: "b2", 8: "b3", 9: "b4", 10: "b5",
+            11: "c1", 12: "c2", 13: "c3", 14: "c4", 15: "c5"
+        }
+    else: # Chế độ "1 - 15" mặc định
+        return str(value)
+        
     return mapping.get(value, str(value))
 
 # 2. Thêm nút chọn chế độ vào Sidebar
@@ -468,36 +458,19 @@ if uploaded_file:
 
         
 
-        for col_idx, col in enumerate(khuong_columns):
-
-            notes_in_col = col[1]
-
-            # Lấy danh sách số
-
-            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
-
+            for col_idx, col in enumerate(khuong_columns):
+                notes_in_col = col[1]
+                raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-
-            # --- TÍCH HỢP CHUYỂN ĐỔI HIEN THỊ ---
-
-            if display_mode == "1. 1.. 1...":
-
-                vals = [get_symbol(v) for v in raw_vals]
-
-            else:
-
+            # --- CHỈ DÙNG ĐOẠN NÀY ĐỂ XỬ LÝ DỮ LIỆU ---
+            if display_mode == "1 - 15":
                 vals = raw_vals
-
-
-
-            if display_mode != "abc":
-
+            else:
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
-
-            else:
-
-                vals = raw_vals
-
+            
+            # ... tiếp tục giữ nguyên phần logic kẻ bảng phía dưới ...
+            is_new_line = (col_idx == 0)
+            # ...
             
 
             # ... (Phần logic kẻ bảng giữ nguyên)
