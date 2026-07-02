@@ -172,18 +172,23 @@ with st.sidebar:
 
     st.write("### Nhập file của bạn")
     
-    # 1. Khởi tạo key trong session_state nếu chưa có để kiểm soát dữ liệu nạp vào
-    if "file_uploader_val" not in st.session_state:
-        st.session_state.file_uploader_val = None
-
-    # 2. Ô uploader sử dụng một key động để có thể reset dễ dàng
-    uploaded_file = st.file_uploader(
+    # 1. Trả về nút đen cũ: Nhận nhiều file cùng lúc, cực nhạy, không lo bấm 2 lần
+    uploaded_files = st.file_uploader(
         "Chọn file JSON của bạn để bắt đầu!",
         type=["json"],
-        accept_multiple_files=False,
-        label_visibility="collapsed",
-        key="file_uploader_key"
+        accept_multiple_files=True,
+        label_visibility="collapsed"
     )
+
+    # --- Cấu hình chế độ hiển thị ---
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+    st.write("**Chế độ hiển thị:**")
+    display_mode = st.radio(
+        "Chọn chế độ hiển thị",
+        options=["1-15", "1. 1.. 1...", "abc"],
+        label_visibility="collapsed"
+    )
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
     
     # 3. Logic xử lý nạp file và tự động reset trạng thái ô nhập an toàn
     if uploaded_file is not None:
@@ -231,12 +236,26 @@ with st.sidebar:
         }
         </style>
     """, unsafe_allow_html=True)
-    st.write("**Danh sách bài hát:**")
+
     
-    # Thêm CSS để biến nút xóa thành text thuần, không viền, không nền
+    st.write("**Danh sách bài hát:**")    
+    # CSS ẩn hoàn toàn danh sách file lỗi của Streamlit và làm đẹp nút xóa x
     st.markdown("""
         <style>
-        div[data-testid="stColumn"] button {
+        /* Ẩn triệt để danh sách file mặc định lem nhem của Streamlit */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section ~ div,
+        [data-testid="stSidebar"] [data-testid="stFileUploaderFilesContainer"],
+        [data-testid="stSidebar"] .uploadedFiles,
+        [data-testid="stSidebar"] .uploadedFile {
+            display: none !important;
+            height: 0px !important;
+            padding: 0px !important;
+            margin: 0px !important;
+            overflow: hidden !important;
+        }
+        
+        /* Biến nút xóa ở cột bên phải thành text thuần, không viền, không nền */
+        div[data-testid="stColumn"] button[key^="del_"] {
             border: none !important;
             background: transparent !important;
             padding: 0 !important;
@@ -245,7 +264,7 @@ with st.sidebar:
             color: #ff4b4b !important;
             font-size: 16px !important;
         }
-        div[data-testid="stColumn"] button:hover {
+        div[data-testid="stColumn"] button[key^="del_"]:hover {
             color: #ff1a1a !important;
             background: transparent !important;
         }
