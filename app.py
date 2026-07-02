@@ -162,64 +162,62 @@ if uploaded_file:
         return int(note_data[1])
         
     #CSS
-    style = f"""
+    style = """
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
     <style>
-    ::-webkit-scrollbar {{ display: none !important; }}
-    html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
+    ::-webkit-scrollbar { display: none !important; }
+    body { 
+        background-color: #f0f2f6; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        margin: 0; 
+        padding: 20px;
+        font-family: sans-serif;
+    }
+    
+    /* Khung cuốn sách */
+    #flipbook {
+        width: 800px;
+        height: 550px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    /* Định hình từng trang sách */
+    .page {
+        background-color: #ffffff;
+        box-sizing: border-box;
+        padding: 25px 35px;
+        border-right: 1px solid #ddd;
+        overflow: hidden;
+    }
+    
+    /* Trang bìa */
+    .cover-page {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
 
-    table {{ 
+    table { 
         border-collapse: collapse; 
         text-align: center; 
         table-layout: fixed !important; 
-        width: {{margin_side}}; 
-        margin: 0 auto 30px auto; 
-        height: 60px !important; 
-    }}
+        width: 100%; 
+        margin: 0 auto 15px auto; 
+    }
 
-    td {{ 
+    td { 
         padding: 2px !important;  
         width: 20px !important; 
         vertical-align: top !important; 
-        border-right: 1px solid #555; 
-        border-left: none; 
-        overflow: hidden;
-    }}
-
-    .note-number {{ 
-        font-size: 15px !important; 
-        font-weight: bold !important; 
-        line-height: 2 !important; 
-        display: block;
-    }}
-
-    @media print {{
-        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-        @page {{ size: A4; margin: 1cm 2cm 1cm 0.8cm; }}
-        
-        /* Ẩn các thứ không cần thiết */
-        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-        
-        .note-number {{ font-size: 11px !important; }}
-        table {{ page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 56px !important; width: 100% !important; }}
-        td {{ width: 14px !important; min-width: 14px !important; max-width: 14px !important; padding: 0 !important; overflow: hidden !important; white-space: nowrap !important; }}
-        
-        /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
-        .khuong-wrapper {{
-            page-break-inside: avoid !important; 
-            break-inside: avoid !important; 
-            margin-bottom: 20px !important;
-         }}
-         
-        /* Ép bảng luôn nằm trọn vẹn */
-        table {{ 
-            width: 100% !important; 
-            table-layout: fixed !important; 
-        }}
-
-        /* Giữ số ở cỡ nhỏ vừa đọc */
-        .note-number {{ font-size: 10px !important; }}
-         
-       }}
+        border-right: 1px solid #ccc; 
+    }
     </style>
     """
     
@@ -271,16 +269,55 @@ if uploaded_file:
         all_khuong_html.append(html_content)
         line_number += 2
         
-    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
+    # === THAY THẾ TỪ ĐÂY ĐỂ CHUYỂN SANG DẠNG LẬT TRANG ===
     
-    # Render HTML
-    for khuong_html in all_khuong_html:
-        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+    # 1. Tạo cấu trúc lật trang và trang bìa đầu tiên
+    display_html = f"""
+    <div id="flipbook">
+        <div class="page cover-page">
+            <h1 style="font-size: 32px; margin-bottom: 10px; font-weight: bold;">{song_name}</h1>
+            <p style="font-size: 14px; opacity: 0.8; font-style: italic;">Nhấp vào mép giấy bên phải để mở sách</p>
+        </div>
+    """
+    
+    # 2. Chia các khuông nhạc vào từng trang (mỗi trang chứa đúng 3 dòng nhạc để vừa khung)
+    lines_per_page = 3
+    for idx in range(0, len(all_khuong_html), lines_per_page):
+        chunk = all_khuong_html[idx : idx + lines_per_page]
+        
+        display_html += "<div class='page'>"
+        for khuong_html in chunk:
+            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+        display_html += "</div>"
+        
+    # 3. Thêm mã JavaScript kích hoạt hiệu ứng lật sách 3D của Turn.js
+    display_html += """
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#flipbook').turn({
+                width: 800,
+                height: 550,
+                autoCenter: true,
+                duration: 800 // Tốc độ lật mượt mà (800ms)
+            });
+        });
+    </script>
+    """
 
+    # 4. Gom style + cấu trúc lật trang để hiển thị lên màn hình
     html_to_render = style + display_html
     
-    total_height = (len(all_khuong_html) * 110) + 200
-    components.html(html_to_render, height=total_height, scrolling=False)
+    # Đặt chiều cao khung hiển thị cố định ở mức 600px là vừa vặn đẹp mắt với cuốn sách
+    components.html(html_to_render, height=600, scrolling=False)
+    
+    # === KẾT THÚC ĐOẠN THAY THẾ ===
+    
+    # Phần nút bấm In/PDF của bạn giữ nguyên phía dưới
+    st.write('<div style="height: 50px;"></div>', unsafe_allow_html=True)    
+    if st.button("to PDF"):
+        js_code = "<script>window.parent.window.print();</script>"
+        components.html(js_code, height=0)
 
     
     # Tạo khoảng cách cố định 50px
