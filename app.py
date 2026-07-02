@@ -142,18 +142,22 @@ with st.sidebar:
     # 2. Widget tải file
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
     
-    # Logic: Lưu file vào session_state 'song_data'
+    # 2. Logic cập nhật dữ liệu vào session_state
     if uploaded_file is not None:
+        # Cập nhật khi có file mới
         st.session_state.song_data = json.load(uploaded_file)
         st.session_state.song_name = uploaded_file.name.replace(".json", "")
-            
-    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
+    elif uploaded_file is None:
+        # Tự động xóa dữ liệu khỏi session_state khi người dùng bấm dấu 'x'
+        st.session_state.song_data = None
+        st.session_state.song_name = None
 
-    if st.session_state.uploaded_data is not None:
-        data = st.session_state.uploaded_data
-    
+    # 3. Hiển thị thông tin file nếu đang có dữ liệu
+    if st.session_state.song_data is not None:
         st.markdown("---")
         st.write("### Danh sách dữ liệu")
+        st.write(f"Đang tải: **{st.session_state.song_name}**")
+        st.markdown("---")
     
     # Giả sử cấu trúc file JSON của bạn là một danh sách các bài hát
     # hoặc bạn muốn liệt kê tên các cột/thông tin trong file
