@@ -134,24 +134,38 @@ def get_symbol(value, mode):
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
-    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
+    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json", "txt"])
+    st.caption("Hãy chọn file JSON hoặc TXT của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
 if uploaded_file:
-    data = json.load(uploaded_file)
-    song_data = data[0]
-    song_name = uploaded_file.name.replace(".json", "")
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
+    file_ext = uploaded_file.name.split('.')[-1].lower()
+    song_name = uploaded_file.name.rsplit('.', 1)[0]
+    columns = []
+
+    if file_ext == "json":
+        data = json.load(uploaded_file)
+        song_data = data[0]
+        columns = song_data.get("columns", [])
     
-    # Hàm lấy số thuần (cũ)
-    def get_number_from_key(note_data):
-        pitch = int(note_data[0])
-        return pitch + 1
+    elif file_ext == "txt":
+        # Đọc file txt và chuyển về định dạng [time, [[pitch, "key"]]]
+        content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
+        for line in content.strip().split('\n'):
+            parts = line.split(',')
+            if len(parts) == 2:
+                t_str, k_str = parts
+                # Tách lấy số từ chuỗi "1Key4"
+                pitch = int(k_str.split("Key")[1]) - 1
+                columns.append([int(t_str), [[pitch, k_str]]])
+
+    # Kiểm tra nếu dữ liệu rỗng
+    if not columns:
+        st.error("File trống hoặc định dạng không đúng!")
+        st.stop()
     
     # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = song_data.get("columns", [])
