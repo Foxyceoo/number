@@ -146,7 +146,7 @@ if uploaded_file:
     song_data = data[0]
     song_name = uploaded_file.name.replace(".json", "")
     columns = song_data.get("columns", [])
-    bits_per_page = 32
+    bits_per_page = 64
   
 
     # Hàm lấy số thuần (cũ)
