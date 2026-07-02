@@ -298,7 +298,7 @@ if uploaded_file:
     st.write('<div style="height: 700px;"></div>', unsafe_allow_html=True)    
     if st.button("Tải PDF xịn"):
     # Tạo nội dung HTML hoàn chỉnh (CSS + Body)
-    full_html = style + display_html 
+        full_html = style + display_html 
     
     pdf_data = generate_pdf(full_html)
     
