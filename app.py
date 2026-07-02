@@ -116,10 +116,10 @@ if st.session_state.user is not None:
             error_data = response.json()
             st.error(f"Lỗi từ Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
             
-    except Exception as e:
-        st.error(f"Lỗi kết nối: {e}")
+            except Exception as e:
+                    st.error(f"Lỗi kết nối: {e}")
         
-        st.markdown("---")
+                    st.markdown("---")
         # Nút đăng xuất để bảo mật hơn
         if st.button("Đăng xuất"):
             st.session_state.user = None
