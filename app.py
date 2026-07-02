@@ -164,15 +164,6 @@ with st.sidebar:
                 song_name = item.get("name", f"Bài hát {i+1}")
                 st.write(f"- {song_name}")
     
-    # Giả sử cấu trúc file JSON của bạn là một danh sách các bài hát
-    # hoặc bạn muốn liệt kê tên các cột/thông tin trong file
-    if isinstance(data, list):
-        # Ví dụ: Liệt kê tên các bài hát nếu mỗi phần tử trong list là 1 bài hát
-        for i, item in enumerate(data):
-            # Thay 'song_name' bằng khóa (key) thực tế trong file JSON của bạn
-            song_name = item.get("name", f"Bài hát {i+1}")
-            st.write(f"- {song_name}")
-    
     # Hoặc nếu bạn muốn hiển thị nhanh thông tin file
     st.info(f"Đang xem: {st.session_state.file_name}")
     
