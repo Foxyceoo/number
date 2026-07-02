@@ -226,6 +226,35 @@ if uploaded_files:
             margin: 0 auto !important;
             width: 90% !important;
         }
+        
+        /* ========================================================================= */
+        /* MỚI: Tác động trực tiếp lên Sidebar để thu ngắn ô nhập và ẩn danh sách file */
+        /* ========================================================================= */
+        /* 1. Ép chiều cao ô nhập file ngắn lại */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            padding: 10px !important;
+            min-height: 60px !important;
+            height: 60px !important;
+        }
+        
+        /* 2. Thu nhỏ icon và chữ hướng dẫn cho gọn */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
+            transform: scale(0.7) !important;
+            margin-bottom: 0px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small {
+            font-size: 11px !important;
+        }
+
+        /* 3. Ẩn danh sách file lặp mặc định xuất hiện ở Sidebar */
+        [data-testid="stSidebar"] [data-testid="stFileUploaderFilesContainer"],
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] + div,
+        [data-testid="stSidebar"] .uploadedFiles,
+        [data-testid="stSidebar"] .uploadedFile {
+            display: none !important;
+            height: 0px !important;
+            padding: 0px !important;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -238,30 +267,6 @@ if uploaded_files:
     # =========================================================================
     page_style = """
     <style>
-    /* 1. Ép chiều cao ô nhập file ngắn lại tối đa */
-    [data-testid="stFileUploader"] section {
-        padding: 10px !important;
-        min-height: 60px !important;
-        height: 60px !important;
-    }
-    
-    /* 2. Thu nhỏ icon và chữ hướng dẫn bên trong ô nhập để vừa vặn */
-    [data-testid="stFileUploader"] section svg {
-        transform: scale(0.7);
-        margin-bottom: 0px !important;
-    }
-    [data-testid="stFileUploader"] section small {
-        font-size: 11px !important;
-    }
-
-    /* 3. Ẩn triệt để phần danh sách file lặp bên dưới bằng cách ẩn container con */
-    [data-testid="stFileUploaderFilesContainer"],
-    [data-testid="stFileUploader"] ~ div,
-    div[data-testid="stFileUploader"] > div {
-        display: none !important;
-        height: 0px !important;
-        padding: 0px !important;
-    }
     ::-webkit-scrollbar { display: none !important; }
     
     body { 
