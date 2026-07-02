@@ -380,7 +380,7 @@ if uploaded_file:
     # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
     # =========================================================================
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
-    if st.button("Xuất PDF / In Toàn Bộ Sheet nhạc 🖨️", key="btn_to_pdf_layout"):
+    if st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
         else:
