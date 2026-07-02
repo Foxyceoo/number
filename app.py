@@ -102,9 +102,11 @@ if uploaded_file:
             if vals:
                 # Dùng join để nối các số bằng thẻ <br>, tất cả dùng cùng cỡ chữ 12px
                 all_nums = "<br>".join(map(str, vals))
+                max_note = max(vals) if vals else 1
+                dynamic_padding = 5 + (max_note * 2)
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 50px; padding-top: 2px;'>
-                    <div style='font-size: 12px; font-weight: bold; line-height: 1.2;'>{all_nums}</div>
+                <div style='padding-top: {dynamic_padding}px; flex-direction: column; align-items: center; padding-top: 2px;'>
+                    <div style='font-size: 12px; font-weight: bold; line-height: 1.5;'>{all_nums}</div>
                 </div>
                 """
             else:
