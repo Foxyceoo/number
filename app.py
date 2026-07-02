@@ -211,7 +211,7 @@ if uploaded_file:
     # =========================================================================
     page_style = f"""
     <style>
-    ::-webkit-scrollbar { display: none !important; }
+    ::-webkit-scrollbar {{ display: none !important; }}
     
     body {{ 
         background-color: #f0f2f6; 
@@ -263,7 +263,7 @@ if uploaded_file:
     .khuong-wrapper {{
         width: 100% !important;
         padding: 0 !important;
-        margin-bottom: {margin_bottom_val} !important;
+        margin-bottom: {{margin_bottom_val}} !important;
         flex-grow: 1; /* Thần chú giúp dòng nhạc tự co giãn chiếm full hàng */
         display: flex;
         align-items: center;
