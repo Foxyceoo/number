@@ -243,8 +243,8 @@ if uploaded_file:
             
             # --- TÍCH HỢP CHUYỂN ĐỔI HIEN THỊ ---
             for col_idx, col in enumerate(khuong_columns):
-            notes_in_col = col[1]
-            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+                notes_in_col = col[1]
+                raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
             # --- CHỈ DÙNG ĐOẠN NÀY ĐỂ XỬ LÝ DỮ LIỆU ---
             if display_mode == "1 - 15":
