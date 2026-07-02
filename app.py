@@ -29,7 +29,7 @@ def check_login():
                  st.session_state.user_name = user_name  # Lưu tên vào session
     
                  st.success("Đăng nhập thành công!")
-                    st.rerun()
+                 st.rerun()
                 else:
                     st.error("Email này chưa được cấp quyền!")
             except Exception as e:
