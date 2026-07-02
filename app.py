@@ -6,14 +6,11 @@ import time
 import pyrebase
 import requests
 import streamlit.components.v1 as components
-# 1. Thêm thư viện quản lý Cookie
-import extra_streamlit_components as stx
 
-# Khởi tạo bộ quản lý Cookie
-cookie_manager = stx.CookieManager()
-
+# Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
+# Sát lề trái
 config = {
     "apiKey": st.secrets["FIREBASE_API_KEY"],
     "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
@@ -28,19 +25,14 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# 2. KHÔI PHỤC TRẠNG THÁI ĐĂNG NHẬP TỪ COOKIE (NẾU CÓ)
+# 2. Quản lý trạng thái đăng nhập
 if 'user' not in st.session_state:
-    user_token = cookie_manager.get(cookie="user_token")
-    user_name = cookie_manager.get(cookie="user_name")
-    if user_token and user_name:
-        st.session_state.user = {"idToken": user_token}
-        st.session_state.user_name = user_name
-    else:
-        st.session_state.user = None
+    st.session_state.user = None
 
 # Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
+    # Dùng key để quản lý giá trị ô nhập liệu rõ ràng hơn
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Mật khẩu", type="password", key="pass_input")
     
@@ -48,70 +40,69 @@ def login_form():
         try:
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
-            user_name = email.split('@')[0]
-            st.session_state.user_name = user_name
-            
-            # LƯU VÀO COOKIE
-            cookies["user_token"] = user['idToken']
-            cookies["user_name"] = user_name
-            cookies.save() 
-            
+            st.session_state.user_name = email.split('@')[0]
+            # Xóa sạch dữ liệu cũ trong bộ nhớ sau khi đăng nhập thành công
             st.rerun() 
         except Exception as e:
+            # Thông báo lỗi chi tiết hơn nếu cần
             st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
             
 # Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
-    st.stop() 
+    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
 else:
+    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
     if 'is_loaded' not in st.session_state:
         st.session_state.is_loaded = False
     
+    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
     if not st.session_state.is_loaded:
         with st.spinner('Đang tải dữ liệu...'):
-            time.sleep(2) 
+            time.sleep(2) # Giả lập thời gian tải
         st.session_state.is_loaded = True
-        st.rerun() 
+        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
     
+    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
     st.success(f"hello, {st.session_state.user_name}!")
+    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
 
-# Sidebar người dùng & Đổi mật khẩu / Đăng xuất
-with st.sidebar:
-    st.markdown("---")
-    st.write(f"**Người dùng:** {st.session_state.user_name}")
-    
-    if st.button("Đổi mật khẩu"):
-        st.session_state.show_change_password = True
+# Kiểm tra nếu người dùng đã đăng nhập thành công
+if st.session_state.user is not None:
+    with st.sidebar:
+        st.markdown("---")
+        st.write(f"**Người dùng:** {st.session_state.user_name}")
         
-    if st.session_state.get("show_change_password", False):
-        new_password = st.text_input("Nhập mật khẩu mới", type="password")
-        if st.button("Xác nhận đổi"):
-            try:
-                id_token = st.session_state.user['idToken']
-                api_key = st.secrets["FIREBASE_API_KEY"]
-                api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
-                payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
-                
-                response = requests.post(api_url, json=payload)
-                if response.status_code == 200:
-                    st.success("Đổi mật khẩu thành công!")
-                    st.session_state.show_change_password = False
-                    st.rerun()
-                else:
-                    error_data = response.json()
-                    st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
-            except Exception as e:
-                st.error(f"Lỗi hệ thống: {e}")
-                
-    if st.button("Đăng xuất"):
-        st.session_state.user = None
-        if "user_token" in cookies:
-            del cookies["user_token"]
-        if "user_name" in cookies:
-            del cookies["user_name"]
-        cookies.save()
-        st.rerun()
+        # Nút đổi mật khẩu
+        if st.button("Đổi mật khẩu"):
+            st.session_state.show_change_password = True
+            
+        # Logic đổi mật khẩu
+        if st.session_state.get("show_change_password", False):
+            new_password = st.text_input("Nhập mật khẩu mới", type="password")
+            if st.button("Xác nhận đổi"):
+                try:
+                    id_token = st.session_state.user['idToken']
+                    api_key = st.secrets["FIREBASE_API_KEY"]
+                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
+                    
+                    response = requests.post(api_url, json=payload)
+                    
+                    if response.status_code == 200:
+                        st.success("Đổi mật khẩu thành công!")
+                        st.session_state.show_change_password = False
+                        st.rerun()
+                    else:
+                        error_data = response.json()
+                        st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                        
+                except Exception as e:
+                    st.error(f"Lỗi hệ thống: {e}")
+                    
+        if st.button("Đăng xuất"):
+            st.session_state.user = None
+            st.rerun()
             
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
