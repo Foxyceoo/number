@@ -238,24 +238,29 @@ if uploaded_files:
     # =========================================================================
     page_style = """
     <style>
-    /* ========================================================================= */
-    /* CẬP NHẬT: Ẩn tận gốc danh sách file mặc định của st.file_uploader */
-    /* ========================================================================= */
-    /* 1. Ẩn container chứa file bên dưới uploader */
+    /* 1. Ép chiều cao ô nhập file ngắn lại tối đa */
+    [data-testid="stFileUploader"] section {
+        padding: 10px !important;
+        min-height: 60px !important;
+        height: 60px !important;
+    }
+    
+    /* 2. Thu nhỏ icon và chữ hướng dẫn bên trong ô nhập để vừa vặn */
+    [data-testid="stFileUploader"] section svg {
+        transform: scale(0.7);
+        margin-bottom: 0px !important;
+    }
+    [data-testid="stFileUploader"] section small {
+        font-size: 11px !important;
+    }
+
+    /* 3. Ẩn triệt để phần danh sách file lặp bên dưới bằng cách ẩn container con */
     [data-testid="stFileUploaderFilesContainer"],
-    [data-testid="stFileUploaderFile"],
-    [data-testid="stUploadedFile"] {
+    [data-testid="stFileUploader"] ~ div,
+    div[data-testid="stFileUploader"] > div {
         display: none !important;
-    }
-    
-    /* 2. Ẩn tất cả các element xuất hiện ngay sau vùng Dropzone (chính là danh sách file) */
-    div[data-testid="stFileUploader"] > section + div {
-        display: none !important;
-    }
-    
-    /* 3. Phá bẫy cấu trúc hàng của Streamlit đối với file cũ */
-    .uploadedFiles, .uploadedFile {
-        display: none !important;
+        height: 0px !important;
+        padding: 0px !important;
     }
     ::-webkit-scrollbar { display: none !important; }
     
