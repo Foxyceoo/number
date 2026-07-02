@@ -151,7 +151,6 @@ if uploaded_file:
     for khuong_html in all_khuong_html:
         display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
-    footer_link = "<div class='print-footer' style='text-align: left; font-size: 12px; color: gray;'>https://foxynumber.streamlit.app</div>"
     html_to_render = style + display_html + footer_link
     
     total_height = (len(all_khuong_html) * 110) + 200
