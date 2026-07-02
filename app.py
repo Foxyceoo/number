@@ -207,13 +207,13 @@ if uploaded_file:
     )
         
     # =========================================================================
-    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 (Tối ưu Flex-Grow để FULL hàng)
+    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 (Đã sửa lỗi nuốt trang do justify-content)
     # =========================================================================
-    page_style = f"""
+    raw_page_style = """
     <style>
-    ::-webkit-scrollbar {{ display: none !important; }}
+    ::-webkit-scrollbar { display: none !important; }
     
-    body {{ 
+    body { 
         background-color: #f0f2f6; 
         margin: 0; 
         padding: 20px 0;
@@ -221,72 +221,69 @@ if uploaded_file:
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start; /* Thay đổi từ center thành flex-start để không bị nuốt trang */
         width: 100%;
-    }}
+    }
     
-    .sheet-page {{
+    .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
         width: 794px;
-        height: 1123px; /* Ép cố định chiều cao trang để flex-grow hoạt động chuẩn */
+        height: 1123px; 
         padding: 50px 0px !important; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
         margin-bottom: 25px;
 
-        /* Sử dụng Flexbox hướng dọc */
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important; /* Đẩy đều các dòng nhạc ra full trang */
-    }}
+        justify-content: space-between !important; 
+    }
 
-    table {{ 
+    table { 
         border-collapse: collapse !important; 
         text-align: center; 
         table-layout: fixed !important; 
         width: 94% !important; 
         margin: 0 auto !important; 
         padding: 0 !important;
-        height: 100%; /* Bảng chiếm trọn chiều cao của khối wrapper */
-    }}
+        height: 100%; 
+    }
 
-    td {{ 
+    td { 
         padding: 2px 0 !important;  
-        vertical-align: middle !important; /* Căn giữa nốt theo chiều dọc cho đẹp */
+        vertical-align: middle !important; 
         overflow: hidden;
         box-sizing: border-box !important;
-    }}
+    }
 
-    /* Mỗi dòng nhạc sẽ tự động giãn đều để lấp đầy khoảng trống */
-    .khuong-wrapper {{
+    .khuong-wrapper {
         width: 100% !important;
         padding: 0 !important;
-        margin-bottom: {{margin_bottom_val}} !important;
-        flex-grow: 1; /* Thần chú giúp dòng nhạc tự co giãn chiếm full hàng */
+        margin-bottom: __MARGIN_BOTTOM__ !important;
+        flex-grow: 1; 
         display: flex;
         align-items: center;
         break-inside: avoid;
         page-break-inside: avoid;
-    }}
+    }
     
-    /* Dòng cuối cùng không cần lùi lề dưới */
-    .khuong-wrapper:last-child {{
+    .khuong-wrapper:last-child {
         margin-bottom: 0px !important;
-    }}
+    }
     
-    @media print {{
-        header, footer, .sidebar, [data-testid="stSidebar"], .stAppDeployButton, button {{
+    @media print {
+        header, footer, .sidebar, [data-testid="stSidebar"], .stAppDeployButton, button {
             display: none !important;
-        }}
-        html, body {{
+        }
+        html, body {
             background-color: #ffffff !important;
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
-        }}
-        .sheet-page {{
+        }
+        .sheet-page {
             width: 794px !important;
             height: 1123px !important;
             box-shadow: none !important;
@@ -295,12 +292,12 @@ if uploaded_file:
             padding: 50px 0px !important; 
             page-break-after: always !important;
             break-after: page !important;
-        }}
-        @page {{
+        }
+        @page {
             size: A4 portrait;
             margin: 0; 
-        }}
-    }}
+        }
+    }
     </style>
     """
     
