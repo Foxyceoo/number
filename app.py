@@ -333,59 +333,53 @@ if uploaded_file:
             display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
         display_html += "</div>"
         
-    # 3. Thêm mã JavaScript kích hoạt hiệu ứng lật sách 3D của Turn.js
+    # 3. Đóng thẻ flipbook và tạo luôn các nút bấm Lật trang bằng HTML điều khiển Turn.js
     display_html += """
     </div>
+    
+    <!-- Thanh điều hướng lật trang tích hợp trực tiếp -->
+    <div style="display: flex; gap: 10px; justify-content: flex-start; margin-top: 15px; font-family: sans-serif;">
+        <button id="prev-btn" style="padding: 8px 16px; font-size: 14px; font-weight: 500; border: 1px solid #dcdfe6; background: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s;">⬅️ Trang trước</button>
+        <button id="next-btn" style="padding: 8px 16px; font-size: 14px; font-weight: 500; border: 1px solid #dcdfe6; background: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s;">Trang kế tiếp ➡️</button>
+    </div>
+
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#flipbook').turn({
+            // Khởi tạo hiệu ứng lật sách
+            var book = $('#flipbook');
+            book.turn({
                 width: 800,
                 height: 550,
                 autoCenter: true,
-                duration: 800 // Tốc độ lật mượt mà (800ms)
+                duration: 800
             });
+            
+            // Xử lý sự kiện khi bấm nút trực tiếp trong HTML công khai
+            $('#prev-btn').click(function() {
+                book.turn('previous');
+            });
+            
+            $('#next-btn').click(function() {
+                book.turn('next');
+            });
+            
+            // Thêm hiệu ứng hover nhỏ cho nút bấm xinh xắn hơn
+            $('#prev-btn, #next-btn').hover(
+                function() { $(this).style.background = '#f5f7fa'; },
+                function() { $(this).style.background = '#fff'; }
+            );
         });
     </script>
     """
 
-    # 4. Gom style + cấu trúc lật trang để hiển thị lên màn hình
+    # 4. Gom cấu trúc style + body lật trang để hiển thị lên màn hình
     html_to_render = style + display_html
     
-    # Đặt chiều cao khung hiển thị cố định ở mức 600px là vừa vặn đẹp mắt với cuốn sách
-    components.html(html_to_render, height=600, scrolling=False)
+    # Tăng nhẹ chiều cao khung lên 640px để chứa vừa vặn cả cuốn sách và hàng nút bấm mới
+    components.html(html_to_render, height=640, scrolling=False)
     
-    # 5. Tạo các nút điều hướng tác vụ ở bên dưới cuốn sách
-    st.write('<div style="height: 10px;"></div>', unsafe_allow_html=True)    
-    
-    # Chia làm 3 cột để đặt các nút bấm nằm ngang hàng cho đẹp
-    col1, col2, col3 = st.columns([1.5, 1.5, 5])
-    
-    with col1:
-        if st.button("Trang kế tiếp ➡️", key="btn_next_page"):
-            # Sử dụng lệnh lệnh của Turn.js là $('#flipbook').turn('next') để lật trang
-            js_next = """
-            <script>
-                window.parent.document.querySelector('iframe[src*="components.html"]').contentWindow.$('#flipbook').turn('next');
-            </script>
-            """
-            # Một cách đơn giản và an toàn hơn để tương tác trực tiếp là nhúng trực tiếp tập lệnh trigger vào chính iframe cũ, 
-            # hoặc tạo ra một lệnh gọi nhảy trang bằng cách gán lệnh lật qua biến nhận diện. Tuy nhiên trong Streamlit, cách tối ưu nhất để điều khiển iframe từ nút Streamlit là truyền lệnh thông qua window.
-            # Để nút chạy mượt mà nhất không bị reload, Yaoyao thiết kế đoạn JS kích hoạt click thẳng vào mép phải cuốn sách:
-            js_code_next = """
-            <script>
-                var fb = window.parent.document.getElementById("flipbook") || window.parent.$("#flipbook");
-                // Thực hiện gọi lệnh lật trang thông qua window của iframe đang chứa turn.js
-                var iframes = window.parent.document.getElementsByTagName('iframe');
-                for (var i = 0; i < iframes.length; i++) {
-                    if(iframes[i].contentWindow.$) {
-                        iframes[i].contentWindow.$('#flipbook').turn('next');
-                    }
-                }
-            </script>
-            """
-            components.html(js_code_next, height=0)
-
-    with col2:
-        if st.button("to PDF 🖨️", key="btn_to_pdf"):
-            js_code_print = "<script>window.parent.window.print();</script>"
-            components.html(js_code_print, height=0)
+    # 5. Giữ lại duy nhất một nút to PDF của Streamlit ở cuối cùng tách biệt
+    st.write('<div style="height: 5px;"></div>', unsafe_allow_html=True)    
+    if st.button("to PDF 🖨️", key="btn_to_pdf_final"):
+        js_code_print = "<script>window.parent.window.print();</script>"
+        components.html(js_code_print, height=0)
