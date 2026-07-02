@@ -374,11 +374,11 @@ if uploaded_file:
     """
     
     # 2. Bắt đầu xây dựng chuỗi HTML hiển thị tất cả các trang
+    # 2. Bắt đầu xây dựng chuỗi HTML hiển thị tất cả các trang (ĐÃ BỎ ĐẦU TRANG)
     display_html = ""
     
     # Thiết lập số dòng nhạc trên mỗi trang là 5
     lines_per_page = 5
-    page_count = 1
     
     # Vòng lặp chia cụm all_khuong_html, mỗi cụm lấy đúng 5 dòng
     for idx in range(0, len(all_khuong_html), lines_per_page):
@@ -386,37 +386,18 @@ if uploaded_file:
         
         # Mở một trang giấy mới
         display_html += "<div class='sheet-page'>"
-        
-        # Nếu là trang đầu tiên (Trang 1), chèn thêm Tiêu đề bài hát làm trang bìa đầu sheet
-        if page_count == 1:
-            display_html += f"""
-            <div class='sheet-header'>
-                <h1 style="font-size: 32px; margin: 0 0 5px 0; color: #1a2a4a; font-weight: bold;">{song_name}</h1>
-                <p style="font-size: 13px; color: #666; font-style: italic; margin: 0;">Bộ chuyển đổi sheet số điện tử</p>
-            </div>
-            """
-        else:
-            # Từ trang 2 trở đi, chèn một tiêu đề nhỏ (Header) ở góc trên cho chuyên nghiệp
-            display_html += f"""
-            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 20px; border-bottom: 1px dashed #ccc; padding-bottom: 5px;">
-                <span>{song_name}</span>
-                <span>Trang {page_count}</span>
-            </div>
-            """
             
-        # Thêm lần lượt 5 khuông nhạc thuộc trang này vào
+        # Thêm thẳng lần lượt 5 khuông nhạc thuộc trang này vào mà không chèn tiêu đề/số trang nữa
         for khuong_html in chunk:
             display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
             
         # Đóng trang giấy
         display_html += "</div>"
-        page_count += 1
         
     # 3. Gom style và toàn bộ các trang giấy để render lên Streamlit
     html_to_render = page_style + display_html
     
-    # Tính toán chiều cao tổng thể để khung components mở rộng tối đa theo số lượng trang, không bị xuất hiện thanh cuộn bên trong khung
-    # Trung bình mỗi trang giấy kèm khoảng cách rộng tầm 900px
+    # Tính toán chiều cao tổng thể để khung components mở rộng tối đa theo số lượng trang
     total_pages = math.ceil(len(all_khuong_html) / lines_per_page)
     calculated_height = total_pages * 900 + 100
     
