@@ -285,31 +285,15 @@ with st.sidebar:
         for idx, current_file in enumerate(uploaded_files):
             display_name = current_file.name.replace(".json", "").replace("_", " ")
             is_current = (st.session_state.selected_song_index == idx)
-            button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
-        
-            # Sửa key từ "btn_{idx}" thành "btn_{current_file.name}"
-            if st.button(button_label, key=f"btn_{current_file.name}", use_container_width=True):
+            button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
+            
+            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
                 st.session_state.selected_song_index = idx
                 st.rerun()
-
-    # Kiểm tra nếu đã có dữ liệu bài hát mới thực hiện xử lý
-# Kiểm tra nếu đã có dữ liệu bài hát mới thực hiện xử lý
-if 'song_data' in locals() or 'song_data' in globals():
-    raw_columns = song_data.get("columns", [])
-    bits_per_page = 32
     
-    if raw_columns:
-        max_bit_index = max([col[0] for col in raw_columns])
-        columns = [[i, []] for i in range(max_bit_index + 1)]
-        for col in raw_columns:
-            bit_pos = col[0]
-            columns[bit_pos] = col
-    else:
-        columns = []
-else:
-    # Nếu chưa có bài hát, khởi tạo các giá trị mặc định để tránh lỗi
-    raw_columns = []
-    bits_per_page = 32
+ 
+    raw_columns = song_data.get("columns", [])
+    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
     
     if raw_columns:
         max_bit_index = max([col[0] for col in raw_columns])
@@ -326,10 +310,6 @@ else:
         pitch = int(note_data[0])
         return pitch + 1
     
-
-    # Lấy danh sách các cột và số bit mỗi trang từ file
-    if 'song_data' not in locals():
-        song_data = {}
 
     # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = song_data.get("columns", [])
