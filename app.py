@@ -10,12 +10,11 @@ padding_bottom_px = 90
 margin_side = "900px"
 
 # Hàm chuyển đổi Key thành số 1-15
-def get_number_from_key(key_str):
-
-    try: return (int(key_str.split('Key')[1]) % 15) + 1
-
-    except: return ""
-
+def get_number_from_key(note_data):
+    # note_data là list [pitch, layer], ví dụ: [7, "2"]
+    # Pitch (note_data[0]) chính là vị trí phím 0-14
+    pitch = int(note_data[0])
+    return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 1-15
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
@@ -92,7 +91,7 @@ if uploaded_file:
         for col_idx, col in enumerate(khuong_columns):
             # col là [time, [[pitch, key], ...]]
             notes_in_col = col[1]
-            vals = sorted([get_number_from_data(n) for n in notes_in_col], reverse=True)
+            vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
 
             # Logic kẻ bảng
             is_new_line = (col_idx == 0)
