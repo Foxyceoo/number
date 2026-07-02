@@ -145,24 +145,24 @@ if uploaded_file:
     data = json.load(uploaded_file)
     song_data = data[0]
     song_name = uploaded_file.name.replace(".json", "")
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
-  
-
-    # Hàm lấy số thuần (cũ)
-    def get_number_from_key(note_data):
-        pitch = int(note_data[0])
-        return pitch + 1
     
-
-    # Lấy danh sách các cột và số bit mỗi trang từ file
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
+    # =========================================================================
+    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
+    # =========================================================================
+    raw_columns = song_data.get("columns", [])
+    bits_per_page = 32  # Bạn có thể đổi thành 64 ở đây, tỷ lệ % sẽ tự động co giãn ngay lập tức!
     
-
-    def get_number_from_data(note_data):
-        # note_data là list [pitch, key]
-        return int(note_data[1])
+    if raw_columns:
+        # Tìm vị trí phách (bit) lớn nhất xuất hiện trong bài hát
+        max_bit_index = max([col[0] for col in raw_columns])
+        # Tạo sẵn một danh sách rỗng từ phách 0 đến phách cuối cùng
+        columns = [[i, []] for i in range(max_bit_index + 1)]
+        # Đổ dữ liệu nốt nhạc thực tế vào đúng vị trí phách của nó
+        for col in raw_columns:
+            bit_pos = col[0]
+            columns[bit_pos] = col
+    else:
+        columns = []
         
     #CSS
     # === THAY THẾ TOÀN BỘ ĐOẠN CUỐI TỪ ĐÂY ĐẾN HẾT FILE ===
