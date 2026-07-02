@@ -162,6 +162,7 @@ if uploaded_file:
         return int(note_data[1])
         
     #CSS
+    margin_side = "100%"
     style = f"""
     <style>
     ::-webkit-scrollbar {{ display: none !important; }}
@@ -230,8 +231,25 @@ if uploaded_file:
     
     # 1. Tạo danh sách các dòng nhạc trước
     all_rows = [] 
+    
+    # Duyệt qua các cột để tạo từng dòng nhạc
     for i in range(0, len(columns), bits_per_page):
-        # ... (giữ nguyên đoạn tạo html_content từ code cũ của bạn) ...
+        # Lấy một đoạn 32 cột (bits_per_page)
+        chunk = columns[i : i + bits_per_page]
+        
+        # Tạo HTML cho từng cột trong dòng này
+        html_content = ""
+        for col in chunk:
+            notes = col.get("notes", [])
+            # Tạo các số cho ô (nếu có nhiều nốt trong 1 cột thì dùng <br>)
+            note_strings = [get_symbol(get_number_from_data(n), display_mode) for n in notes]
+            notes_html = "<br>".join([f"<span class='note-number'>{n}</span>" for n in note_strings])
+            
+            html_content += f"<td>{notes_html}</td>"
+        
+        # Bọc thêm div wrapper để in ấn tốt hơn
+        full_row_html = f"<div class='khuong-wrapper'>{row_html}</div>"
+        
         # (Lưu ý: Đoạn này tạo html_content cho 1 dòng nhạc)
         
         row_html = f"<div class='khuong-wrapper'>{html_content}</div>"
