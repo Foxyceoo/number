@@ -327,6 +327,10 @@ else:
     
 
     # Lấy danh sách các cột và số bit mỗi trang từ file
+    if 'song_data' not in locals():
+    song_data = {}
+
+    # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
