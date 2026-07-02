@@ -22,18 +22,15 @@ config = {
 }
 
 # --- LOGIC XEM CÔNG KHAI ---
-# Bỏ qua yêu cầu đăng nhập nếu là chế độ xem công khai
 params = st.query_params
-is_public_view = "mode" in params 
+# Lấy mode, nếu không có thì trả về None
+mode = params.get("mode") 
 
-# Chỉ bắt buộc đăng nhập nếu KHÔNG PHẢI chế độ công khai
-if not is_public_view:
-    if 'user' not in st.session_state:
-        st.session_state.user = None
-        
-    if st.session_state.user is None:
-        login_form()
-        st.stop()
+# Chỉ chặn nếu KHÔNG PHẢI chế độ công khai (tức là không có mode) 
+# VÀ chưa đăng nhập
+if mode is None and st.session_state.user is None:
+    login_form()
+    st.stop()
 
 # Khởi tạo Auth
 firebase = pyrebase.initialize_app(config)
