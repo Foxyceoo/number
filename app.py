@@ -278,7 +278,7 @@ if uploaded_file:
     </style>
     """
 
-     PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
+    PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
     current_page_height = 0
     display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
 
