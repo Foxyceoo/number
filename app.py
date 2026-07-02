@@ -166,62 +166,51 @@ if uploaded_file:
         
     #CSS
     style = """
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
     <style>
     ::-webkit-scrollbar { display: none !important; }
-    body { 
-        background-color: #f0f2f6; 
-        display: flex; 
-        justify-content: center; 
-        align-items: center; 
-        margin: 0; 
-        padding: 20px;
-        font-family: sans-serif;
-    }
-    
-    /* Khung cuốn sách */
-    #flipbook {
-        width: 800px;
-        height: 550px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    
-    /* Định hình từng trang sách */
-    .page {
+    html, body { width: 100%; margin: 0; padding: 0; }
+
+    /* Định dạng khung trang A4 chuẩn hiển thị trên Web */
+    .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
-        width: 1240px;
-        height: 1754px;
-        padding: 25px 35px;
-        border-right: 1px solid #ddd;
-        overflow: hidden;
-    }
-    
-    /* Trang bìa */
-    .cover-page {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
+        width: 794px; /* Chiều rộng chuẩn A4 trên Web (96 DPI) */
+        min-height: 1123px; /* Chiều cao chuẩn A4 trên Web */
+        padding: 40px 0px !important; /* XÓA BỎ CĂN LỀ TRÁI PHẢI (= 0px) */
+        margin: 0 auto 20px auto;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        page-break-after: always;
     }
 
     table { 
-        border-collapse: collapse; 
+        border-collapse: collapse !important; 
         text-align: center; 
         table-layout: fixed !important; 
-        width: 100%; 
-        margin: 0 auto 15px auto; 
+        width: 100% !important; 
+        margin: 0 padding: 0 !important;
     }
 
     td { 
-        padding: 2px !important;  
-        width: 20px !important; 
+        padding: 2px 0 !important;  
         vertical-align: top !important; 
-        border-right: 1px solid #ccc; 
+        overflow: hidden;
+        box-sizing: border-box !important;
+    }
+
+    .khuong-wrapper {
+        width: 100% !important;
+        padding: 0 !important;
+        margin-bottom: 30px !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    @media print {
+        .sidebar, header, .stAppDeployButton, footer { display: none !important; }
+        @page { size: A4; margin: 1cm 0cm 1cm 0cm; } /* Xóa lề khi in ấn */
+        .sheet-page { width: 100% !important; box-shadow: none !important; padding: 0 !important; }
+        table { page-break-inside: avoid !important; break-inside: avoid !important; }
     }
     </style>
     """
