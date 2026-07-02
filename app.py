@@ -145,30 +145,26 @@ if uploaded_file:
     data = json.load(uploaded_file)
     song_data = data[0]
     song_name = uploaded_file.name.replace(".json", "")
+    columns = song_data.get("columns", [])
+    bits_per_page = 32
+  
+
+    # Hàm lấy số thuần (cũ)
+    def get_number_from_key(note_data):
+        pitch = int(note_data[0])
+        return pitch + 1
     
-    # =========================================================================
-    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
-    # =========================================================================
-    raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  # Bạn có thể đổi thành 64 ở đây, tỷ lệ % sẽ tự động co giãn ngay lập tức!
+
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+    columns = song_data.get("columns", [])
+    bits_per_page = 32
     
-    if raw_columns:
-        # Tìm vị trí phách (bit) lớn nhất xuất hiện trong bài hát
-        max_bit_index = max([col[0] for col in raw_columns])
-        # Tạo sẵn một danh sách rỗng từ phách 0 đến phách cuối cùng
-        columns = [[i, []] for i in range(max_bit_index + 1)]
-        # Đổ dữ liệu nốt nhạc thực tế vào đúng vị trí phách của nó
-        for col in raw_columns:
-            bit_pos = col[0]
-            columns[bit_pos] = col
-    else:
-        columns = []
+
+    def get_number_from_data(note_data):
+        # note_data là list [pitch, key]
+        return int(note_data[1])
         
     #CSS
-    # === THAY THẾ TOÀN BỘ ĐOẠN CUỐI TỪ ĐÂY ĐẾN HẾT FILE ===
-    
-    # 1. Định nghĩa lại Style để hiển thị dạng trang giấy trải dài (A4-like style)
-    # Bỏ thư viện turn.js cũ, chỉ giữ lại CSS tạo khung trang giấy đẹp mắt
     page_style = """
     <style>
     ::-webkit-scrollbar { display: none !important; }
@@ -183,7 +179,7 @@ if uploaded_file:
         gap: 25px;
     }
     
-    /* Trang A4 chuẩn Web: Rộng đúng 794px, KHÔNG CĂN LỀ TRÁI PHẢI */
+    /* Khung trang A4 Web chuẩn: Rộng đúng 794px, KHÔNG CĂN LỀ TRÁI PHẢI */
     .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
@@ -200,7 +196,8 @@ if uploaded_file:
         text-align: center; 
         table-layout: fixed !important; 
         width: 100% !important; 
-        margin: 0 padding: 0 !important;
+        margin: 0;
+        padding: 0 !important;
     }
 
     td { 
@@ -227,22 +224,24 @@ if uploaded_file:
     </style>
     """
     
-    # ==========================================
-    # 3. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU %
-    # ==========================================
+    # =========================================================================
+    # 3. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU % THEO PHÁCH THỰC TẾ
+    # =========================================================================
     all_khuong_html = []
     
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
         
-        # Điền nốt trống cho đủ 32 bit nếu là khuông cuối cùng
+        # Điền nốt trống cho đủ số lượng bit quy định ở khuông cuối cùng của bài
         if len(khuong_columns) < bits_per_page:
             needed = bits_per_page - len(khuong_columns)
             for _ in range(needed):
                 khuong_columns.append([0, []])
 
-        # Tạo bảng tràn viền cố định layout
+        # Khởi tạo bảng sát mép
         html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse; margin: 0; padding: 0;'><tr>"
+        
+        # Chia đều 100% chiều rộng trang cho số bit phách nhạc
         cell_width_pct = 100.0 / bits_per_page
 
         for col_idx, col in enumerate(khuong_columns):
@@ -257,7 +256,7 @@ if uploaded_file:
             is_new_line = (col_idx == 0)
             is_beat_4 = ((col_idx + 1) % 8 == 0)
             
-            # Vạch nhịp dọc màu xanh
+            # Vạch ngăn nhịp dọc màu xanh
             border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
             border_left = "1.5px solid #00008c" if is_new_line else "none"
 
@@ -271,15 +270,15 @@ if uploaded_file:
             else:
                 cell_content = "<div style='min-height: 45px;'></div>"
 
-            # Ép cứng tỷ lệ % theo chiều rộng cột
+            # Ép cứng phần trăm width sát sạt vào mép trang theo tỷ lệ thực tế
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
         
-    # ==========================================
-    # 4. CHIA 5 DÒNG NHẠC VÀO TRANG GIẤY A4
-    # ==========================================
+    # =========================================================================
+    # 4. CHIA 5 DÒNG NHẠC VÀO TRANG GIẤY A4 (Loại bỏ hoàn toàn lật sách)
+    # =========================================================================
     display_html = ""
     lines_per_page = 5
     
@@ -291,17 +290,17 @@ if uploaded_file:
             display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
         display_html += "</div>"
         
-    # Hợp nhất CSS và nội dung HTML
+    # Hợp nhất CSS sạch và nội dung HTML chính thức
     html_to_render = page_style + display_html
     
-    # Tính toán chiều cao hợp lý cho iframe components của Streamlit (Tránh xuất hiện scrollbar phụ)
+    # Tính toán chiều cao hợp lý cho iframe components của Streamlit
     total_pages = math.ceil(len(all_khuong_html) / lines_per_page)
     calculated_height = total_pages * 1150 + 100
     
-    # Đẩy HTML sạch lên giao diện
+    # Đẩy HTML sạch lên giao diện (Chỉ gọi DUY NHẤT một lần ở cuối file)
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
-    # Nút bấm in ấn / Xuất PDF
+    # Nút bấm in ấn / Xuất PDF dưới chân trang
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
     if st.button("Xuất PDF / In Sheet nhạc 🖨️", key="btn_to_pdf_layout"):
         js_code_print = "<script>window.parent.window.print();</script>"
