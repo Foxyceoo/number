@@ -111,8 +111,22 @@ def get_number_from_key(note_data):
     pitch = int(note_data[0])
     return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 1-15
 
+#Hiển thị
+def get_symbol(value):
+    mapping = {
+        1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7",
+        8: "1.", 9: "2.", 10: "3.", 11: "4.", 12: "5.", 13: "6.", 14: "7.",
+        15: "1.."
+    }
+    return mapping.get(value, str(value))
+
+# 2. Thêm nút chọn chế độ vào Sidebar
+
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
+    st.markdown("---")
+    # Nút chọn chế độ
+    display_mode = st.radio("Chế độ hiển thị:", ["Số thuần", "Sheet 1-15"])
     st.markdown("---")
     uploaded_file = st.file_uploader("**Sheet 123**", type=["json"])
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
@@ -122,6 +136,13 @@ if uploaded_file:
     data = json.load(uploaded_file)
     song_data = data[0]
     song_name = uploaded_file.name.replace(".json", "")
+    columns = song_data.get("columns", [])
+    bits_per_page = 32
+    
+    # Hàm lấy số thuần (cũ)
+    def get_number_from_key(note_data):
+        pitch = int(note_data[0])
+        return pitch + 1
     
     # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = song_data.get("columns", [])
@@ -196,36 +217,37 @@ if uploaded_file:
     all_khuong_html = []
     line_number = 1
     
-    # Duyệt theo từng trang (bits_per_page)
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
         
+        # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
+        if len(khuong_columns) < bits_per_page:
+            needed = bits_per_page - len(khuong_columns)
+            for _ in range(needed):
+                khuong_columns.append([0, []])
+
         html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
         
         for col_idx, col in enumerate(khuong_columns):
-            # col là [time, [[pitch, key], ...]]
             notes_in_col = col[1]
-            vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
-
-            # Logic kẻ bảng
+            # Lấy danh sách số
+            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+            
+            # --- TÍCH HỢP CHUYỂN ĐỔI ---
+            if display_mode == "Sheet 1-15":
+                vals = [get_symbol(v) for v in raw_vals]
+            else:
+                vals = raw_vals
+            
+            # ... (Phần logic kẻ bảng giữ nguyên)
             is_new_line = (col_idx == 0)
             is_beat_4 = ((col_idx + 1) % 8 == 0)
             border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
             border_left = "0.5px solid #00008c" if is_new_line else "none"
 
-            # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
-            # Kiểm tra xem khuông cuối cùng có thiếu nhịp không
-            if len(khuong_columns) < bits_per_page:
-                needed = bits_per_page - len(khuong_columns)
-                for _ in range(needed):
-                    khuong_columns.append([0, []]) # Thêm cột rỗng
-
             if vals:
-                # Dùng join để nối các số bằng thẻ <br>
+                # Dùng join để nối các số/ký hiệu
                 all_nums = "<br>".join(map(str, vals))
-                
-                # Sửa lại: Dùng display: flex và bỏ dynamic_padding dựa trên giá trị nốt
-                # Chỉ để padding-top cố định một chút để tránh dính sát mép trên
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
                     <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
@@ -238,7 +260,7 @@ if uploaded_file:
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
-        line_number += 1
+        line_number += 2
         
     display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
     
