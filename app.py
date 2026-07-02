@@ -4,6 +4,34 @@ import json
 import math
 import streamlit.components.v1 as components
 
+# Đường dẫn đến file CSV của bạn (đã xuất bản từ Google Sheets)
+CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
+
+def check_login():
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
+
+    if not st.session_state.logged_in:
+        email_input = st.text_input("Nhập email để truy cập:")
+        if st.button("Đăng nhập"):
+            try:
+                # Đọc danh sách từ Google Sheets
+                df = pd.read_csv(CSV_URL)
+                # Kiểm tra email trong cột 'Mail'
+                if email_input in df['Mail'].values:
+                    st.session_state.logged_in = True
+                    st.session_state.user_email = email_input
+                    st.success("Đăng nhập thành công!")
+                    st.rerun()
+                else:
+                    st.error("Email này chưa được cấp quyền!")
+            except Exception as e:
+                st.error("Không thể kết nối đến danh sách xác thực.")
+        st.stop()
+
+# Gọi hàm kiểm tra
+check_login()
+
 st.set_page_config(page_title='"Number" one Foxy', layout="wide")
 padding_top_px = 40
 padding_bottom_px = 90
