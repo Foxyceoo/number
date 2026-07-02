@@ -228,16 +228,15 @@ if uploaded_files:
         }
         
         /* ========================================================================= */
-        /* MỚI: Tác động trực tiếp lên Sidebar để thu ngắn ô nhập và ẩn danh sách file */
+        /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
         /* ========================================================================= */
-        /* 1. Ép chiều cao ô nhập file ngắn lại */
+        
+        /* 1. Thu nhỏ vùng Dropzone nhập file */
         [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
             padding: 10px !important;
             min-height: 60px !important;
             height: 60px !important;
         }
-        
-        /* 2. Thu nhỏ icon và chữ hướng dẫn cho gọn */
         [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
             transform: scale(0.7) !important;
             margin-bottom: 0px !important;
@@ -246,14 +245,15 @@ if uploaded_files:
             font-size: 11px !important;
         }
 
-        /* 3. Ẩn danh sách file lặp mặc định xuất hiện ở Sidebar */
-        [data-testid="stSidebar"] [data-testid="stFileUploaderFilesContainer"],
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] + div,
-        [data-testid="stSidebar"] .uploadedFiles,
-        [data-testid="stSidebar"] .uploadedFile {
+        /* 2. Ép toàn bộ các element đi kèm/nằm dưới stFileUploader (trừ vùng section kéo thả) có chiều cao bằng 0 và ẩn đi */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] div,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
             display: none !important;
             height: 0px !important;
             padding: 0px !important;
+            margin: 0px !important;
+            overflow: hidden !important;
         }
         </style>
         """,
