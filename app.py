@@ -262,10 +262,38 @@ if uploaded_file:
     }
     
     @media print {
-        body { background-color: #ffffff; padding: 0; }
-        .sheet-page { box-shadow: none; padding: 40px 20px !important; width: 100% !important; }
-        .sidebar, header, .stAppDeployButton, footer { display: none !important; }
-        @page { size: A4; margin: 1cm 0cm 1cm 0cm; }
+        /* 1. Ẩn toàn bộ giao diện thừa của Streamlit */
+        header, footer, .sidebar, [data-testid="stSidebar"], .stAppDeployButton, button {
+            display: none !important;
+        }
+        
+        /* 2. Đưa body về trạng thái in chuẩn, xóa sạch nền xám và khoảng cách thừa */
+        html, body {
+            background-color: #ffffff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        /* 3. Ép các trang giấy A4 hiển thị chuẩn xác khi xuất file */
+        .sheet-page {
+            width: 100% !important;
+            max-width: 794px !important;
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 auto !important;
+            padding: 60px 0px !important; /* Giữ nguyên lề trên dưới bạn vừa chỉnh */
+            
+            /* Ép trình duyệt BẮT BUỘC phải ngắt trang sau khi hết 1 khối .sheet-page */
+            page-break-after: always !important;
+            break-after: page !important;
+        }
+
+        /* 4. Cấu hình cài đặt trang in của trình duyệt */
+        @page {
+            size: A4 portrait;
+            margin: 0; /* Xóa lề mặc định của trình duyệt để không bị lệch */
+        }
     }
     </style>
     """
