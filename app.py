@@ -19,29 +19,22 @@ def check_login():
                 df = pd.read_csv(CSV_URL)
                 # Kiểm tra email trong cột 'Mail'
                 if email_input in df['Mail'].values:
-                    st.session_state.logged_in = True
-                    st.session_state.user_email = email_input
-                    st.success("Đăng nhập thành công!")
+                 # Tìm dòng có email trùng khớp
+                 user_info = df.loc[df['Mail'] == email_input]
+                 # Lấy tên ra (giả sử cột tên là 'Tên')
+                 user_name = user_info['Tên'].values[0]
+    
+                 st.session_state.logged_in = True
+                 st.session_state.user_email = email_input
+                 st.session_state.user_name = user_name  # Lưu tên vào session
+    
+                 st.success("Đăng nhập thành công!")
                     st.rerun()
                 else:
                     st.error("Email này chưa được cấp quyền!")
             except Exception as e:
                 st.error("Không thể kết nối đến danh sách xác thực.")
         st.stop()
-        # ... phần code đọc danh sách ...
-    if email_input in df['Mail'].values:
-        # Tìm dòng có email trùng khớp
-        user_info = df.loc[df['Mail'] == email_input]
-        # Lấy tên ra (giả sử cột tên là 'Tên')
-        user_name = user_info['Tên'].values[0]
-    
-        st.session_state.logged_in = True
-        st.session_state.user_email = email_input
-        st.session_state.user_name = user_name  # Lưu tên vào session
-    
-        st.success("Đăng nhập thành công!")
-        st.rerun()
-    # ...
 
 # Gọi hàm kiểm tra
 check_login()
