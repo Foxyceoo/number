@@ -366,7 +366,7 @@ if uploaded_file:
                 """
             else:
                 # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
-                cell_content = "<div style='min-height: 60px;'></div>"
+                cell_content = "<div style='min-height: {min_cell_height}px;'></div>"
 
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
