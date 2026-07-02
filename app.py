@@ -160,13 +160,17 @@ with st.sidebar:
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-# Thay vì if uploaded_file: thì dùng:
+# 3. Sử dụng đúng tên biến đã khởi tạo
 if st.session_state.song_data is not None:
+    # Lấy dữ liệu từ state
     data = st.session_state.song_data
-    song_data = data[0]
-    song_name = st.session_state.song_name
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
+    
+    # Kiểm tra xem file có cấu trúc list không để tránh lỗi
+    if isinstance(data, list) and len(data) > 0:
+        song_data = data[0]
+        song_name = st.session_state.song_name
+        columns = song_data.get("columns", [])
+        bits_per_page = 32
     
     # Hàm lấy số thuần (cũ)
     def get_number_from_key(note_data):
