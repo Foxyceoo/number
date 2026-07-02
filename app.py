@@ -218,27 +218,9 @@ with st.sidebar:
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
-    # --- Danh sách bài hát Custom ---
-    st.markdown("""
-        <style>
-        div[data-testid="stColumn"] button {
-            border: none !important;
-            background: transparent !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            line-height: 40px !important; /* Cân bằng chiều cao với nút bài hát */
-            color: #ff4b4b !important;
-            font-size: 16px !important;
-        }
-        div[data-testid="stColumn"] button:hover {
-            color: #ff1a1a !important;
-            background: transparent !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
+    # --- Danh sách bài hát Custom (Nút đen cũ, chỉ có x là text thuần) ---
+    st.write("**Danh sách bài hát:**")
     
-    st.write("**Danh sách bài hát:**")    
     # CSS ẩn hoàn toàn danh sách file lỗi của Streamlit và làm đẹp nút xóa x
     st.markdown("""
         <style>
@@ -271,29 +253,37 @@ with st.sidebar:
         </style>
     """, unsafe_allow_html=True)
 
-    if not st.session_state.playlist_files:
+    if not uploaded_files:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
-        for name in list(st.session_state.playlist_files.keys()):
-            display_name = name.replace(".json", "").replace("_", " ")
-            is_current = (st.session_state.current_song == name)
+        # Khởi tạo index bài hát được chọn nếu chưa có
+        if "selected_song_index" not in st.session_state:
+            st.session_state.selected_song_index = 0
+
+        # Duyệt qua danh sách file đang có trong uploader
+        for idx, current_file in enumerate(uploaded_files):
+            display_name = current_file.name.replace(".json", "").replace("_", " ")
             
-            # ĐƯỢC CẬP NHẬT: Thêm dấu ** để tên bài hát luôn được IN ĐẬM
+            # Kiểm tra xem bài hát này có đang được chọn không
+            is_current = (st.session_state.selected_song_index == idx)
             button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
             
             # Chia cột: Cột nút bài hát chiếm 90%, cột nút xóa chiếm 10%
             col_btn, col_del = st.columns([0.9, 0.1])
             
             with col_btn:
-                if st.button(button_label, key=f"btn_{name}", use_container_width=True):
-                    st.session_state.current_song = name
+                # Nút đen truyền thống của Streamlit, bấm phát ăn ngay
+                if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+                    st.session_state.selected_song_index = idx
+                    st.rerun()
             
             with col_del:
-                # Nút bấm bây giờ chỉ là chữ x màu đỏ thuần túy, tự động căn thẳng hàng
-                if st.button("✕", key=f"del_{name}"):
-                    del st.session_state.playlist_files[name]
-                    if st.session_state.current_song == name:
-                        st.session_state.current_song = None
+                # Nút xóa x là text thuần màu đỏ, không bị lệch dòng
+                if st.button("✕", key=f"del_{idx}"):
+                    # Mẹo xóa file khỏi danh sách của bộ uploader mặc định
+                    uploaded_files.pop(idx)
+                    if st.session_state.selected_song_index >= len(uploaded_files):
+                        st.session_state.selected_song_index = max(0, len(uploaded_files) - 1)
                     st.rerun()
 # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
 # # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
