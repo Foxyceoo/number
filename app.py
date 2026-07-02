@@ -132,60 +132,50 @@ def get_symbol(value, mode):
 
 # 2. Thêm nút chọn chế độ vào Sidebar
 
-# =========================================================================
-# BỘ ĐIỀU KHIỂN SIDEBAR CHÍNH
-# =========================================================================
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    
-    # Cho phép chọn nhiều file cùng lúc
-    uploaded_files = st.file_uploader("**Nhập file của bạn**", type=["json"], accept_multiple_files=True)
+    # Thay đổi cấu hình để nhận nhiều file cùng lúc
+    uploaded_files = st.file_uploader(
+        "Nhập file của bạn", 
+        type=["json"], 
+        accept_multiple_files=True  # Thêm dòng này nha cậu
+    )
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
-    
-    # CHUYỂN NÚT BẤM VÀO ĐÂY (VÙNG KHOANH ĐỎ Ở SIDEBAR)
-    if uploaded_files:
-        # Khởi tạo bài hát được chọn nếu chưa có
-        if "selected_song_index" not in st.session_state:
-            st.session_state.selected_song_index = 0
-            
-        # Kiểm tra nếu index vượt quá số lượng file thực tế (do xóa bớt file) thì đưa về 0
-        if st.session_state.selected_song_index >= len(uploaded_files):
-            st.session_state.selected_song_index = 0
-            
-        # Tạo danh sách nút bấm xếp dọc ngay dưới uploader
-        for index, file in enumerate(uploaded_files):
-            display_name = file.name.replace(".json", "")
-            
-            # Đổi màu nút bấm của file đang chọn để dễ phân biệt
-            is_selected = st.session_state.selected_song_index == index
-            btn_type = "primary" if is_selected else "secondary"
-            
-            if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
-                st.session_state.selected_song_index = index
-                st.rerun()
-                
-        st.markdown("---")
-        
+    # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-# =========================================================================
-# XỬ LÝ DỮ LIỆU FILE ĐANG CHỌN (Ở GIAO DIỆN CHÍNH)
-# =========================================================================
 if uploaded_files:
-    # Lấy file hiện tại dựa trên index đã chọn từ Sidebar
+    # 1. Khởi tạo bài hát được chọn trong session_state nếu chưa có
+    if "selected_song_index" not in st.session_state:
+        st.session_state.selected_song_index = 0
+        
+    # Tạo một vùng sidebar hoặc main tùy thuộc vị trí cậu đặt uploader trước đó
+    # Ở đây Yaoyao tạo các nút bấm xếp dọc sát nhau y hệt ảnh 2
+    for index, file in enumerate(uploaded_files):
+        display_name = file.name.replace(".json", "")
+        
+        # Nếu là file đang được chọn, nút bấm sẽ có màu xanh/đỏ nổi bật (primary)
+        is_selected = st.session_state.selected_song_index == index
+        btn_type = "primary" if is_selected else "secondary"
+        
+        # Tạo nút bấm cho từng file
+        if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
+            st.session_state.selected_song_index = index
+            st.rerun()
+            
+    # 2. Lấy dữ liệu của file đang được lựa chọn để vẽ sheet nhạc
+    # Nếu lỡ xóa file làm index vượt quá số lượng hiện tại, đưa về 0
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
+        
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
+    # Tiếp tục luồng xử lý JSON của cậu
     data = json.load(current_selected_file)
     song_data = data[0]
     song_name = current_selected_file.name.replace(".json", "")
-    
-    raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  
-    
-else:
-    st.info("Vui lòng tải file JSON từ Sidebar để xem sheet nhạc.")
     
     # =========================================================================
     # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN...
