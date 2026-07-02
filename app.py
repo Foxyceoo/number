@@ -21,17 +21,6 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
-# --- LOGIC XEM CÔNG KHAI ---
-params = st.query_params
-# Lấy mode, nếu không có thì trả về None
-mode = params.get("mode") 
-
-# Chỉ chặn nếu KHÔNG PHẢI chế độ công khai (tức là không có mode) 
-# VÀ chưa đăng nhập
-if mode is None and st.session_state.user is None:
-    login_form()
-    st.stop()
-
 # Khởi tạo Auth
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
@@ -148,34 +137,9 @@ with st.sidebar:
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
-
-    # 1. Định nghĩa các lựa chọn và lấy giá trị từ URL (query_params)
-    options = ["1-15", "1. 1.. 1...", "abc"]
-    # Lấy mode từ URL, mặc định là "1-15" nếu không có
-    default_mode = st.query_params.get("mode", "1-15")
-    
-    # Kiểm tra an toàn: nếu URL gửi linh tinh thì lấy mặc định là "1-15"
-    if default_mode not in options:
-        default_mode = "1-15"
-        
-    # 2. CHỈ KHAI BÁO ST.RADIO MỘT LẦN DUY NHẤT
-    display_mode = st.radio(
-        "Chế độ hiển thị:", 
-        options, 
-        index=options.index(default_mode)
-    )
-    
+    # Nút chọn chế độ
+    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
-
-    # 3. Nút tạo link chia sẻ
-    if st.button("Tạo link chia sẻ"):
-        # Lấy base URL của app bạn (Streamlit sẽ tự hiểu)
-        base_url = "https://foxynumber.streamlit.app/" 
-        share_url = f"{base_url}?mode={display_mode}"
-        
-        st.info("Copy link này để gửi cho bạn bè:")
-        st.code(share_url)
-        
 
 if uploaded_file:
     data = json.load(uploaded_file)
