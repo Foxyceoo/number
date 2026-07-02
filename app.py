@@ -299,13 +299,13 @@ if uploaded_file:
     if st.button("Tải PDF xịn"):
         # Biến full_html chỉ được tạo ra KHI NGƯỜI DÙNG BẤM NÚT
         
-    full_html = style + display_html 
+        full_html = style + display_html 
     
-    pdf_data = generate_pdf(full_html)
+        pdf_data = generate_pdf(full_html)
     
-    st.download_button(
-        label="Tải về máy",
-        data=pdf_data,
-        file_name=f"{song_name}.pdf",
-        mime="application/pdf"
-    )
+        st.download_button(
+            label="Tải về máy",
+            data=pdf_data,
+            file_name=f"{song_name}.pdf",
+            mime="application/pdf"
+        )
