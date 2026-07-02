@@ -312,6 +312,27 @@ if uploaded_file:
             display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
         display_html += "</div>"
         
+    # === THAY THẾ TOÀN BỘ ĐOẠN CUỐI TỪ ĐÂY ĐẾN HẾT FILE ===
+    
+    # 1. Tạo cấu trúc lật trang và trang bìa đầu tiên
+    display_html = f"""
+    <div id="flipbook">
+        <div class="page cover-page">
+            <h1 style="font-size: 32px; margin-bottom: 10px; font-weight: bold;">{song_name}</h1>
+            <p style="font-size: 14px; opacity: 0.8; font-style: italic;">Nhấp vào mép giấy bên phải hoặc dùng nút bên dưới để lật</p>
+        </div>
+    """
+    
+    # 2. Chia các khuông nhạc vào từng trang (mỗi trang chứa đúng 3 dòng nhạc để vừa khung)
+    lines_per_page = 3
+    for idx in range(0, len(all_khuong_html), lines_per_page):
+        chunk = all_khuong_html[idx : idx + lines_per_page]
+        
+        display_html += "<div class='page'>"
+        for khuong_html in chunk:
+            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+        display_html += "</div>"
+        
     # 3. Thêm mã JavaScript kích hoạt hiệu ứng lật sách 3D của Turn.js
     display_html += """
     </div>
@@ -333,8 +354,38 @@ if uploaded_file:
     # Đặt chiều cao khung hiển thị cố định ở mức 600px là vừa vặn đẹp mắt với cuốn sách
     components.html(html_to_render, height=600, scrolling=False)
     
-    # 5. Tạo khoảng cách nhỏ xuống nút bấm (ĐÃ BỎ ĐOẠN LẶP LẠI VÀ ĐOẠN CAO 700PX THỪA)
-    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
-    if st.button("to PDF", key="btn_to_pdf"):
-        js_code = "<script>window.parent.window.print();</script>"
-        components.html(js_code, height=0)
+    # 5. Tạo các nút điều hướng tác vụ ở bên dưới cuốn sách
+    st.write('<div style="height: 10px;"></div>', unsafe_allow_html=True)    
+    
+    # Chia làm 3 cột để đặt các nút bấm nằm ngang hàng cho đẹp
+    col1, col2, col3 = st.columns([1.5, 1.5, 5])
+    
+    with col1:
+        if st.button("Trang kế tiếp ➡️", key="btn_next_page"):
+            # Sử dụng lệnh lệnh của Turn.js là $('#flipbook').turn('next') để lật trang
+            js_next = """
+            <script>
+                window.parent.document.querySelector('iframe[src*="components.html"]').contentWindow.$('#flipbook').turn('next');
+            </script>
+            """
+            # Một cách đơn giản và an toàn hơn để tương tác trực tiếp là nhúng trực tiếp tập lệnh trigger vào chính iframe cũ, 
+            # hoặc tạo ra một lệnh gọi nhảy trang bằng cách gán lệnh lật qua biến nhận diện. Tuy nhiên trong Streamlit, cách tối ưu nhất để điều khiển iframe từ nút Streamlit là truyền lệnh thông qua window.
+            # Để nút chạy mượt mà nhất không bị reload, Yaoyao thiết kế đoạn JS kích hoạt click thẳng vào mép phải cuốn sách:
+            js_code_next = """
+            <script>
+                var fb = window.parent.document.getElementById("flipbook") || window.parent.$("#flipbook");
+                // Thực hiện gọi lệnh lật trang thông qua window của iframe đang chứa turn.js
+                var iframes = window.parent.document.getElementsByTagName('iframe');
+                for (var i = 0; i < iframes.length; i++) {
+                    if(iframes[i].contentWindow.$) {
+                        iframes[i].contentWindow.$('#flipbook').turn('next');
+                    }
+                }
+            </script>
+            """
+            components.html(js_code_next, height=0)
+
+    with col2:
+        if st.button("to PDF 🖨️", key="btn_to_pdf"):
+            js_code_print = "<script>window.parent.window.print();</script>"
+            components.html(js_code_print, height=0)
