@@ -197,16 +197,55 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    st.markdown("""
-    <style>
-    /* Ẩn hoàn toàn khối danh sách file mặc định của Streamlit */
-    [data-testid="stFileUploader"] section ~ div,
-    [data-testid="stFileUploaderFilesContainer"],
-    .uploadedFiles {
-        display: none !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <style>
+        /* Mở rộng tối đa container chính của Streamlit */
+        .block-container {
+            max-width: 100% !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-top: 2rem !important;
+        }
+        /* Căn giữa thành phần iframe */
+        iframe {
+            display: block;
+            margin: 0 auto !important;
+            width: 90% !important;
+        }
+        
+        /* ========================================================================= */
+        /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
+        /* ========================================================================= */
+        
+        /* 1. Thu nhỏ vùng Dropzone nhập file */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            padding: 10px !important;
+            min-height: 60px !important;
+            height: 60px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
+            transform: scale(0.7) !important;
+            margin-bottom: 0px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small {
+            font-size: 11px !important;
+        }
+
+        /* 2. Ép toàn bộ các element đi kèm/nằm dưới stFileUploader (trừ vùng section kéo thả) có chiều cao bằng 0 và ẩn đi */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] div,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
+            display: none !important;
+            height: 0px !important;
+            padding: 0px !important;
+            margin: 0px !important;
+            overflow: hidden !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     # 2. Khởi tạo trạng thái chọn bài
     if "selected_song_index" not in st.session_state:
