@@ -224,10 +224,12 @@ if uploaded_file:
                     pitch = int(key_str.split("Key")[1]) - 1
                     columns.append([n["time"], [[pitch, key_str]]])
     elif file_ext == "txt":
-        content = uploaded_file.getvalue().decode("utf-8")
+        content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
         for line in content.strip().split('\n'):
             if ',' in line:
-                t, k = line.split(',')
+                parts = line.split(',')
+            if len(parts) == 2:
+                t, k = parts
                 pitch = int(k.split("Key")[1]) - 1
                 columns.append([int(t), [[pitch, k]]])
 
