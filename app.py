@@ -82,18 +82,31 @@ if st.session_state.user is not None:
             try:
                 # Lấy idToken từ session
                 id_token = st.session_state.user['idToken']
-        
+                
                 # URL API cập nhật tài khoản của Firebase
                 api_key = st.secrets["FIREBASE_API_KEY"]
                 api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
-        
+                
                 payload = {
                     "idToken": id_token,
                     "password": new_password,
                     "returnSecureToken": True
                 }
-        
+                
+                # Gửi request
                 response = requests.post(api_url, json=payload)
+                
+                # Kiểm tra kết quả
+                if response.status_code == 200:
+                    st.success("Đổi mật khẩu thành công!")
+                    st.session_state.show_change_password = False
+                    st.rerun()
+                else:
+                    st.error(f"Lỗi: {response.json().get('error', {}).get('message', 'Không xác định')}")
+                    
+            except Exception as e:
+                # Khối này bắt buộc phải có để hoàn thiện câu lệnh try
+                st.error(f"Đã xảy ra lỗi hệ thống: {e}")
         
         if response.status_code == 200:
             st.success("Đổi mật khẩu thành công!")
