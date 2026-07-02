@@ -10,7 +10,6 @@ import streamlit.components.v1 as components
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
-# Sát lề trái
 config = {
     "apiKey": st.secrets["FIREBASE_API_KEY"],
     "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
@@ -25,11 +24,9 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# 2. Quản lý trạng thái đăng nhập
 if 'user' not in st.session_state:
     st.session_state.user = None
 
-# Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
     email = st.text_input("Email", key="email_input")
@@ -44,7 +41,6 @@ def login_form():
         except Exception as e:
             st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
             
-# Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
     st.stop() 
@@ -60,7 +56,6 @@ else:
     
     st.success(f"hello, {st.session_state.user_name}!")
 
-# Kiểm tra nếu người dùng đã đăng nhập thành công
 if st.session_state.user is not None:
     with st.sidebar:
         st.markdown("---")
@@ -93,10 +88,10 @@ if st.session_state.user is not None:
         if st.button("Đăng xuất"):
             st.session_state.user = None
             st.rerun()
-            
+
+# --- ĐOẠN LOGIC HÀM GỐC CỦA CẬU ĐÃ ĐƯỢC KHÔI PHỤC ---
 def get_number_from_key(note_data):
-    pitch = int(note_data[0])
-    return pitch + 1  
+    return int(note_data[1])
 
 def get_symbol(value, mode):
     if mode == "1. 1.. 1...":
@@ -117,7 +112,7 @@ def get_symbol(value, mode):
 
 # Giao diện chính của Sidebar
 with st.sidebar:
-    # Nới rộng Sidebar một chút và tạo layout căn hàng cho danh sách file + nút bấm
+    # CSS can thiệp co bảng trắng uploader lại còn 73% để nhường chỗ đặt nút bấm
     st.markdown(
         """
         <style>
@@ -125,11 +120,11 @@ with st.sidebar:
             min-width: 420px !important;
             max-width: 420px !important;
         }
-        /* Ép các file đã chọn thu hẹp chiều rộng lại còn 73% để nhường chỗ bên phải */
+        /* Co khối danh sách file màu trắng lại */
         [data-testid="stFileUploaderFileList"] [data-testid="stFileUploaderFile"] {
             max-width: 73% !important;
         }
-        /* Định dạng các nút bấm chọn bài hát dạng tròn/vuông nhỏ đồng bộ chiều cao */
+        /* Định dạng chiều cao nút bấm khớp với từng dòng file */
         .song-btn-container button {
             height: 46px !important;
             margin-top: 2px !important;
@@ -143,7 +138,6 @@ with st.sidebar:
 
     st.title("Bộ chuyển đổi sheet số")
     
-    # 1. Bố cục gốc: Ô nhập file của cậu giữ nguyên bản
     uploaded_files = st.file_uploader(
         "Nhập file của bạn", 
         type=["json"], 
@@ -160,15 +154,13 @@ if uploaded_files:
         st.session_state.selected_song_index = 0
         
     with st.sidebar:
-        # 2. KHU VỰC ĐƯA NÚT BẤM LÊN TRÊN SONG SONG VỚI KHỐI TRẮNG
-        # Sử dụng CSS mã hóa vị trí tương đối để kéo ngược danh sách nút bấm lên đúng khoảng trống bên phải ô uploader
+        # Kéo danh sách nút bấm lên đặt song song vào khoảng trống bên phải của ô uploader trắng
         st.markdown('<div class="song-btn-container" style="position: relative; margin-top: -332px; margin-bottom: 120px; float: right; width: 25%; z-index: 999;">', unsafe_allow_html=True)
         
         for index, file in enumerate(uploaded_files):
             is_selected = st.session_state.selected_song_index == index
             btn_type = "primary" if is_selected else "secondary"
             
-            # Tạo nút bấm "Chọn" ngắn gọn thẳng hàng kế bên từng file json
             if st.button("Chọn", key=f"btn_song_{index}", type=btn_type, use_container_width=True):
                 st.session_state.selected_song_index = index
                 st.rerun()
@@ -184,9 +176,7 @@ if uploaded_files:
     song_data = data[0]
     song_name = current_selected_file.name.replace(".json", "")
     
-    # =========================================================================
-    # TOÀN BỘ CÁC THUẬT TOÁN VÀ LOGIC HIỂN THỊ SHEET BÊN DƯỚI GIỮ NGUYÊN 100%
-    # =========================================================================
+    # --- TOÀN BỘ LOGIC THUẬT TOÁN GỐC ĐƯỢC GIỮ NGUYÊN HOÀN TOÀN ---
     raw_columns = song_data.get("columns", [])
     bits_per_page = 32  
     
@@ -198,12 +188,6 @@ if uploaded_files:
             columns[bit_pos] = col
     else:
         columns = []
-
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
-
-    def get_number_from_data(note_data):
-        return int(note_data[1])
 
     st.markdown(
         """
@@ -302,6 +286,8 @@ if uploaded_files:
     """
     
     all_khuong_html = []
+    lines_per_page = 8  
+
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
         if len(khuong_columns) < bits_per_page:
