@@ -35,7 +35,8 @@ if uploaded_file:
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
-
+        
+    #CSS
     style = f"""
     <style>
     ::-webkit-scrollbar {{ display: none !important; }}
@@ -51,8 +52,7 @@ if uploaded_file:
     }}
 
     td {{ 
-        padding: 0 !important; 
-        height: 60px !important; 
+        padding: 5px !important;  
         width: 20px !important; 
         vertical-align: top !important; 
         border-right: 1px solid #555; 
