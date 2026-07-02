@@ -13,11 +13,6 @@ import streamlit.components.v1 as components
 downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
 SHEET_DIR = os.path.join(downloads_path, "sheetkynber")
 
-if not os.path.exists(SHEET_DIR):
-    os.makedirs(SHEET_DIR)
-    # Tự tạo một file mẫu để app không bị báo lỗi trống
-    with open(os.path.join(SHEET_DIR, "Huong_dan.json"), "w", encoding="utf-8") as f:
-        f.write('[{"note": "Chào mừng cậu đến với sheetkynber!"}]')
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
@@ -205,11 +200,11 @@ with st.sidebar:
 st.write("**Danh sách bài hát:**")
 
 # Lấy danh sách file .json từ thư mục
-if os.path.exists(SHEET_DIR):
-    all_files = [f for f in os.listdir(SHEET_DIR) if f.endswith('.json')]
-else:
-    all_files = []
-    st.warning("Không tìm thấy thư mục 'sheetkynber'!")
+if not os.path.exists(SHEET_DIR):
+    os.makedirs(SHEET_DIR)
+    # Tự tạo một file mẫu để app không bị báo lỗi trống
+    with open(os.path.join(SHEET_DIR, "Huong_dan.json"), "w", encoding="utf-8") as f:
+        f.write('[{"note": "Chào mừng cậu đến với sheetkynber!"}]')
 
 if not all_files:
     st.info("Thư mục trống hoặc chưa tồn tại.")
