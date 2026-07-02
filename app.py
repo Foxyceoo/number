@@ -133,12 +133,28 @@ def get_symbol(value, mode):
 # 2. Thêm nút chọn chế độ vào Sidebar
 
 with st.sidebar:
+    # MỚI: CSS để nới rộng Sidebar ra 450px và ẩn danh sách file trùng lặp gốc đi
+    st.markdown(
+        """
+        <style>
+        [data-testid="stSidebar"] {
+            min-width: 450px !important;
+            max-width: 450px !important;
+        }
+        [data-testid="stFileUploaderFileList"] {
+            display: none !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.title("Bộ chuyển đổi sheet số")
     # Thay đổi cấu hình để nhận nhiều file cùng lúc
     uploaded_files = st.file_uploader(
         "Nhập file của bạn", 
         type=["json"], 
-        accept_multiple_files=True  # Thêm dòng này nha cậu
+        accept_multiple_files=True
     )
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
@@ -161,10 +177,22 @@ if uploaded_files:
             is_selected = st.session_state.selected_song_index == index
             btn_type = "primary" if is_selected else "secondary"
             
-            # Tạo nút bấm cho từng file
-            if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
-                st.session_state.selected_song_index = index
-                st.rerun()
+            # MỚI: Chia cột tỉ lệ 3:1 để đặt tên file nằm kế bên nút bấm y như trong image_a34888.png
+            col_file, col_btn = st.columns([3, 1])
+            
+            with col_file:
+                # Vẽ hộp hiển thị file mô phỏng giống giao diện gốc cho đẹp mắt
+                st.markdown(f"""
+                <div style='background-color: #f1f3f6; padding: 10px; border-radius: 6px; border: 1px solid #dcdfe6; min-height: 44px; display: flex; align-items: center;'>
+                    <span style='font-size: 14px; font-weight: 500; color: #303133; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>📄 {display_name}</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with col_btn:
+                # Nút chọn bài nằm ngay sát bên phải
+                if st.button("Chọn", key=f"btn_song_{index}", type=btn_type, use_container_width=True):
+                    st.session_state.selected_song_index = index
+                    st.rerun()
             
     # 2. Lấy dữ liệu của file đang được lựa chọn để vẽ sheet nhạc
     # Nếu lỡ xóa file làm index vượt quá số lượng hiện tại, đưa về 0
