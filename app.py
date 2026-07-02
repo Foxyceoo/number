@@ -51,14 +51,15 @@ if st.session_state.user is None:
     login_form()
     st.stop() # Dừng ứng dụng nếu chưa đăng nhập
 else:
-    with st.spinner('Đang tải dữ liệu, vui lòng đợi...'):
-        time.sleep(2) # Giả lập thời gian tải dữ liệu
-        
-    st.success(f"Chào mừng bạn trở lại, {st.session_state.user_name}!")
+    st.success(f"Chào {st.session_state.user_name}!")
     
-    # Có thể xóa thông báo thành công sau 2 giây nếu muốn màn hình sạch hơn
-    time.sleep(2)
-    st.rerun()
+    # Thay vì dùng placeholder.markdown(...), hãy dùng st.empty() nếu muốn xóa
+    # Hoặc đơn giản là hiển thị lời chào và đợi 3 giây rồi dùng st.empty()
+    hello_msg = st.empty()
+    hello_msg.markdown(f"<h2 style='text-align: center;'>Hello {st.session_state.user_name}!</h2>", unsafe_allow_html=True)
+    
+    time.sleep(3)
+    hello_msg.empty() # Xóa lời chào sau 3 giây
 
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
