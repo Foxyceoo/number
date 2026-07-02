@@ -353,60 +353,69 @@ if uploaded_file:
     display_html = ""
     lines_per_page = 5
     
+    # Danh sách chứa HTML của từng trang sau khi gom đủ 5 dòng
+    pages_list = []
+    
     for idx in range(0, len(all_khuong_html), lines_per_page):
         chunk = all_khuong_html[idx : idx + lines_per_page]
         
-        display_html += "<div class='sheet-page'>"
+        page_content = "<div class='sheet-page'>"
         for khuong_html in chunk:
-            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
-        display_html += "</div>"
+            page_content += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+        page_content += "</div>"
         
-    # Hợp nhất CSS và nội dung
-    html_to_render = page_style + display_html
+        pages_list.append(page_content)
+        
+    # Chuỗi HTML đầy đủ để hiển thị trên Web xem trước
+    html_to_render = page_style + "".join(pages_list)
     
-    # Tính chiều cao cho cấu trúc lặp trang
-    total_pages = math.ceil(len(all_khuong_html) / lines_per_page)
+    # Tính chiều cao hiển thị trên web
+    total_pages = len(pages_list)
     calculated_height = total_pages * 1150 + 100
     
-    # Render nội dung chính lên màn hình Web hiển thị (vẫn đủ tất cả các trang)
+    # Render nội dung chính lên màn hình Web hiển thị
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
-    # Nút bấm in ấn tự động loại bỏ trang đầu và trang cuối
+    # =========================================================================
+    # 6. XỬ LÝ LỌC TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
+    # =========================================================================
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
     if st.button("Xuất PDF / In Sheet nhạc (Bỏ trang đầu & cuối) 🖨️", key="btn_to_pdf_layout"):
-        # Đoạn JS ma thuật: Tự động lọc lấy trang 2 đến (Tổng số trang - 1) để in
-        js_code_print = f"""
-        <script>
-        (function() {{
-            // Lấy tất cả các trang sheet-page có trong iframe cha
-            var pages = window.parent.document.querySelectorAll('.sheet-page');
-            if (pages.length <= 2) {{
-                alert('Bản nhạc quá ngắn (chỉ có ' + pages.length + ' trang), không thể bỏ trang đầu và cuối!');
-                return;
-            }}
+        if len(pages_list) <= 2:
+            st.error(f"Bản nhạc quá ngắn (chỉ có {len(pages_list)} trang), không thể bỏ trang đầu và cuối!")
+        else:
+            # Python tự động cắt bỏ trang đầu (index 0) và trang cuối cùng
+            filtered_pages = pages_list[1:-1]
+            html_for_print = page_style + "".join(filtered_pages)
             
-            // Tạo một cửa sổ in ẩn để chứa nội dung lọc
-            var printWindow = window.open('', '_blank');
+            # Sử dụng json.dumps để biến chuỗi HTML thành chuỗi JSON an toàn cho JavaScript
+            import json
+            safe_html_json = json.dumps(html_for_print)
             
-            // Lấy toàn bộ phần style CSS hiện tại
-            var styles = window.parent.document.querySelector('head').innerHTML;
-            printWindow.document.write('<html><head>' + styles + '</head><body>');
-            
-            // Chỉ copy từ trang thứ 2 (index 1) đến trang áp chót (index length - 2)
-            for (var i = 1; i < pages.length - 1; i++) {{
-                printWindow.document.write(pages[i].outerHTML);
-            }}
-            
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            
-            // Kích hoạt lệnh in trên cửa sổ đã lọc
-            printWindow.focus();
-            setTimeout(function() {{
-                printWindow.print();
-                printWindow.close();
-            }}, 500);
-        }})();
-        </script>
-        """
-        components.html(js_code_print, height=0)
+            # Đoạn lệnh JS mở cửa sổ mới và kích hoạt lệnh in của trình duyệt
+            js_code_print = f"""
+            <script>
+            (function() {{
+                // Giải mã dữ liệu an toàn từ Python truyền sang
+                var htmlContent = {safe_html_json};
+                
+                // Mở cửa sổ in mới
+                var printWindow = window.open('', '_blank');
+                if (!printWindow) {{
+                    alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
+                    return;
+                }}
+                
+                printWindow.document.write('<html><head><title>In Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
+                printWindow.document.close();
+                printWindow.focus();
+                
+                // Chờ một chút để trình duyệt load hết CSS rồi gọi hộp thoại In
+                setTimeout(function() {{
+                    printWindow.print();
+                    printWindow.close();
+                }}, 500);
+            }})();
+            </script>
+            """
+            components.html(js_code_print, height=0)
