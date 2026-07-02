@@ -157,14 +157,11 @@ with st.sidebar:
     elif uploaded_file is None:
         # Nếu không có file (người dùng bấm x), reset dữ liệu
         st.session_state.uploaded_data = None
-        
-    # --- RENDER DANH SÁCH ---
-    if st.session_state.uploaded_data is not None:
     
-    st.markdown("---")
-    # Nút chọn chế độ
-    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
-    st.markdown("---")
+        st.markdown("---")
+        # Nút chọn chế độ
+        display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
+        st.markdown("---")
 
 # 3. Sử dụng đúng tên biến đã khởi tạo
 if st.session_state.song_data is not None:
