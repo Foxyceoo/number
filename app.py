@@ -7,10 +7,9 @@ import pyrebase
 import requests
 import streamlit.components.v1 as components
 
-# Cấu hình URL dữ liệu
+# Khởi tạo URL dữ liệu và cấu hình Firebase
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
-# Cấu hình Firebase
 config = {
     "apiKey": st.secrets["FIREBASE_API_KEY"],
     "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
@@ -21,7 +20,7 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
-# Khởi tạo Firebase Auth
+# Khởi tạo Auth
 @st.cache_resource
 def init_firebase():
     firebase = pyrebase.initialize_app(config)
@@ -35,7 +34,7 @@ if 'user' not in st.session_state:
 if 'is_loaded' not in st.session_state:
     st.session_state.is_loaded = False
 
-# Giao diện đăng nhập
+# Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
     email = st.text_input("Email", key="email_input")
@@ -46,42 +45,62 @@ def login_form():
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
             st.session_state.user_name = email.split('@')[0]
-            st.session_state.is_loaded = False # Reset trạng thái tải để chạy spinner
+            st.session_state.is_loaded = False 
             st.rerun() 
         except Exception as e:
             st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
-
-# Luồng kiểm soát chính của ứng dụng
+            
+# Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
-    st.stop()
+    st.stop() 
 
-# Hiển thị hiệu ứng tải dữ liệu 1 lần duy nhất sau khi đăng nhập thành công
+# Hiển thị spinner nạp dữ liệu 1 lần duy nhất sau login
 if not st.session_state.is_loaded:
-    with st.spinner('Đang khởi tạo cấu trúc dữ liệu...'):
-        time.sleep(1.5) # Giả lập thời gian tải ngắn lại cho đỡ sốt ruột
+    with st.spinner('Đang tải dữ liệu...'):
+        time.sleep(1.5)
     st.session_state.is_loaded = True
     st.rerun()
 
-# --- GIAO DIỆN CHÍNH SAU KHI ĐĂNG NHẬP THÀNH CÔNG ---
-st.success(f"Xin chào, {st.session_state.user_name}!")
+# Hiển thị lời chào sau khi tải xong
+st.success(f"Hello, {st.session_state.user_name}!")
 
-# KHỞI TẠO SIDEBAR
+# Chức năng bổ trợ hiển thị ký tự nốt nhạc
+def get_number_from_key(note_data):
+    pitch = int(note_data[0])
+    return pitch + 1 
+
+def get_symbol(value, mode):
+    if mode == "1. 1.. 1...":
+        mapping = {
+            1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
+            6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
+            11: "4.", 12: "5.", 13: "6.", 14: "7.", 15: "1.."
+        }
+    elif mode == "abc":
+        mapping = {
+            1: "a1", 2: "a2", 3: "a3", 4: "a4", 5: "a5",
+            6: "b1", 7: "b2", 8: "b3", 9: "b4", 10: "b5",
+            11: "c1", 12: "c2", 13: "c3", 14: "c4", 15: "c5"
+        }
+    else: 
+        return str(value)
+    return mapping.get(value, str(value))
+
+# --- THIẾT KẾ SIDEBAR ---
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    
-    # 1. Ô tải file JSON
     uploaded_files = st.file_uploader(
         "Nhập file của bạn", 
         type=["json"], 
-        accept_multiple_files=True
+        accept_multiple_files=True 
     )
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     
-    # 2. Danh sách nút bấm bài nhạc (Vùng khoanh đỏ cũ)
+    # Render danh sách nút chọn bài hát ngay trong sidebar cho gọn gàng
     if uploaded_files:
-        st.write('<div style="height: 5px;"></div>', unsafe_allow_html=True)
-        
+        st.markdown("---")
+        st.write("**Danh sách bài hát:**")
         if "selected_song_index" not in st.session_state:
             st.session_state.selected_song_index = 0
             
@@ -96,39 +115,32 @@ with st.sidebar:
             if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
                 st.session_state.selected_song_index = index
                 st.rerun()
-    
+
+    st.markdown("---")
+    display_mode = st.sidebar.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
     
-    # 3. Chế độ hiển thị ký hiệu nốt
-    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
-    st.markdown("---")
-    
-    # 4. Thông tin tài khoản & Tiện ích
+    # Tiện ích tài khoản
     st.write(f"**Người dùng:** {st.session_state.user_name}")
-    
-    # Sử dụng nút đổi mật khẩu mở ra một hộp thoại nhập liệu ẩn/hiện hợp lý
-    if st.button("Đổi mật khẩu"):
+    if st.button("Đổi mật khẩu", use_container_width=True):
         st.session_state.show_change_password = not st.session_state.get("show_change_password", False)
         
     if st.session_state.get("show_change_password", False):
-        with st.form("change_password_form"):
+        with st.form("change_password_inner"):
             new_password = st.text_input("Nhập mật khẩu mới", type="password")
-            submit_change = st.form_submit_button("Xác nhận đổi")
-            
-            if submit_change:
+            if st.form_submit_button("Xác nhận đổi"):
                 try:
                     id_token = st.session_state.user['idToken']
                     api_key = st.secrets["FIREBASE_API_KEY"]
                     api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
                     payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
-                    
                     response = requests.post(api_url, json=payload)
+                    
                     if response.status_code == 200:
                         st.success("Đổi mật khẩu thành công!")
                         st.session_state.show_change_password = False
                     else:
-                        error_data = response.json()
-                        st.error(f"Lỗi: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                        st.error("Có lỗi xảy ra khi đổi mật khẩu.")
                 except Exception as e:
                     st.error(f"Lỗi hệ thống: {e}")
                     
@@ -137,41 +149,16 @@ with st.sidebar:
         st.session_state.is_loaded = False
         st.rerun()
 
-# XỬ LÝ DỮ LIỆU VÀ VẼ SHEET NHẠC Ở KHUNG CHÍNH
+# --- XỬ LÝ DỮ LIỆU CHÍNH & HIỂN THỊ SHEET ---
 if uploaded_files:
-    def get_number_from_key(note_data):
-        pitch = int(note_data[0])
-        return pitch + 1  
-
-    def get_symbol(value, mode):
-        if mode == "1. 1.. 1...":
-            mapping = {
-                1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
-                6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
-                11: "4.", 12: "5.", 13: "6.", 14: "7.", 15: "1.."
-            }
-        elif mode == "abc":
-            mapping = {
-                1: "a1", 2: "a2", 3: "a3", 4: "a4", 5: "a5",
-                6: "b1", 7: "b2", 8: "b3", 9: "b4", 10: "b5",
-                11: "c1", 12: "c2", 13: "c3", 14: "c4", 15: "c5"
-            }
-        else: 
-            return str(value)
-        return mapping.get(value, str(value))
-
-    # Lấy file hiện tại và QUAN TRỌNG: Đưa con trỏ file về vị trí xuất phát 0
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
-    current_selected_file.seek(0)
     
-    try:
-        data = json.load(current_selected_file)
-        song_data = data[0]
-    except Exception as e:
-        st.error(f"File JSON không đúng cấu trúc chuẩn của app nhạc! Chi tiết: {e}")
-        st.stop()
-
-    # Thuật toán khôi phục khoảng lặng của bạn giữ nguyên
+    # Đảm bảo con trỏ file quay về đầu để không bị lỗi trống dữ liệu khi rerun
+    current_selected_file.seek(0)
+    data = json.load(current_selected_file)
+    song_data = data[0]
+    
+    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG
     raw_columns = song_data.get("columns", [])
     bits_per_page = 32  
     
@@ -184,7 +171,7 @@ if uploaded_files:
     else:
         columns = []
 
-    # Inject CSS làm đẹp giao diện Streamlit chính
+    # Inject CSS làm rộng container hiển thị nội dung chính
     st.markdown(
         """
         <style>
@@ -204,7 +191,7 @@ if uploaded_files:
         unsafe_allow_html=True
     )
 
-    # Khung giao diện A4 CSS
+    # Cấu hình Style CSS cho trang giấy A4
     page_style = """
     <style>
     ::-webkit-scrollbar { display: none !important; }
@@ -239,10 +226,10 @@ if uploaded_files:
         table-layout: fixed !important; 
         width: 94% !important; 
         margin: 0 auto !important; 
-        padding: 0;
+        padding: 0 !important;
     }
     td { 
-        padding: 2px 0 !important;   
+        padding: 2px 0 !important;  
         vertical-align: top !important; 
         overflow: hidden;
         box-sizing: border-box !important;
@@ -282,7 +269,7 @@ if uploaded_files:
     </style>
     """
     
-    # Vòng lặp sinh bảng khuông nhạc HTML
+    # 2. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU TỶ LỆ
     all_khuong_html = []
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
@@ -325,7 +312,7 @@ if uploaded_files:
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
         
-    # Gom đủ 8 dòng/trang
+    # 3. PHÂN TRANG VÀ TỰ ĐỘNG BÙ KHUÔNG ẨN (8 DÒNG/TRANG)
     lines_per_page = 8  
     pages_list = []
     
@@ -351,20 +338,21 @@ if uploaded_files:
         pages_list.append(page_content)
         
     html_to_render = page_style + "".join(pages_list)
+    
+    # Tính toán chiều cao hiển thị tương thích số trang để tránh cuộn đôi
     total_pages = len(pages_list)
     calculated_height = total_pages * 1180 + 50
     
-    # Render preview sheet nhạc lên khung bên phải
+    # Kết xuất giao diện xem trước bài hát hoàn chỉnh
     components.html(html_to_render, height=calculated_height, scrolling=True)
     
-    # NÚT XUẤT FILE PDF KHÔNG DÙNG RERUN TRIGGER
+    # NÚT XUẤT FILE PDF TRỰC TIẾP KHÔNG DÙNG STATE TRIGGER (TRÁNH LỖI PHÁT SINH KHI RE-RENDER)
     st.write('<div style="height: 10px;"></div>', unsafe_allow_html=True)    
     
-    if st.button("Xuất PDF Bản Nhạc", key="btn_to_pdf_layout", type="primary", use_container_width=True):
+    if st.button("Xuất PDF Toàn Bộ Bản Nhạc", key="btn_to_pdf_layout", type="primary", use_container_width=True):
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
         else:
-            # Inject thẳng đoạn mã mở cửa sổ in mà không cần reload state
             safe_html_json = json.dumps(html_to_render)
             js_code_print = f"""
             <script>
@@ -387,4 +375,4 @@ if uploaded_files:
             """
             components.html(js_code_print, height=0)
 else:
-    st.info("Vui lòng kéo thả hoặc chọn các file JSON ở Sidebar bên trái để hiển thị sheet nhạc nhé!")
+    st.info("Cậu hãy thả hoặc chọn các file JSON ở thanh Sidebar bên trái để hiển thị sheet nhạc nhé!")
