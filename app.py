@@ -144,22 +144,16 @@ with st.sidebar:
     
     # Render danh sách nút chọn bài hát ngay trong sidebar cho gọn gàng
     if uploaded_files:
-        st.markdown("---")
-        st.write("**Danh sách bài hát:**")
-        if "selected_song_index" not in st.session_state:
-            st.session_state.selected_song_index = 0
-            
-        if st.session_state.selected_song_index >= len(uploaded_files):
-            st.session_state.selected_song_index = 0
-            
-        for index, file in enumerate(uploaded_files):
-            display_name = file.name.replace(".json", "")
-            is_selected = st.session_state.selected_song_index == index
-            btn_type = "primary" if is_selected else "secondary"
-            
-            if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
-                st.session_state.selected_song_index = index
-                st.rerun()
+    # 1. Lấy file đang chọn
+    if "selected_song_index" not in st.session_state:
+        st.session_state.selected_song_index = 0
+        
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
+    current_selected_file.seek(0) # Đảm bảo đọc file từ đầu
+    
+    # 2. Định nghĩa song_data tại đây
+    data = json.load(current_selected_file)
+    song_data = data[0] if isinstance(data, list) else data
 
     st.markdown("---")
     display_mode = st.sidebar.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
