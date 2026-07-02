@@ -144,7 +144,7 @@ st.markdown(
         max-width: 100% !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
-        padding-top: 2rem !important;
+        padding-top: 5rem !important;
     }
     /* Căn giữa thành phần iframe hiển thị sheet nhạc */
     iframe {
