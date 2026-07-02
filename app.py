@@ -147,6 +147,54 @@ if uploaded_file:
     song_name = uploaded_file.name.replace(".json", "")
     columns = song_data.get("columns", [])
     bits_per_page = 32
+
+     all_khuong_html = []
+    line_number = 1
+    
+    for i in range(0, len(columns), bits_per_page):
+        khuong_columns = columns[i : i + bits_per_page]
+        
+        # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
+        if len(khuong_columns) < bits_per_page:
+            needed = bits_per_page - len(khuong_columns)
+            for _ in range(needed):
+                khuong_columns.append([0, []])
+
+        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
+        
+        for col_idx, col in enumerate(khuong_columns):
+            notes_in_col = col[1]
+            # Lấy danh sách số
+            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+            
+            # --- TÍCH HỢP CHUYỂN ĐỔI ---
+            if display_mode == "1. 1.. 1..." or display_mode == "abc":
+                vals = [get_symbol(v, display_mode) for v in raw_vals]
+            else:
+                vals = raw_vals
+            
+            # ... (Phần logic kẻ bảng giữ nguyên)
+            is_new_line = (col_idx == 0)
+            is_beat_4 = ((col_idx + 1) % 8 == 0)
+            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
+            border_left = "0.5px solid #00008c" if is_new_line else "none"
+
+            if vals:
+                # Dùng join để nối các số/ký hiệu
+                all_nums = "<br>".join(map(str, vals))
+                cell_content = f"""
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
+                    <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
+                </div>
+                """
+            else:
+                cell_content = ""
+
+            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
+        
+        html_content += "</tr></table>"
+        all_khuong_html.append(html_content)
+        line_number += 2
     
     # Hàm lấy số thuần (cũ)
     def get_number_from_key(note_data):
@@ -160,30 +208,6 @@ if uploaded_file:
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
-
-    # 1. Định nghĩa giới hạn trang
-    PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
-    current_page_height = 0
-    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
-
-    # 2. Xử lý từng khuông nhạc
-    for khuong_html in all_khuong_html:
-        # Giả sử mỗi khuông có chiều cao cố định (ví dụ 120px)
-        khuong_height = 120 
-    
-        # Kiểm tra xem có đủ chỗ không
-        if current_page_height + khuong_height > PAGE_HEIGHT:
-            # Hết chỗ -> Cắt trang
-            display_html += "<div style='page-break-before: always;'></div>"
-            current_page_height = 0 # Reset chiều cao trang mới
-    
-        # Cộng dồn chiều cao
-        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
-        current_page_height += khuong_height
-
-    # 3. Render
-    html_to_render = style + display_html
-    components.html(html_to_render, height=2000, scrolling=True)
 
         
     #CSS
@@ -253,54 +277,30 @@ if uploaded_file:
        }}
     </style>
     """
+
+     PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
+    current_page_height = 0
+    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
+
+    # 2. Xử lý từng khuông nhạc
+    for khuong_html in all_khuong_html:
+        # Giả sử mỗi khuông có chiều cao cố định (ví dụ 120px)
+        khuong_height = 120 
     
-    all_khuong_html = []
-    line_number = 1
+        # Kiểm tra xem có đủ chỗ không
+        if current_page_height + khuong_height > PAGE_HEIGHT:
+            # Hết chỗ -> Cắt trang
+            display_html += "<div style='page-break-before: always;'></div>"
+            current_page_height = 0 # Reset chiều cao trang mới
     
-    for i in range(0, len(columns), bits_per_page):
-        khuong_columns = columns[i : i + bits_per_page]
-        
-        # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
-        if len(khuong_columns) < bits_per_page:
-            needed = bits_per_page - len(khuong_columns)
-            for _ in range(needed):
-                khuong_columns.append([0, []])
+        # Cộng dồn chiều cao
+        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+        current_page_height += khuong_height
 
-        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
-        
-        for col_idx, col in enumerate(khuong_columns):
-            notes_in_col = col[1]
-            # Lấy danh sách số
-            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
-            
-            # --- TÍCH HỢP CHUYỂN ĐỔI ---
-            if display_mode == "1. 1.. 1..." or display_mode == "abc":
-                vals = [get_symbol(v, display_mode) for v in raw_vals]
-            else:
-                vals = raw_vals
-            
-            # ... (Phần logic kẻ bảng giữ nguyên)
-            is_new_line = (col_idx == 0)
-            is_beat_4 = ((col_idx + 1) % 8 == 0)
-            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
-            border_left = "0.5px solid #00008c" if is_new_line else "none"
+    # 3. Render
+    html_to_render = style + display_html
+    components.html(html_to_render, height=2000, scrolling=True)
 
-            if vals:
-                # Dùng join để nối các số/ký hiệu
-                all_nums = "<br>".join(map(str, vals))
-                cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
-                    <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
-                </div>
-                """
-            else:
-                cell_content = ""
-
-            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
-        
-        html_content += "</tr></table>"
-        all_khuong_html.append(html_content)
-        line_number += 2
         
     display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
     
