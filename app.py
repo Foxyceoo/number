@@ -32,7 +32,6 @@ if 'user' not in st.session_state:
 # Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
-    # Dùng key để quản lý giá trị ô nhập liệu rõ ràng hơn
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Mật khẩu", type="password", key="pass_input")
     
@@ -41,31 +40,25 @@ def login_form():
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
             st.session_state.user_name = email.split('@')[0]
-            # Xóa sạch dữ liệu cũ trong bộ nhớ sau khi đăng nhập thành công
             st.rerun() 
         except Exception as e:
-            # Thông báo lỗi chi tiết hơn nếu cần
             st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
             
 # Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
-    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
+    st.stop() 
 else:
-    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
     if 'is_loaded' not in st.session_state:
         st.session_state.is_loaded = False
     
-    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
     if not st.session_state.is_loaded:
         with st.spinner('Đang tải dữ liệu...'):
-            time.sleep(2) # Giả lập thời gian tải
+            time.sleep(2) 
         st.session_state.is_loaded = True
-        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
+        st.rerun() 
     
-    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
     st.success(f"hello, {st.session_state.user_name}!")
-    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
 
 # Kiểm tra nếu người dùng đã đăng nhập thành công
 if st.session_state.user is not None:
@@ -73,11 +66,9 @@ if st.session_state.user is not None:
         st.markdown("---")
         st.write(f"**Người dùng:** {st.session_state.user_name}")
         
-        # Nút đổi mật khẩu
         if st.button("Đổi mật khẩu"):
             st.session_state.show_change_password = True
             
-        # Logic đổi mật khẩu
         if st.session_state.get("show_change_password", False):
             new_password = st.text_input("Nhập mật khẩu mới", type="password")
             if st.button("Xác nhận đổi"):
@@ -106,12 +97,10 @@ if st.session_state.user is not None:
             
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
-    # note_data là list [pitch, layer], ví dụ: [7, "2"]
-    # Pitch (note_data[0]) chính là vị trí phím 0-14
     pitch = int(note_data[0])
-    return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 1-15
+    return pitch + 1  
 
-#Hiển thị
+# Hiển thị ký hiệu theo chế độ
 def get_symbol(value, mode):
     if mode == "1. 1.. 1...":
         mapping = {
@@ -125,19 +114,17 @@ def get_symbol(value, mode):
             6: "b1", 7: "b2", 8: "b3", 9: "b4", 10: "b5",
             11: "c1", 12: "c2", 13: "c3", 14: "c4", 15: "c5"
         }
-    else: # Chế độ "1 - 15" mặc định
+    else: 
         return str(value)
         
     return mapping.get(value, str(value))
 
-# 2. Thêm nút chọn chế độ vào Sidebar
-
+# Bộ điều khiển Sidebar
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
-    # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
@@ -147,10 +134,10 @@ if uploaded_file:
     song_name = uploaded_file.name.replace(".json", "")
     
     # =========================================================================
-    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
+    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG
     # =========================================================================
     raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
+    bits_per_page = 32  
     
     if raw_columns:
         max_bit_index = max([col[0] for col in raw_columns])
@@ -168,21 +155,15 @@ if uploaded_file:
     if raw_columns:
         max_notes_in_col = max([len(col[1]) for col in raw_columns if len(col) > 1])
 
-    # Thiết lập số dòng mỗi trang dựa theo độ dày của cột
     if max_notes_in_col <= 3:
-        lines_per_page = 10  # 3 số 1 cột -> 10 dòng/trang
+        lines_per_page = 10  
         margin_bottom_val = "15px"
     elif max_notes_in_col == 4:
-        lines_per_page = 8   # 4 số 1 cột -> 8 dòng/trang
+        lines_per_page = 8   
         margin_bottom_val = "20px"
     else:
-        lines_per_page = 5   # Hợp âm dày hơn -> 5 dòng/trang
+        lines_per_page = 5   
         margin_bottom_val = "30px"
-
-    # Hàm lấy số thuần (cũ)
-    def get_number_from_key(note_data):
-        pitch = int(note_data[0])
-        return pitch + 1
 
     def get_number_from_data(note_data):
         return int(note_data[1])
@@ -207,7 +188,7 @@ if uploaded_file:
     )
         
     # =========================================================================
-    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 
+    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 (Đã tối ưu hóa hiển thị chuỗi trang)
     # =========================================================================
     raw_page_style = """
     <style>
@@ -230,7 +211,7 @@ if uploaded_file:
         box-sizing: border-box;
         width: 794px;
         height: 1123px; 
-        padding: 50px 0px !important; 
+        padding: 60px 0px !important; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
@@ -248,7 +229,7 @@ if uploaded_file:
         width: 94% !important; 
         margin: 0 auto !important; 
         padding: 0 !important;
-        height: 100%; 
+        height: auto !important; /* Đổi thành auto để không đè nén chiều cao của trang trước */
     }
 
     td { 
@@ -265,6 +246,7 @@ if uploaded_file:
         flex-grow: 1; 
         display: flex;
         align-items: center;
+        justify-content: center;
         break-inside: avoid;
         page-break-inside: avoid;
     }
@@ -289,7 +271,7 @@ if uploaded_file:
             box-shadow: none !important;
             border: none !important;
             margin: 0 auto !important;
-            padding: 50px 0px !important; 
+            padding: 60px 0px !important; 
             page-break-after: always !important;
             break-after: page !important;
         }
@@ -301,7 +283,6 @@ if uploaded_file:
     </style>
     """
     
-    # THÊM DÒNG NÀY NGAY DƯỚI RAW_PAGE_STYLE ĐỂ ĐỊNH NGHĨA BIẾN PAGE_STYLE
     page_style = raw_page_style.replace("__MARGIN_BOTTOM__", margin_bottom_val)
     
     # =========================================================================
@@ -367,11 +348,9 @@ if uploaded_file:
         
         page_content = "<div class='sheet-page'>"
         
-        # 1. Chèn các khuông nhạc thực tế
         for khuong_html in chunk:
             page_content += f"<div class='khuong-wrapper'>{khuong_html}</div>"
         
-        # 2. Tự động bù các khuông nhạc ẩn để giữ tỷ lệ giãn hàng chuẩn xác ở trang cuối
         if len(chunk) < lines_per_page:
             needed_lines = lines_per_page - len(chunk)
             for _ in range(needed_lines):
@@ -383,9 +362,9 @@ if uploaded_file:
     # Chuỗi HTML đầy đủ hiển thị
     html_to_render = page_style + "".join(pages_list)
     
-    # Tính chiều cao hiển thị trên web động theo số trang
+    # Tính toán chiều cao linh hoạt, đảm bảo khoảng cách an toàn cho cuộn trang
     total_pages = len(pages_list)
-    calculated_height = total_pages * 1150 + 100
+    calculated_height = (total_pages * 1148) + 60
     
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
@@ -397,20 +376,16 @@ if uploaded_file:
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
         else:
-            # Giữ nguyên toàn bộ tất cả các trang, không trừ trang nào cả
             html_for_print = page_style + "".join(pages_list)
             
-            # Sử dụng json.dumps để mã hóa an toàn tuyệt đối, không lo lỗi ký tự đặc biệt
             import json
             safe_html_json = json.dumps(html_for_print)
             
-            # Đoạn lệnh JS mở cửa sổ mới chứa trọn vẹn nội dung và kích hoạt lệnh in
             js_code_print = f"""
             <script>
             (function() {{
                 var htmlContent = {safe_html_json};
                 
-                // Mở cửa sổ in mới
                 var printWindow = window.open('', '_blank');
                 if (!printWindow) {{
                     alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
@@ -421,7 +396,6 @@ if uploaded_file:
                 printWindow.document.close();
                 printWindow.focus();
                 
-                // Chờ 500ms để trình duyệt tải xong CSS rồi tự động gọi hộp thoại In
                 setTimeout(function() {{
                     printWindow.print();
                     printWindow.close();
