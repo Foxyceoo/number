@@ -80,7 +80,7 @@ if uploaded_file:
     
     # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = song_data.get("columns", [])
-    bits_per_page = 32
+    bits_per_page = song_data.get("bitsPerPage", 16)
     
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
@@ -152,25 +152,29 @@ if uploaded_file:
     line_number = 1
     
     # Duyệt theo từng trang (bits_per_page)
-    # Sửa đoạn logic kẻ bảng của bạn thành:
-   for col_idx, col in enumerate(khuong_columns):
-        # col là [time, [[pitch, key], ...]]
-        notes_in_col = col[1]
-        vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
-
-        # Định nghĩa biến phach để sử dụng cho logic kẻ bảng
-        phach = col_idx 
-
-        # Logic kẻ bảng
-        is_new_line = (phach == 0)
-        is_beat_4 = ((phach + 1) % 4 == 0)
-        is_beat_16 = ((phach + 1) % 16 == 0)
+    for i in range(0, len(columns), bits_per_page):
+        khuong_columns = columns[i : i + bits_per_page]
         
-        # Thiết lập đường kẻ phải: nếu là phách 4 hoặc 16 thì kẻ đậm
-        border_right = "0.5px solid #00008c" if (is_beat_4 or is_beat_16) else "0px solid #d8d8d8"
-        # Thiết lập đường kẻ trái: chỉ kẻ cho cột đầu tiên của khuông
-        border_left = "0.5px solid #00008c" if is_new_line else "none"
-       
+        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
+        
+        for col_idx, col in enumerate(khuong_columns):
+            # col là [time, [[pitch, key], ...]]
+            notes_in_col = col[1]
+            vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+
+            # Logic kẻ bảng
+            is_new_line = (col_idx == 0)
+            is_beat_4 = ((col_idx + 1) % 8 == 0)
+            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #d8d8d8"
+            border_left = "0.5px solid #00008c" if is_new_line else "none"
+
+            # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
+            # Kiểm tra xem khuông cuối cùng có thiếu nhịp không
+            if len(khuong_columns) < bits_per_page:
+                needed = bits_per_page - len(khuong_columns)
+                for _ in range(needed):
+                    khuong_columns.append([0, []]) # Thêm cột rỗng
+
             if vals:
                 # Dùng join để nối các số bằng thẻ <br>
                 all_nums = "<br>".join(map(str, vals))
@@ -189,7 +193,7 @@ if uploaded_file:
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
-        line_number += 2
+        line_number += 1
         
     display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
     
