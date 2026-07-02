@@ -213,6 +213,9 @@ if uploaded_file:
     total_height = (len(all_khuong_html) * 110) + 200
     components.html(html_to_render, height=total_height, scrolling=False)
 
+    
+    # Tạo khoảng cách cố định 50px
+    st.write('<div style="height: 700px;"></div>', unsafe_allow_html=True)    
     if st.button("to PDF"):
         js_code = "<script>window.parent.window.print();</script>"
         components.html(js_code, height=0)
