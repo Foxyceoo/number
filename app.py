@@ -205,15 +205,18 @@ if uploaded_file:
         
         /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
         .khuong-wrapper {{
-            page-break-inside: avoid !important; 
-            break-inside: avoid !important; 
-            margin-bottom: 20px !important;
+            display: block !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            margin-bottom: 15px !important;
          }}
          
         /* Ép bảng luôn nằm trọn vẹn */
         table {{ 
             width: 100% !important; 
             table-layout: fixed !important; 
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important;
         }}
 
         /* Giữ số ở cỡ nhỏ vừa đọc */
