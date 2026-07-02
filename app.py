@@ -144,8 +144,7 @@ if 'song_name' not in st.session_state:
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
-
-    # Xử lý logic dữ liệu
+    
     if uploaded_file is not None:
         st.session_state.uploaded_data = json.load(uploaded_file)
         st.session_state.file_name = uploaded_file.name
@@ -153,14 +152,22 @@ with st.sidebar:
         st.session_state.uploaded_data = None
         st.session_state.file_name = None
 
-    # Hiển thị UI chỉ khi có dữ liệu
-    if st.session_state.uploaded_data is not None:
-        st.markdown("---")
-        st.write(f"Đang xem: **{st.session_state.file_name}**")
-        
-        # Nút chọn chế độ
-        display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
-        st.markdown("---")
+# 3. Xử lý Màn hình chính (Main Area - Nơi hiển thị sheet nhạc)
+# Đảm bảo khối này KHÔNG nằm trong 'with st.sidebar'
+if st.session_state.uploaded_data is not None:
+    st.write(f"### Đang hiển thị: {st.session_state.file_name}")
+    
+    # Lấy dữ liệu
+    data = st.session_state.uploaded_data
+    
+    # Code vẽ bảng/sheet của bạn ở đây
+    if isinstance(data, list) and len(data) > 0:
+        song_data = data[0]
+        # ... logic render bảng của bạn ...
+        st.write("Dữ liệu đã được tải thành công!") 
+        # (Thêm các lệnh st.table hoặc st.dataframe vào đây)
+else:
+    st.info("Hãy chọn file JSON ở thanh bên để bắt đầu!")
         
 # 3. Sử dụng đúng tên biến đã khởi tạo
 if st.session_state.song_data is not None:
