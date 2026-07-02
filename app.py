@@ -141,10 +141,18 @@ with st.sidebar:
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-if uploaded_file:
-    data = json.load(uploaded_file)
-    song_data = data[0]
+if st.session_state.uploaded_data is not None:
+    data = st.session_state.uploaded_data # Dữ liệu là 1 list các bài hát
+    
+    # 1. Tạo danh sách tiêu đề để hiển thị
+    song_names = [song.get("name", f"Bài hát {i+1}") for i, song in enumerate(data)]
     song_name = uploaded_file.name.replace(".json", "")
+
+    selected_name = st.radio("Chọn bài để hiển thị:", song_names)
+    
+    # 3. Tìm index của bài được chọn
+    selected_index = song_names.index(selected_name)
+    st.session_state.current_song = data[selected_index]
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
