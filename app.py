@@ -205,6 +205,7 @@ if uploaded_file:
         
         /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
         .khuong-wrapper {{
+            margin-top: 50px !important;
             page-break-inside: avoid !important; 
             break-inside: avoid !important; 
             margin-bottom: 20px !important;
