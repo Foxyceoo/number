@@ -271,6 +271,9 @@ if uploaded_file:
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
         line_number += 2
+
+    # Tạo khoảng trắng 50px phía trên tên bài hát
+    spacer = "<div style='height: 50px;'></div>"
         
     display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
     
