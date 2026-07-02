@@ -100,12 +100,11 @@ if uploaded_file:
             border_left = "0.5px solid #00008c" if is_new_line else "none"
 
             if vals:
-                top_num = vals[0]
-                bottom_nums = "<br>".join(map(str, vals[1:]))
+                # Dùng join để nối các số bằng thẻ <br>, tất cả dùng cùng cỡ chữ 12px
+                all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 50px; padding-top: 2px;'>
-                    <div class='top-row' style='font-size: 15px; font-weight: bold;'>{top_num}</div>
-                    <div class='bottom-row' style='font-size: 10px; line-height: 1;'>{bottom_nums}</div>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50px;'>
+                    <div style='font-size: 12px; font-weight: bold; line-height: 1.2;'>{all_nums}</div>
                 </div>
                 """
             else:
