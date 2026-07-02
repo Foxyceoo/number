@@ -351,7 +351,7 @@ if uploaded_file:
     # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN ĐÃ ĐƯỢC CĂN GIỮA
     # =========================================================================
     display_html = ""
-    lines_per_page = 10
+    lines_per_page = 5
     
     for idx in range(0, len(all_khuong_html), lines_per_page):
         chunk = all_khuong_html[idx : idx + lines_per_page]
@@ -368,11 +368,45 @@ if uploaded_file:
     total_pages = math.ceil(len(all_khuong_html) / lines_per_page)
     calculated_height = total_pages * 1150 + 100
     
-    # Render nội dung chính lên Streamlit
+    # Render nội dung chính lên màn hình Web hiển thị (vẫn đủ tất cả các trang)
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
-    # Nút bấm in ấn / Xuất PDF
+    # Nút bấm in ấn tự động loại bỏ trang đầu và trang cuối
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
-    if st.button("Xuất PDF / In Sheet nhạc 🖨️", key="btn_to_pdf_layout"):
-        js_code_print = "<script>window.parent.window.print();</script>"
+    if st.button("Xuất PDF / In Sheet nhạc (Bỏ trang đầu & cuối) 🖨️", key="btn_to_pdf_layout"):
+        # Đoạn JS ma thuật: Tự động lọc lấy trang 2 đến (Tổng số trang - 1) để in
+        js_code_print = f"""
+        <script>
+        (function() {{
+            // Lấy tất cả các trang sheet-page có trong iframe cha
+            var pages = window.parent.document.querySelectorAll('.sheet-page');
+            if (pages.length <= 2) {{
+                alert('Bản nhạc quá ngắn (chỉ có ' + pages.length + ' trang), không thể bỏ trang đầu và cuối!');
+                return;
+            }}
+            
+            // Tạo một cửa sổ in ẩn để chứa nội dung lọc
+            var printWindow = window.open('', '_blank');
+            
+            // Lấy toàn bộ phần style CSS hiện tại
+            var styles = window.parent.document.querySelector('head').innerHTML;
+            printWindow.document.write('<html><head>' + styles + '</head><body>');
+            
+            // Chỉ copy từ trang thứ 2 (index 1) đến trang áp chót (index length - 2)
+            for (var i = 1; i < pages.length - 1; i++) {{
+                printWindow.document.write(pages[i].outerHTML);
+            }}
+            
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            
+            // Kích hoạt lệnh in trên cửa sổ đã lọc
+            printWindow.focus();
+            setTimeout(function() {{
+                printWindow.print();
+                printWindow.close();
+            }}, 500);
+        }})();
+        </script>
+        """
         components.html(js_code_print, height=0)
