@@ -209,19 +209,23 @@ if uploaded_file:
             break-inside: avoid !important; 
             margin-bottom: 20px !important;
          }}
-         
-        /* Ép bảng luôn nằm trọn vẹn */
-        table {{ 
-            width: 100% !important; 
-            table-layout: fixed !important; 
-        }}
 
-        /* Giữ số ở cỡ nhỏ vừa đọc */
-        .note-number {{ font-size: 10px !important; }}
+         .song-title {{
+            display: none !important;
+         }}
          
-       }}
-    </style>
-    """
+         /* Ép bảng luôn nằm trọn vẹn */
+         table {{ 
+             width: 100% !important; 
+             table-layout: fixed !important; 
+         }}
+
+         /* Giữ số ở cỡ nhỏ vừa đọc */
+         .note-number {{ font-size: 10px !important; }}
+         
+        }}
+     </style>
+     """
     
     all_khuong_html = []
     line_number = 1
