@@ -65,7 +65,35 @@ else:
     # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
     st.success(f"hello, {st.session_state.user_name}!")
     # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
-
+# Kiểm tra nếu người dùng đã đăng nhập thành công
+if st.session_state.user is not None:
+    with st.sidebar:
+        st.markdown("---")
+        st.write(f"👤 **Người dùng:** {st.session_state.user_name}")
+        
+        # Nút đổi mật khẩu
+        if st.button("🔑 Đổi mật khẩu"):
+            st.session_state.show_change_password = True
+            
+        # Logic đổi mật khẩu
+        if st.session_state.get("show_change_password", False):
+            new_password = st.text_input("Nhập mật khẩu mới", type="password")
+            if st.button("Xác nhận đổi"):
+                try:
+                    # Lấy user localId từ session_state.user
+                    user_id_token = st.session_state.user['idToken']
+                    auth.update_user(new_password=new_password, id_token=user_id_token)
+                    st.success("Đổi mật khẩu thành công!")
+                    st.session_state.show_change_password = False
+                except Exception as e:
+                    st.error(f"Lỗi: {e}")
+        
+        st.markdown("---")
+        # Nút đăng xuất để bảo mật hơn
+        if st.button("Đăng xuất"):
+            st.session_state.user = None
+            st.rerun()
+            
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
     # note_data là list [pitch, layer], ví dụ: [7, "2"]
