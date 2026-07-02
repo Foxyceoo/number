@@ -151,16 +151,26 @@ if uploaded_file:
         song_data = data[0]
         columns = song_data.get("columns", [])
     
-    elif file_ext == "txt":
-        # Đọc file txt và chuyển về định dạng [time, [[pitch, "key"]]]
+   elif file_ext == "txt":
+        # Đọc nội dung file dưới dạng text
         content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-        for line in content.strip().split('\n'):
-            parts = line.split(',')
-            if len(parts) == 2:
-                t_str, k_str = parts
-                # Tách lấy số từ chuỗi "1Key4"
-                pitch = int(k_str.split("Key")[1]) - 1
-                columns.append([int(t_str), [[pitch, k_str]]])
+        try:
+            # Vì nội dung là JSON, ta parse nó bằng thư viện json
+            data = json.loads(content)
+            # Truy cập vào list songNotes bên trong
+            song_data = data[0]
+            raw_notes = song_data.get("songNotes", [])
+            
+            # Chuyển đổi sang định dạng columns để logic sau đó vẫn chạy đúng
+            # Định dạng yêu cầu: [time, [[pitch, key_str]]]
+            for n in raw_notes:
+                key_str = n["key"]
+                # Tách số từ chuỗi "1Key4" -> pitch = 4-1 = 3
+                pitch = int(key_str.split("Key")[1]) - 1
+                columns.append([n["time"], [[pitch, key_str]]])
+        except Exception as e:
+            st.error(f"Lỗi khi đọc định dạng file: {e}")
+            st.stop()
 
     # Kiểm tra nếu dữ liệu rỗng
     if not columns:
