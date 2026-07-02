@@ -291,6 +291,28 @@ if uploaded_file:
         display_html += "</div>"
         
     # 3. Thêm mã JavaScript kích hoạt hiệu ứng lật sách 3D của Turn.js
+    # === THAY THẾ TOÀN BỘ ĐOẠN CUỐI TỪ ĐÂY ĐẾN HẾT FILE ===
+    
+    # 1. Tạo cấu trúc lật trang và trang bìa đầu tiên
+    display_html = f"""
+    <div id="flipbook">
+        <div class="page cover-page">
+            <h1 style="font-size: 32px; margin-bottom: 10px; font-weight: bold;">{song_name}</h1>
+            <p style="font-size: 14px; opacity: 0.8; font-style: italic;">Nhấp vào mép giấy bên phải để mở sách</p>
+        </div>
+    """
+    
+    # 2. Chia các khuông nhạc vào từng trang (mỗi trang chứa đúng 3 dòng nhạc để vừa khung)
+    lines_per_page = 3
+    for idx in range(0, len(all_khuong_html), lines_per_page):
+        chunk = all_khuong_html[idx : idx + lines_per_page]
+        
+        display_html += "<div class='page'>"
+        for khuong_html in chunk:
+            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+        display_html += "</div>"
+        
+    # 3. Thêm mã JavaScript kích hoạt hiệu ứng lật sách 3D của Turn.js
     display_html += """
     </div>
     <script type="text/javascript">
@@ -311,17 +333,8 @@ if uploaded_file:
     # Đặt chiều cao khung hiển thị cố định ở mức 600px là vừa vặn đẹp mắt với cuốn sách
     components.html(html_to_render, height=600, scrolling=False)
     
-    # === KẾT THÚC ĐOẠN THAY THẾ ===
-    
-    # Phần nút bấm In/PDF của bạn giữ nguyên phía dưới
-    st.write('<div style="height: 50px;"></div>', unsafe_allow_html=True)    
-    if st.button("to PDF"):
-        js_code = "<script>window.parent.window.print();</script>"
-        components.html(js_code, height=0)
-
-    
-    # Tạo khoảng cách cố định 50px
-    st.write('<div style="height: 700px;"></div>', unsafe_allow_html=True)    
-    if st.button("to PDF"):
+    # 5. Tạo khoảng cách nhỏ xuống nút bấm (ĐÃ BỎ ĐOẠN LẶP LẠI VÀ ĐOẠN CAO 700PX THỪA)
+    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
+    if st.button("to PDF", key="btn_to_pdf"):
         js_code = "<script>window.parent.window.print();</script>"
         components.html(js_code, height=0)
