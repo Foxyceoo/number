@@ -239,12 +239,23 @@ if uploaded_files:
     page_style = """
     <style>
     /* ========================================================================= */
-    /* MỚI: Ẩn danh sách file upload mặc định của Streamlit (tránh lặp 2 lần) */
+    /* CẬP NHẬT: Ẩn tận gốc danh sách file mặc định của st.file_uploader */
     /* ========================================================================= */
-    [data-testid="stFileUploaderFile"], 
-    [data-testid="stUploadedFile"],
-    section[data-testid="stFileUploadDropzone"] + div { 
-        display: none !important; 
+    /* 1. Ẩn container chứa file bên dưới uploader */
+    [data-testid="stFileUploaderFilesContainer"],
+    [data-testid="stFileUploaderFile"],
+    [data-testid="stUploadedFile"] {
+        display: none !important;
+    }
+    
+    /* 2. Ẩn tất cả các element xuất hiện ngay sau vùng Dropzone (chính là danh sách file) */
+    div[data-testid="stFileUploader"] > section + div {
+        display: none !important;
+    }
+    
+    /* 3. Phá bẫy cấu trúc hàng của Streamlit đối với file cũ */
+    .uploadedFiles, .uploadedFile {
+        display: none !important;
     }
     ::-webkit-scrollbar { display: none !important; }
     
