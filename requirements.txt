@@ -4,3 +4,4 @@ weasyprint
 pypdf
 streamlit-authenticator
 pyrebase4
+streamlit-google-oauth
