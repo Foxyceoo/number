@@ -148,7 +148,7 @@ if uploaded_file:
     columns = song_data.get("columns", [])
     bits_per_page = 32
 
-    all_khuong_html = []
+     all_khuong_html = []
     line_number = 1
     
     for i in range(0, len(columns), bits_per_page):
@@ -278,7 +278,7 @@ if uploaded_file:
     </style>
     """
 
-    PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
+     PAGE_HEIGHT = 1000  # px - không gian khả dụng của 1 trang A4
     current_page_height = 0
     display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
 
