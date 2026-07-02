@@ -44,14 +44,28 @@ if st.session_state.get('logged_in'):
     # Tạo vùng chứa trống
     placeholder = st.empty()
     
-    # Hiển thị chữ to, căn giữa
-    placeholder.markdown(f"<h1 style='text-align: center;'>Hello {st.session_state.user_name}!</h1>", unsafe_allow_html=True)
+    # Định nghĩa màu sắc và kích thước bằng CSS
+    # Bạn có thể thay đổi "blue" thành màu khác như "red", "green", "orange", "purple", v.v.
+    # Hoặc dùng mã màu hex như "#FF69B4" (Hồng)
+    style = """
+    <style>
+        .big-colorful-hello {
+            text-align: center;
+            color: #00008c; /* Đổi màu tại đây */
+            font-size: 80px; /* Tăng kích thước tại đây (px) */
+            font-weight: bold;
+            margin-top: 100px; /* Khoảng cách từ trên xuống */
+        }
+    </style>
+    """
     
-    # Đợi "n" giây
-    import time
-    time.sleep(2)
+    # Hiển thị style và lời chào
+    placeholder.markdown(style + f"<div class='big-colorful-hello'>Hello {st.session_state.user_name}!</div>", unsafe_allow_html=True)
     
-    # Xóa sạch cả vùng chứa đó (chữ Hello to ở giữa sẽ biến mất)
+    # Đợi 3 giây
+    time.sleep(3)
+    
+    # Xóa sạch lời chào khỏi giao diện
     placeholder.empty()
 
 # Hàm chuyển đổi Key thành số 1-15
