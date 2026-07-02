@@ -145,49 +145,49 @@ if uploaded_file:
     file_ext = uploaded_file.name.split('.')[-1].lower()
     song_name = uploaded_file.name.rsplit('.', 1)[0]
     
-    # Khởi tạo columns trống ngay từ đầu
+    # 1. Khởi tạo columns trống
     columns = []
-
-    if file_ext == "json":
-        data = json.load(uploaded_file)
-        song_data = data[0]
-        # Nếu file json dạng cũ có 'columns'
+    song_name = uploaded_file.name.rsplit('.', 1)[0]
+    
+    # 2. Xử lý file
+    content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
+    try:
+        data = json.loads(content)
+        # Kiểm tra xem cấu trúc là list hay dict
+        song_data = data[0] if isinstance(data, list) else data
+        
+        # Nếu file có sẵn 'columns' (dạng cũ)
         if "columns" in song_data:
             columns = song_data.get("columns", [])
-        # Nếu file json dạng mới (giống file txt của bạn) có 'songNotes'
+        # Nếu file có 'songNotes' (dạng mới)
         elif "songNotes" in song_data:
             raw_notes = song_data.get("songNotes", [])
-            # Gom nốt theo thời gian (tạo columns)
+            # Gom nốt theo thời gian (time) để tạo cấu trúc columns [time, [[pitch, key]]]
             time_map = {}
             for n in raw_notes:
                 t = n["time"]
                 k = n["key"]
-                pitch = int(k.split("Key")[1]) - 1
+                # Tách số từ "1Key4" -> 3
+                try:
+                    pitch = int(k.split("Key")[1]) - 1
+                except:
+                    pitch = 0
+                
                 if t not in time_map:
                     time_map[t] = []
                 time_map[t].append([pitch, k])
-            columns = [[t, notes] for t, notes in sorted(time_map.items())]
-
-    elif file_ext == "txt":
-        content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-        try:
-            data = json.loads(content)
-            song_data = data[0]
-            raw_notes = song_data.get("songNotes", [])
             
-            # Gom nốt giống như trên để tạo columns
-            time_map = {}
-            for n in raw_notes:
-                t = n["time"]
-                k = n["key"]
-                pitch = int(k.split("Key")[1]) - 1
-                if t not in time_map:
-                    time_map[t] = []
-                time_map[t].append([pitch, k])
+            # Chuyển map thành list theo đúng định dạng
             columns = [[t, notes] for t, notes in sorted(time_map.items())]
-        except Exception as e:
-            st.error(f"Lỗi định dạng file: {e}")
-            st.stop()
+            
+    except Exception as e:
+        st.error(f"Lỗi định dạng file: {e}")
+        st.stop()
+
+    # 3. Kiểm tra dữ liệu sau khi xử lý
+    if not columns:
+        st.error("Không tìm thấy nốt nhạc trong file!")
+        st.stop()
 
     # Kiểm tra nếu dữ liệu rỗng
     if not columns:
