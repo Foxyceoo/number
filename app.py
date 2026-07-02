@@ -237,37 +237,41 @@ if uploaded_file:
             for _ in range(needed):
                 khuong_columns.append([0, []])
 
-        html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse;'><tr>"
+        # 1. Khởi tạo bảng ép cấu trúc cố định
+        html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse; margin: 0; padding: 0;'>"
+        html_content += "<tr>"
+        
+        # 2. Tính toán chính xác phần trăm chiều rộng cho mỗi cột (100% chia đều cho 32 bit)
+        cell_width_pct = 100.0 / bits_per_page
         
         for col_idx, col in enumerate(khuong_columns):
             notes_in_col = col[1]
-            # Lấy danh sách số
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-            # --- TÍCH HỢP CHUYỂN ĐỔI ---
             if display_mode == "1. 1.. 1..." or display_mode == "abc":
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
             
-            # ... (Phần logic kẻ bảng giữ nguyên)
             is_new_line = (col_idx == 0)
             is_beat_4 = ((col_idx + 1) % 8 == 0)
-            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
-            border_left = "0.5px solid #00008c" if is_new_line else "none"
+            
+            # Cấu hình vạch nhịp dọc màu xanh
+            border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
+            border_left = "1.5px solid #00008c" if is_new_line else "none"
 
             if vals:
-                # Dùng join để nối các số/ký hiệu
                 all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
-                    <div style='font-size: 10px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 45px;'>
+                    <div style='font-size: 10.5px; font-weight: bold; line-height: 1.2; text-align: center;'>{all_nums}</div>
                 </div>
                 """
             else:
-                cell_content = ""
+                cell_content = "<div style='min-height: 45px;'></div>"
 
-            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
+            # 3. ÉP CỨNG width theo % vào từng ô <td> để không bị co giãn tự do nữa
+            html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; text-align: center; box-sizing: border-box;'>{cell_content}</td>"
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
