@@ -228,7 +228,7 @@ if uploaded_file:
         
         /* CŨ: padding: 40px 0px !important; */
         /* MỚI: Tăng lề trên và lề dưới lên 60px để tạo khoảng trống thoáng đãng */
-        padding: 60px 0px !important; 
+        padding: 100px 0px !important; 
         
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
