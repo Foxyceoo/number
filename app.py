@@ -31,19 +31,21 @@ if 'user' not in st.session_state:
 # Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
-    email = st.text_input("Email")
-    password = st.text_input("Mật khẩu", type="password")
+    # Dùng key để quản lý giá trị ô nhập liệu rõ ràng hơn
+    email = st.text_input("Email", key="email_input")
+    password = st.text_input("Mật khẩu", type="password", key="pass_input")
     
     if st.button("Đăng nhập"):
         try:
-            # Sử dụng thư viện pyrebase để đăng nhập
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
             st.session_state.user_name = email.split('@')[0]
-            st.rerun() # Tải lại trang để vào ứng dụng
-        except:
-            st.error("Email hoặc mật khẩu không đúng!")
-
+            # Xóa sạch dữ liệu cũ trong bộ nhớ sau khi đăng nhập thành công
+            st.rerun() 
+        except Exception as e:
+            # Thông báo lỗi chi tiết hơn nếu cần
+            st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
+            
 # Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
