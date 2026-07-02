@@ -3,42 +3,54 @@ import pandas as pd
 import json
 import math
 import time
+import pyrebase
 import streamlit.components.v1 as components
 
 # Đường dẫn đến file CSV của bạn (đã xuất bản từ Google Sheets)
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
-def check_login():
-    if 'logged_in' not in st.session_state:
-        st.session_state.logged_in = False
+# 1. Khởi tạo kết nối với Firebase
+config = {
+    "apiKey": st.secrets["FIREBASE_API_KEY"],
+    "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
+    "projectId": st.secrets["FIREBASE_PROJECT_ID"],
+    "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
+    "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
+    "appId": st.secrets["FIREBASE_APP_ID"]
+}
 
-    if not st.session_state.logged_in:
-        email_input = st.text_input("Nhập email để truy cập:")
-        if st.button("Đăng nhập"):
-            try:
-                # Đọc danh sách từ Google Sheets
-                df = pd.read_csv(CSV_URL)
-                # Kiểm tra email trong cột 'Mail'
-                if email_input in df['Mail'].values:
-                 # Tìm dòng có email trùng khớp
-                 user_info = df.loc[df['Mail'] == email_input]
-                 # Lấy tên ra (giả sử cột tên là 'Tên')
-                 user_name = user_info['Tên'].values[0]
-    
-                 st.session_state.logged_in = True
-                 st.session_state.user_email = email_input
-                 st.session_state.user_name = user_name  # Lưu tên vào session
-    
-                 st.success("Đăng nhập thành công!")
-                 st.rerun()
-                else:
-                    st.error("Email này chưa được cấp quyền!")
-            except Exception as e:
-                st.error("Không thể kết nối đến danh sách xác thực.")
-        st.stop()
+firebase = pyrebase.initialize_app(config)
+auth = firebase.auth()
 
-# Gọi hàm kiểm tra
-check_login()
+# 2. Quản lý trạng thái đăng nhập
+if 'user' not in st.session_state:
+    st.session_state.user = None
+
+def login_form():
+    st.title("Đăng nhập")
+    email = st.text_input("Email")
+    password = st.text_input("Mật khẩu", type="password")
+    
+    if st.button("Đăng nhập"):
+        try:
+            user = auth.sign_in_with_email_and_password(email, password)
+            st.session_state.user = user
+            st.success("Đăng nhập thành công!")
+            st.rerun()
+        except:
+            st.error("Sai email hoặc mật khẩu!")
+
+    if st.button("Tạo tài khoản mới"):
+        try:
+            auth.create_user_with_email_and_password(email, password)
+            st.success("Tạo tài khoản thành công! Hãy đăng nhập.")
+        except:
+            st.error("Lỗi: Email không hợp lệ hoặc mật khẩu quá ngắn.")
+
+# 3. Luồng chính của app
+if st.session_state.user is None:
+    login_form()
+    st.stop()  # Dừng app nếu chưa đăng nhập
 
 #Lời chào sau đăng nhập
 if st.session_state.get('logged_in'):
