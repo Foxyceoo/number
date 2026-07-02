@@ -220,19 +220,17 @@ if uploaded_file:
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
         
-        # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
         if len(khuong_columns) < bits_per_page:
             needed = bits_per_page - len(khuong_columns)
             for _ in range(needed):
                 khuong_columns.append([0, []])
 
-        # 1. Khởi tạo bảng ép cấu trúc cố định
-        html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse; margin: 0; padding: 0;'>"
-        html_content += "<tr>"
+        # Khởi tạo bảng sát mép, không căn lề
+        html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse; margin: 0; padding: 0;'><tr>"
         
-        # 2. Tính toán chính xác phần trăm chiều rộng cho mỗi cột (100% chia đều cho 32 bit)
+        # Chia đều 100% chiều rộng trang cho số bit phách nhạc
         cell_width_pct = 100.0 / bits_per_page
-        
+
         for col_idx, col in enumerate(khuong_columns):
             notes_in_col = col[1]
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
@@ -245,9 +243,8 @@ if uploaded_file:
             is_new_line = (col_idx == 0)
             is_beat_4 = ((col_idx + 1) % 8 == 0)
             
-            # Cấu hình vạch nhịp dọc màu xanh
-            border_right = "1px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
-            border_left = "1px solid #00008c" if is_new_line else "none"
+            border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
+            border_left = "1.5px solid #00008c" if is_new_line else "none"
 
             if vals:
                 all_nums = "<br>".join(map(str, vals))
@@ -259,8 +256,8 @@ if uploaded_file:
             else:
                 cell_content = "<div style='min-height: 45px;'></div>"
 
-            # 3. ÉP CỨNG width theo % vào từng ô <td> để không bị co giãn tự do nữa
-            html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; text-align: center; box-sizing: border-box;'>{cell_content}</td>"
+            # Ép cứng phần trăm width sát sạt vào mép trang
+            html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
