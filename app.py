@@ -166,7 +166,7 @@ if uploaded_file:
         if is_beat_4 or is_beat_16:
             border_right = "0.5px solid #00008c"
         
-     v   # Logic cho đường viền trái (nếu là cột đầu tiên của khuông)
+        # Logic cho đường viền trái (nếu là cột đầu tiên của khuông)
         border_left = "0.5px solid #00008c" if col_idx == 0 else "none"
             
             # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
