@@ -254,7 +254,7 @@ if uploaded_file:
                 vals = raw_vals
             
             is_new_line = (col_idx == 0)
-            is_beat_4 = ((col_idx + 1) % 8 == 0)
+            is_beat_4 = ((col_idx + 1) % 4 == 0)
             
             # Vạch ngăn nhịp dọc màu xanh
             border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
