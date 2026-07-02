@@ -262,7 +262,7 @@ if uploaded_file:
                 all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
-                    <div style='font-size: 10.5px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
+                    <div style='font-size: 10px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
                 </div>
                 """
             else:
