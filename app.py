@@ -128,7 +128,7 @@ with st.sidebar:
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
-    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1..."])
+    display_mode = st.radio("Chế độ hiển thị:", ["1 - 15", "1. 1.. 1..."])
     st.markdown("---")
 
 if uploaded_file:
@@ -233,7 +233,7 @@ if uploaded_file:
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
             # --- TÍCH HỢP CHUYỂN ĐỔI ---
-            if display_mode == "Sheet 1-15":
+            if display_mode == "1. 1.. 1...":
                 vals = [get_symbol(v) for v in raw_vals]
             else:
                 vals = raw_vals
