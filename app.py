@@ -405,33 +405,30 @@ if uploaded_file:
     if "trigger_print" not in st.session_state:
         st.session_state.trigger_print = False
 
-    # 2. Khi bấm nút, chỉ bật cờ trigger lên chứ không render components luôn tại đây
+    # 2. Khi bấm nút, bật cờ trigger
     if st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
         else:
             st.session_state.trigger_print = True
 
-    # 3. Khi cờ trigger được bật, tiến hành sinh JS với key độc nhất
+    # 3. Khi cờ trigger được bật, tiến hành sinh JS
     if st.session_state.get("trigger_print", False):
-        # Giữ nguyên toàn bộ tất cả các trang, không trừ trang nào cả
         html_for_print = page_style + "".join(pages_list)
         
-        # Sử dụng json.dumps để mã hóa an toàn tuyệt đối, không lo lỗi ký tự đặc biệt
         import json
         safe_html_json = json.dumps(html_for_print)
         
-        # Tạo một mã số duy nhất dựa trên thời gian để ép Streamlit tạo mới component HTML
+        # Tạo mã số duy nhất dựa trên thời gian
         print_id = int(time.time())
         
-        # Đoạn lệnh JS mở cửa sổ mới chứa trọn vẹn nội dung và kích hoạt lệnh in
+        # Chèn thẳng print_id vào comment của JS để thay đổi nội dung chuỗi, ép Streamlit reload lại component này
         js_code_print = f"""
         <script>
         (function() {{
-            // ID duy nhất của lượt in này: {print_id}
+            // ID lượt in: {print_id}
             var htmlContent = {safe_html_json};
             
-            // Mở cửa sổ in mới
             var printWindow = window.open('', '_blank');
             if (!printWindow) {{
                 alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
@@ -442,7 +439,6 @@ if uploaded_file:
             printWindow.document.close();
             printWindow.focus();
             
-            // Chờ 500ms để trình duyệt tải xong CSS rồi tự động gọi hộp thoại In
             setTimeout(function() {{
                 printWindow.print();
                 printWindow.close();
@@ -450,8 +446,8 @@ if uploaded_file:
         }})();
         </script>
         """
-        # Truyền thêm key động dựa vào print_id để giải phóng component cũ
-        components.html(js_code_print, height=0, key=f"print_component_{print_id}")
+        # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
+        components.html(js_code_print, height=0)
         
-        # 4. Tắt cờ trigger để sẵn sàng đón nhận lượt bấm tiếp theo của cậu
+        # 4. Tắt cờ trigger để sẵn sàng cho lần bấm tiếp theo
         st.session_state.trigger_print = False
