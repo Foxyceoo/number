@@ -206,13 +206,13 @@ if uploaded_file:
         width: 100%;
     }
     
-    /* Trang A4 chuẩn Web: Thêm padding lề trái/phải 20px để tạo khoảng thở */
+    /* Trang A4 chuẩn Web */
     .sheet-page {
         background-color: #ffffff;
-        box-sizing: border-box; /* Giữ cố định chiều rộng 794px kể cả khi thêm padding */
+        box-sizing: border-box;
         width: 794px;
         min-height: 1123px;
-        padding: 40px 20px !important; /* Trên/Dưới: 40px, Trái/Phải: 20px */
+        padding: 40px 0px !important; /* Trả về 0px vì chúng ta đã đổi chiến thuật dùng margin cho table */
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
@@ -224,8 +224,8 @@ if uploaded_file:
         border-collapse: collapse !important; 
         text-align: center; 
         table-layout: fixed !important; 
-        width: 100% !important; 
-        margin: 0 !important;
+        width: 94% !important; /* Đồng bộ độ rộng co vào tại đây */
+        margin: 0 auto !important; /* Luôn luôn nằm chính giữa trang giấy */
         padding: 0 !important;
     }
 
@@ -266,8 +266,8 @@ if uploaded_file:
             for _ in range(needed):
                 khuong_columns.append([0, []])
 
-        # Tạo bảng co giãn 100% theo container
-        html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse; margin: 0; padding: 0;'><tr>"
+        # MỚI: Ép chiều rộng bảng nhạc co lại còn 94% và căn giữa để tự tạo lề trái/phải đều nhau
+        html_content = "<table style='table-layout: fixed; width: 94% !important; border-collapse: collapse; margin: 0 auto !important; padding: 0;'><tr>"
         cell_width_pct = 100.0 / bits_per_page
 
         for col_idx, col in enumerate(khuong_columns):
