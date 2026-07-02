@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 import extra_streamlit_components as stx
 
 # Khởi tạo bộ quản lý Cookie
-cookies = EncryptedCookiesManager(prefix="my_sheet_app_", password="thay_doi_mat_ma_bao_mat_o_day_nhe_123456")
+cookie_manager = stx.CookieManager()
 if not cookies.ready():
     st.stop() # Đợi cookie sẵn sàng tải
 
