@@ -63,7 +63,7 @@ else:
         st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
     
     # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
-    st.success(f"Chào mừng bạn, {st.session_state.user_name}!")
+    st.success(f"hello, {st.session_state.user_name}!")
     # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
 
 # Hàm chuyển đổi Key thành số 1-15
