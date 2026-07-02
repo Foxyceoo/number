@@ -143,26 +143,25 @@ if 'song_name' not in st.session_state:
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
-    
+
+    # Xử lý logic dữ liệu
     if uploaded_file is not None:
-        # Lưu dữ liệu vào state
         st.session_state.uploaded_data = json.load(uploaded_file)
         st.session_state.file_name = uploaded_file.name
-        
-        # Lưu cả 'song_data' nếu cần (đồng bộ hóa)
-        # st.session_state.song_data = st.session_state.uploaded_data[0] 
-        
     elif uploaded_file is None:
-        # Nếu không có file (người dùng bấm x), reset dữ liệu
         st.session_state.uploaded_data = None
-    
+        st.session_state.file_name = None
+
+    # Hiển thị UI chỉ khi có dữ liệu
+    if st.session_state.uploaded_data is not None:
         st.markdown("---")
+        st.write(f"Đang xem: **{st.session_state.file_name}**")
+        
         # Nút chọn chế độ
         display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
         st.markdown("---")
-
+        
 # 3. Sử dụng đúng tên biến đã khởi tạo
 if st.session_state.song_data is not None:
     # Lấy dữ liệu từ state
