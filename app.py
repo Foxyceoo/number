@@ -34,7 +34,7 @@ def login_form():
     if st.button("Đăng nhập"):
         try:
             user = auth.sign_in_with_email_and_password(email, password)
-            st.session_state.user = user
+            st.session_state.user_name = user['email'].split('@')[0]
             st.success("Đăng nhập thành công!")
             st.rerun()
         except:
