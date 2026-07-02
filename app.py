@@ -51,18 +51,20 @@ if st.session_state.user is None:
     login_form()
     st.stop() # Dừng ứng dụng nếu chưa đăng nhập
 else:
-    st.success(f"Hello {st.session_state.user_name}!")
+    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
+    if 'is_loaded' not in st.session_state:
+        st.session_state.is_loaded = False
     
-    # Thay vì dùng placeholder.markdown(...), hãy dùng st.empty() nếu muốn xóa
-    # Hoặc đơn giản là hiển thị lời chào và đợi 3 giây rồi dùng st.empty()
-    with st.spinner('Đang tải dữ liệu, vui lòng đợi...'):
-        time.sleep(2) # Giả lập thời gian tải dữ liệu
-        
-    st.success(f"Chào mừng bạn trở lại, {st.session_state.user_name}!")
+    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
+    if not st.session_state.is_loaded:
+        with st.spinner('Đang tải dữ liệu...'):
+            time.sleep(2) # Giả lập thời gian tải
+        st.session_state.is_loaded = True
+        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
     
-    # Có thể xóa thông báo thành công sau 2 giây nếu muốn màn hình sạch hơn
-    time.sleep(2)
-    st.rerun()
+    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
+    st.success(f"Chào mừng bạn, {st.session_state.user_name}!")
+    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
 
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
