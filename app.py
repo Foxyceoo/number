@@ -132,54 +132,67 @@ def get_symbol(value, mode):
 
 # 2. Thêm nút chọn chế độ vào Sidebar
 
+# --- THIẾT KẾ SIDEBAR ---
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    # Thay đổi cấu hình để nhận nhiều file cùng lúc
     uploaded_files = st.file_uploader(
         "Nhập file của bạn", 
         type=["json"], 
-        accept_multiple_files=True  # Thêm dòng này nha cậu
+        accept_multiple_files=True 
     )
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
-    st.markdown("---")
-    # Nút chọn chế độ
-    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
-    st.markdown("---")
-
-if uploaded_files:
-    # 1. Khởi tạo bài hát được chọn trong session_state nếu chưa có
-    if "selected_song_index" not in st.session_state:
-        st.session_state.selected_song_index = 0
-        
-    # Tạo một vùng sidebar hoặc main tùy thuộc vị trí cậu đặt uploader trước đó
-    # Ở đây Yaoyao tạo các nút bấm xếp dọc sát nhau y hệt ảnh 2
-    for index, file in enumerate(uploaded_files):
-        display_name = file.name.replace(".json", "")
-        
-        # Nếu là file đang được chọn, nút bấm sẽ có màu xanh/đỏ nổi bật (primary)
-        is_selected = st.session_state.selected_song_index == index
-        btn_type = "primary" if is_selected else "secondary"
-        
-        # Tạo nút bấm cho từng file
-        if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
-            st.session_state.selected_song_index = index
-            st.rerun()
+    
+    # Render danh sách nút chọn bài hát ngay trong sidebar cho gọn gàng
+    if uploaded_files:
+        st.markdown("---")
+        st.write("**Danh sách bài hát:**")
+        if "selected_song_index" not in st.session_state:
+            st.session_state.selected_song_index = 0
             
-    # 2. Lấy dữ liệu của file đang được lựa chọn để vẽ sheet nhạc
-    # Nếu lỡ xóa file làm index vượt quá số lượng hiện tại, đưa về 0
-    if st.session_state.selected_song_index >= len(uploaded_files):
-        st.session_state.selected_song_index = 0
+        if st.session_state.selected_song_index >= len(uploaded_files):
+            st.session_state.selected_song_index = 0
+            
+        for index, file in enumerate(uploaded_files):
+            display_name = file.name.replace(".json", "")
+            is_selected = st.session_state.selected_song_index == index
+            btn_type = "primary" if is_selected else "secondary"
+            
+            if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
+                st.session_state.selected_song_index = index
+                st.rerun()
+
+    st.markdown("---")
+    display_mode = st.sidebar.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
+    st.markdown("---")
+    
+    # Tiện ích tài khoản
+    st.write(f"**Người dùng:** {st.session_state.user_name}")
+    if st.button("Đổi mật khẩu", use_container_width=True):
+        st.session_state.show_change_password = not st.session_state.get("show_change_password", False)
         
-    current_selected_file = uploaded_files[st.session_state.selected_song_index]
-    
-    # Tiếp tục luồng xử lý JSON của cậu
-    data = json.load(current_selected_file)
-    song_data = data[0]
-    song_name = current_selected_file.name.replace(".json", "")
-    
-    # =========================================================================
-    # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN...
-    # =========================================================================
+    if st.session_state.get("show_change_password", False):
+        with st.form("change_password_inner"):
+            new_password = st.text_input("Nhập mật khẩu mới", type="password")
+            if st.form_submit_button("Xác nhận đổi"):
+                try:
+                    id_token = st.session_state.user['idToken']
+                    api_key = st.secrets["FIREBASE_API_KEY"]
+                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
+                    response = requests.post(api_url, json=payload)
+                    
+                    if response.status_code == 200:
+                        st.success("Đổi mật khẩu thành công!")
+                        st.session_state.show_change_password = False
+                    else:
+                        st.error("Có lỗi xảy ra khi đổi mật khẩu.")
+                except Exception as e:
+                    st.error(f"Lỗi hệ thống: {e}")
+                    
+    if st.button("Đăng xuất", use_container_width=True):
+        st.session_state.user = None
+        st.session_state.is_loaded = False
+        st.rerun()
     
     # =========================================================================
     # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
