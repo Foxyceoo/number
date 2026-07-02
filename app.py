@@ -208,7 +208,7 @@ with st.sidebar:
         for idx, current_file in enumerate(uploaded_files):
             display_name = current_file.name.replace(".json", "").replace("_", " ")
             is_current = (st.session_state.selected_song_index == idx)
-            button_label = f"---**{display_name}**---" if is_current else f"**{display_name}**"
+            button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
             
             if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
                 st.session_state.selected_song_index = idx
