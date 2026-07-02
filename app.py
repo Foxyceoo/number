@@ -191,8 +191,8 @@ if uploaded_file:
     .page {
         background-color: #ffffff;
         box-sizing: border-box;
-        width: 880px;
-        height: 850px;
+        width: 1240px;
+        height: 1754px;
         padding: 25px 35px;
         border-right: 1px solid #ddd;
         overflow: hidden;
