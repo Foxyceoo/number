@@ -133,36 +133,75 @@ def get_symbol(value, mode):
 # ==========================================
 # GOM TOÀN BỘ SIDEBAR VÀO ĐÂY ĐỂ TRÁNH LỖI NHẢY ELEMENT
 # ==========================================
+# =========================================================================
+# 2. QUẢN LÝ SIDEBAR (Giao diện mới: Siêu gọn - Không lặp - Có nút xóa)
+# =========================================================================
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    uploaded_files = st.file_uploader(
-        "Nhập file của bạn", 
-        type=["json"], 
-        accept_multiple_files=True
-    )
-    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
-    st.markdown("---")
     
-    # Nút chọn chế độ
-    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
-    st.markdown("---")
+    # Khởi tạo danh sách lưu trữ file trong Session State nếu chưa có
+    if "playlist_files" not in st.session_state:
+        st.session_state.playlist_files = {}
+        
+    if "current_song" not in st.session_state:
+        st.session_state.current_song = None
 
-    # HIỂN THỊ DANH SÁCH BÀI HÁT NGAY TRONG BLOCK SIDEBAR CHÍNH
-    if uploaded_files:
-        if "selected_song_index" not in st.session_state:
-            st.session_state.selected_song_index = 0
-            
-        st.write("**Danh sách bài hát:**")
-        for index, file in enumerate(uploaded_files):
-            display_name = file.name.replace(".json", "")
-            
-            is_selected = st.session_state.selected_song_index == index
-            btn_type = "primary" if is_selected else "secondary"
-            
-            if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
-                st.session_state.selected_song_index = index
-                st.rerun()
+    st.write("### Nhập file của bạn")
+    
+    # Ô uploader cấu hình chỉ nhận 1 file mỗi lần chọn để giao diện cực kỳ thanh thoát
+    uploaded_file = st.file_uploader(
+        "Chọn file JSON của bạn để bắt đầu!",
+        type=["json"],
+        accept_multiple_files=False,
+        label_visibility="collapsed"
+    )
+    
+    # Tự động nạp file vào danh sách lưu trữ tạm thời khi người dùng chọn file
+    if uploaded_file is not None:
+        file_name = uploaded_file.name
+        if file_name not in st.session_state.playlist_files:
+            st.session_state.playlist_files[file_name] = uploaded_file.getvalue()
+            st.toast(f"Đã nạp bài: {file_name.replace('.json', '')}", icon="✅")
 
+    # --- Cấu hình chế độ hiển thị ---
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+    st.write("**Chế độ hiển thị:**")
+    view_mode = st.radio(
+        "Chọn chế độ hiển thị",
+        options=["1-15", "1. 1.. 1...", "abc"],
+        label_visibility="collapsed"
+    )
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+
+    # --- Danh sách bài hát Custom ---
+    st.write("**Danh sách bài hát:**")
+    
+    if not st.session_state.playlist_files:
+        st.info("Chưa có bài hát nào được tải lên.")
+    else:
+        # Hiển thị vòng lặp danh sách bài hát đẹp đẽ
+        for name in list(st.session_state.playlist_files.keys()):
+            # Làm sạch tên hiển thị cho nút bấm
+            display_name = name.replace(".json", "").replace("_", " ")
+            
+            # Chia hàng thành 2 cột: Cột nút chọn bài và Cột nút xóa bài (❌)
+            col_btn, col_del = st.columns([0.85, 0.15])
+            
+            with col_btn:
+                # Nếu bài hát đang được chọn, in đậm nút bấm lên để phân biệt
+                is_current = (st.session_state.current_song == name)
+                button_label = f"🎵 {display_name}" if is_current else display_name
+                
+                if st.button(button_label, key=f"btn_{name}", use_container_width=True):
+                    st.session_state.current_song = name
+                    # (Tại đây cậu thêm logic đọc nội dung file từ st.session_state.playlist_files[name] để render sheet nhé)
+            
+            with col_del:
+                if st.button("❌", key=f"del_{name}", help="Xóa bài này"):
+                    del st.session_state.playlist_files[name]
+                    if st.session_state.current_song == name:
+                        st.session_state.current_song = None
+                    st.rerun()
 # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
 if uploaded_files:
     if st.session_state.selected_song_index >= len(uploaded_files):
@@ -211,61 +250,25 @@ if uploaded_files:
         return int(note_data[1])
 
     st.markdown(
-        """
-        <style>
-        /* Mở rộng tối đa container chính của Streamlit */
-        .block-container {
-            max-width: 100% !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            padding-top: 2rem !important;
-        }
-        /* Căn giữa thành phần iframe */
-        iframe {
-            display: block;
-            margin: 0 auto !important;
-            width: 90% !important;
-        }
-        
-        /* ========================================================================= */
-        /* CẬP NHẬT: HIỂN THỊ LẠI CHỮ TRONG Ô NHẬP & ẨN DANH SÁCH FILE CŨ */
-        /* ========================================================================= */
-        
-        /* 1. Thiết lập chiều cao vùng kéo thả file ở Sidebar */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
-            padding: 10px !important;
-            min-height: 60px !important;
-            height: 60px !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
-            transform: scale(0.7) !important;
-            margin-bottom: 0px !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small {
-            font-size: 11px !important;
-        }
-
-        /* 2. ĐẢM BẢO CHỮ BÊN TRONG Ô KHÔNG BỊ ẨN */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section * {
-            display: inline-block !important;
-        }
-
-        /* 3. CHỈ ẨN DANH SÁCH FILE LẶP (Các thành phần nằm SAU hoặc BÊN NGOÀI vùng section) */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section ~ div,
-        [data-testid="stSidebar"] [data-testid="stFileUploaderFilesContainer"],
-        [data-testid="stSidebar"] .uploadedFiles,
-        [data-testid="stSidebar"] .uploadedFile {
-            display: none !important;
-            height: 0px !important;
-            padding: 0px !important;
-            margin: 0px !important;
-            overflow: hidden !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
+    """
+    <style>
+    /* Mở rộng tối đa container chính của Streamlit */
+    .block-container {
+        max-width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 2rem !important;
+    }
+    /* Căn giữa thành phần iframe hiển thị sheet nhạc */
+    iframe {
+        display: block;
+        margin: 0 auto !important;
+        width: 90% !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
         
     #CSS
     # =========================================================================
