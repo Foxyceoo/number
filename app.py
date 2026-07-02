@@ -153,29 +153,24 @@ if uploaded_file:
     
     # Duyệt theo từng trang (bits_per_page)
     # Sửa đoạn logic kẻ bảng của bạn thành:
-    for col_idx, col in enumerate(khuong_columns):
-        # Khai báo phach dựa trên vị trí cột
-        phach = col_idx
-    
-        # Bây giờ bạn có thể dùng 'phach' thoải mái mà không bị lỗi
+   for col_idx, col in enumerate(khuong_columns):
+        # col là [time, [[pitch, key], ...]]
+        notes_in_col = col[1]
+        vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+
+        # Định nghĩa biến phach để sử dụng cho logic kẻ bảng
+        phach = col_idx 
+
+        # Logic kẻ bảng
+        is_new_line = (phach == 0)
         is_beat_4 = ((phach + 1) % 4 == 0)
         is_beat_16 = ((phach + 1) % 16 == 0)
-    
-        # Xác định đường kẻ
-        border_right = "0px solid #d8d8d8"
-        if is_beat_4 or is_beat_16:
-            border_right = "0.5px solid #00008c"
         
-        # Logic cho đường viền trái (nếu là cột đầu tiên của khuông)
-        border_left = "0.5px solid #00008c" if col_idx == 0 else "none"
-            
-            # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
-            # Kiểm tra xem khuông cuối cùng có thiếu nhịp không
-            if len(khuong_columns) < bits_per_page:
-                needed = bits_per_page - len(khuong_columns)
-                for _ in range(needed):
-                    khuong_columns.append([0, []]) # Thêm cột rỗng
-
+        # Thiết lập đường kẻ phải: nếu là phách 4 hoặc 16 thì kẻ đậm
+        border_right = "0.5px solid #00008c" if (is_beat_4 or is_beat_16) else "0px solid #d8d8d8"
+        # Thiết lập đường kẻ trái: chỉ kẻ cho cột đầu tiên của khuông
+        border_left = "0.5px solid #00008c" if is_new_line else "none"
+       
             if vals:
                 # Dùng join để nối các số bằng thẻ <br>
                 all_nums = "<br>".join(map(str, vals))
