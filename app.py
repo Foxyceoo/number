@@ -94,7 +94,7 @@ if uploaded_file:
         /* Giữ số ở cỡ nhỏ vừa đọc */
         .note-number {{ font-size: 10px !important; }}
          
-        .print-footer {{ display: block !important; position: fixed !important; bottom: 10px !important; left: 10px !important; width: 100% !important; }}
+        .print-footer {{ display: note !important; position: fixed !important; bottom: 10px !important; left: 10px !important; width: 100% !important; }}
     }}
     </style>
     """
