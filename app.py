@@ -11,8 +11,6 @@ import extra_streamlit_components as stx
 
 # Khởi tạo bộ quản lý Cookie
 cookie_manager = stx.CookieManager()
-if not cookies.ready():
-    st.stop() # Đợi cookie sẵn sàng tải
 
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
