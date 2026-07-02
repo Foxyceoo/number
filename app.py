@@ -141,6 +141,22 @@ with st.sidebar:
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
+if st.session_state.uploaded_data is not None:
+    data = st.session_state.uploaded_data # Dữ liệu là 1 list các bài hát
+    
+    # Tạo danh sách tên bài hát để chọn
+    song_names = [song.get("name", f"Bài hát {i+1}") for i, song in enumerate(data)]
+    
+    # Chọn bài hát
+    selected_song_name = st.sidebar.selectbox("Chọn bài hát:", song_names)
+    
+    # Tìm bài hát được chọn
+    selected_index = song_names.index(selected_song_name)
+    selected_song_data = data[selected_index]
+    
+    # LƯU BÀI ĐANG CHỌN VÀO SESSION STATE
+    st.session_state.current_song = selected_song_data
+
 if uploaded_file:
     data = json.load(uploaded_file)
     song_data = data[0]
