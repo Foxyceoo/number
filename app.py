@@ -244,7 +244,7 @@ if uploaded_file:
             
             # --- TÍCH HỢP CHUYỂN ĐỔI ---
             if display_mode == "1. 1.. 1..." or display_mode == "abc":
-                vals = [get_symbol(v) for v in raw_vals]
+                vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
             
