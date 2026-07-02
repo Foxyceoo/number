@@ -96,7 +96,7 @@ if uploaded_file:
         border-collapse: collapse; 
         text-align: center; 
         table-layout: fixed !important; 
-        width: {margin_side}; 
+        width: {{margin_side}}; 
         margin: 0 auto 30px auto; 
         height: 60px !important; 
     }}
