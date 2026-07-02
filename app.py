@@ -228,10 +228,10 @@ if uploaded_files:
         }
         
         /* ========================================================================= */
-        /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
+        /* CẬP NHẬT: HIỂN THỊ LẠI CHỮ TRONG Ô NHẬP & ẨN DANH SÁCH FILE CŨ */
         /* ========================================================================= */
         
-        /* 1. Thu nhỏ vùng Dropzone nhập file */
+        /* 1. Thiết lập chiều cao vùng kéo thả file ở Sidebar */
         [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
             padding: 10px !important;
             min-height: 60px !important;
@@ -245,10 +245,16 @@ if uploaded_files:
             font-size: 11px !important;
         }
 
-        /* 2. Ép toàn bộ các element đi kèm/nằm dưới stFileUploader (trừ vùng section kéo thả) có chiều cao bằng 0 và ẩn đi */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] div,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
+        /* 2. ĐẢM BẢO CHỮ BÊN TRONG Ô KHÔNG BỊ ẨN */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section * {
+            display: inline-block !important;
+        }
+
+        /* 3. CHỈ ẨN DANH SÁCH FILE LẶP (Các thành phần nằm SAU hoặc BÊN NGOÀI vùng section) */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section ~ div,
+        [data-testid="stSidebar"] [data-testid="stFileUploaderFilesContainer"],
+        [data-testid="stSidebar"] .uploadedFiles,
+        [data-testid="stSidebar"] .uploadedFile {
             display: none !important;
             height: 0px !important;
             padding: 0px !important;
