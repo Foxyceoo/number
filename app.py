@@ -234,32 +234,29 @@ if uploaded_file:
     
     # Duyệt qua các cột để tạo từng dòng nhạc
     for i in range(0, len(columns), bits_per_page):
-        # Lấy một đoạn 32 cột (bits_per_page)
         chunk = columns[i : i + bits_per_page]
         
-        # Tạo HTML cho từng cột trong dòng này
+        # 1. Tạo nội dung HTML cho các cột trong dòng này
         html_content = ""
         for col in chunk:
-            # DEBUG: In ra để xem cấu trúc thực tế của col
-            # st.write(f"DEBUG: loại dữ liệu của col là {type(col)}, giá trị: {col}")
-            
-            # Kiểm tra nếu col là dictionary thì mới lấy "notes"
+            # Kiểm tra an toàn: chỉ lấy dữ liệu nếu col là dict
             if isinstance(col, dict):
                 notes = col.get("notes", [])
                 note_strings = [get_symbol(get_number_from_data(n), display_mode) for n in notes]
                 notes_html = "<br>".join([f"<span class='note-number'>{n}</span>" for n in note_strings])
                 html_content += f"<td>{notes_html}</td>"
             else:
-                # Nếu col không phải dict, xử lý theo cách khác hoặc bỏ qua
-                html_content += "<td></td>"
+                html_content += "<td></td>" # Cột trống nếu dữ liệu lỗi
         
-        # Bọc thêm div wrapper để in ấn tốt hơn
+        # 2. Tạo table hoàn chỉnh cho 1 dòng (row_html)
+        row_html = f"<table class='sheet-table'><tr>{html_content}</tr></table>"
+        
+        # 3. Bọc table vào div wrapper (full_row_html)
         full_row_html = f"<div class='khuong-wrapper'>{row_html}</div>"
         
-        # (Lưu ý: Đoạn này tạo html_content cho 1 dòng nhạc)
+        # 4. Thêm vào danh sách tổng
+        all_rows.append(full_row_html)
         
-        row_html = f"<div class='khuong-wrapper'>{html_content}</div>"
-        all_rows.append(row_html)
         line_number += 2
 
     # 2. Chia các dòng nhạc vào các trang
