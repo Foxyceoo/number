@@ -296,7 +296,7 @@ if uploaded_file:
     
     # Tạo khoảng cách cố định 50px
     st.write('<div style="height: 700px;"></div>', unsafe_allow_html=True)    
-    if st.button("Tải PDF xịn"):
+    if st.button("Tải PDF"):
         # Biến full_html chỉ được tạo ra KHI NGƯỜI DÙNG BẤM NÚT
         
         full_html = style + display_html 
