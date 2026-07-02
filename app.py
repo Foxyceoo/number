@@ -112,23 +112,32 @@ def get_number_from_key(note_data):
     return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 1-15
 
 #Hiển thị
-def get_symbol(value):
-    mapping = {
-        1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7",
-        8: "1.", 9: "2.", 10: "3.", 11: "4.", 12: "5.", 13: "6.", 14: "7.",
-        15: "1.."
-    }
+def get_symbol(value, mode):
+    if mode == "1. 1.. 1...":
+        mapping = {
+            1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
+            6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
+            11: "4.", 12: "5.", 13: "6.", 14: "7.", 15: "1.."
+        }
+    elif mode == "abc":
+        mapping = {
+            1: "a1", 2: "a2", 3: "a3", 4: "a4", 5: "a5",
+            6: "b1", 7: "b2", 8: "b3", 9: "b4", 10: "b5",
+            11: "c1", 12: "c2", 13: "c3", 14: "c4", 15: "c5"
+        }
+    else: # Chế độ "1 - 15" mặc định
+        return str(value)
+        
     return mapping.get(value, str(value))
-
+    
 # 2. Thêm nút chọn chế độ vào Sidebar
-
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
-    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
+    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json", "txt"])
+    st.caption("Hãy chọn file JSON hoặc TXT của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
-    display_mode = st.radio("Chế độ hiển thị:", ["1 - 15", "1. 1.. 1..."])
+    display_mode = st.radio("Chế độ hiển thị:", ["1 - 15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
 if uploaded_file:
@@ -232,11 +241,16 @@ if uploaded_file:
             # Lấy danh sách số
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-            # --- TÍCH HỢP CHUYỂN ĐỔI ---
-            if display_mode == "1. 1.. 1...":
-                vals = [get_symbol(v) for v in raw_vals]
-            else:
+            # --- TÍCH HỢP CHUYỂN ĐỔI HIEN THỊ ---
+            for col_idx, col in enumerate(khuong_columns):
+            notes_in_col = col[1]
+            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+            
+            # --- CHỈ DÙNG ĐOẠN NÀY ĐỂ XỬ LÝ DỮ LIỆU ---
+            if display_mode == "1 - 15":
                 vals = raw_vals
+            else:
+                vals = [get_symbol(v, display_mode) for v in raw_vals]
             
             # ... (Phần logic kẻ bảng giữ nguyên)
             is_new_line = (col_idx == 0)
