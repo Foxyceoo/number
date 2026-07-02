@@ -178,7 +178,7 @@ if uploaded_file:
         iframe {
             display: block;
             margin: 0 auto !important;
-            width: 100% !important;
+            width: 94% !important;
         }
         </style>
         """,
