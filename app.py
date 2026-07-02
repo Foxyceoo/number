@@ -187,6 +187,9 @@ if uploaded_file:
 
         
     #CSS
+    # =========================================================================
+    # 2. ĐỊNH NGHĨA CSS TRANG GIẤY A4 (Đã thêm lề trang trái/phải 20px)
+    # =========================================================================
     page_style = """
     <style>
     ::-webkit-scrollbar { display: none !important; }
@@ -198,24 +201,25 @@ if uploaded_file:
         font-family: sans-serif;
         display: flex;
         flex-direction: column;
-        align-items: center; /* Giữ trang giấy luôn nằm ở trung tâm */
+        align-items: center;
         justify-content: center;
         width: 100%;
     }
     
-    /* Trang A4 chuẩn Web: Rộng cố định 794px, tràn viền bảng */
+    /* Trang A4 chuẩn Web: Thêm padding lề trái/phải 20px để tạo khoảng thở */
     .sheet-page {
         background-color: #ffffff;
-        box-sizing: border-box;
+        box-sizing: border-box; /* Giữ cố định chiều rộng 794px kể cả khi thêm padding */
         width: 794px;
         min-height: 1123px;
-        padding: 40px 0px !important; /* Tuyệt đối không để lề trái phải đè bảng nhạc */
+        padding: 40px 20px !important; /* Trên/Dưới: 40px, Trái/Phải: 20px */
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
         margin-bottom: 25px;
     }
 
+    /* Bảng nhạc co giãn ăn trọn 100% không gian còn lại sau khi đã trừ lề */
     table { 
         border-collapse: collapse !important; 
         text-align: center; 
@@ -242,7 +246,7 @@ if uploaded_file:
     
     @media print {
         body { background-color: #ffffff; padding: 0; }
-        .sheet-page { box-shadow: none; padding: 0; width: 100% !important; }
+        .sheet-page { box-shadow: none; padding: 40px 20px !important; width: 100% !important; }
         .sidebar, header, .stAppDeployButton, footer { display: none !important; }
         @page { size: A4; margin: 1cm 0cm 1cm 0cm; }
     }
