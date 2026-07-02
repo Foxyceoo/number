@@ -225,14 +225,6 @@ with st.sidebar:
                 st.session_state.selected_song_index = idx
                 st.rerun()
             
-            with col_del:
-                # Nút xóa x là text thuần màu đỏ, không bị lệch dòng
-                if st.button("✕", key=f"del_{idx}"):
-                    # Mẹo xóa file khỏi danh sách của bộ uploader mặc định
-                    uploaded_files.pop(idx)
-                    if st.session_state.selected_song_index >= len(uploaded_files):
-                        st.session_state.selected_song_index = max(0, len(uploaded_files) - 1)
-                    st.rerun()
 # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
 # # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
 # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
