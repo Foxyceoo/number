@@ -158,10 +158,10 @@ with st.sidebar:
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-if uploaded_file:
-    data = json.load(uploaded_file)
-    song_data = data[0]
-    song_name = uploaded_file.name.replace(".json", "")
+# Thay vì if uploaded_file: thì dùng:
+if st.session_state.song_data_content is not None:
+    data = st.session_state.song_data_content
+    song_name = st.session_state.file_name_info.replace(".json", "")
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
