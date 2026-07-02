@@ -131,10 +131,27 @@ def get_symbol(value, mode):
     return mapping.get(value, str(value))
 
 # 2. Thêm nút chọn chế độ vào Sidebar
+if 'song_data_content' not in st.session_state:
+    st.session_state.song_data_content = None
+if 'file_name_info' not in st.session_state:
+    st.session_state.file_name_info = None
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
+    
+    # Widget file_uploader không cần key cố định để có thể reset
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
+    
+    # Logic: Nếu có file mới được upload, lưu vào session_state
+    if uploaded_file is not None:
+        st.session_state.song_data_content = json.load(uploaded_file)
+        st.session_state.file_name_info = uploaded_file.name
+    
+    # Logic: Nếu bấm "x" ở widget (uploaded_file thành None), xóa dữ liệu đã lưu
+    if uploaded_file is None:
+        # Nếu muốn xóa hẳn dữ liệu khi bấm 'x' ở file_uploader thì dùng dòng dưới:
+        # st.session_state.song_data_content = None 
+        pass
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
