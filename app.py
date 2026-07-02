@@ -194,7 +194,7 @@ if uploaded_file:
 
     @media print {{
         .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
-        @page {{ size: A4; margin: 1cm 1.2cm 1cm 0.8cm; }}
+        @page {{ size: A4; margin: 1cm 2cm 1cm 0.8cm; }}
         
         /* Ẩn các thứ không cần thiết */
         .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
