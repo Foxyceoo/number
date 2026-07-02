@@ -145,25 +145,21 @@ if uploaded_file:
     data = json.load(uploaded_file)
     song_data = data[0]
     song_name = uploaded_file.name.replace(".json", "")
-    
-    # 1. Lấy danh sách cột thô từ file JSON
-    raw_columns = song_data.get("columns", [])
+    columns = song_data.get("columns", [])
     bits_per_page = 32
     
-    # 2. LOGIC TÌM SỐ LỚN NHẤT ĐỂ XÁC ĐỊNH ĐỘ DÀI FULL BÀI
-    if raw_columns:
-        # Tìm chỉ số cột (bit) lớn nhất xuất hiện trong dữ liệu (col[0] là vị trí của cột đó trong bài)
-        max_bit_index = max([col[0] for col in raw_columns])
-        
-        # Tạo ra một mảng danh sách đầy đủ từ bit 0 đến bit lớn nhất (mặc định ban đầu là trống)
-        columns = [[i, []] for i in range(max_bit_index + 1)]
-        
-        # Đổ dữ liệu nốt nhạc thô từ JSON vào đúng vị trí của nó trong mảng đầy đủ vừa tạo
-        for col in raw_columns:
-            bit_pos = col[0]
-            columns[bit_pos] = col
-    else:
-        columns = []
+    # Hàm lấy số thuần (cũ)
+    def get_number_from_key(note_data):
+        pitch = int(note_data[0])
+        return pitch + 1
+    
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+    columns = song_data.get("columns", [])
+    bits_per_page = 32
+    
+    def get_number_from_data(note_data):
+        # note_data là list [pitch, key]
+        return int(note_data[1])
         
     #CSS
     style = """
