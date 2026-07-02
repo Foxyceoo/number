@@ -128,7 +128,7 @@ with st.sidebar:
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
-    display_mode = st.radio("Chế độ hiển thị:", ["Số thuần", "Sheet 1-15"])
+    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1..."])
     st.markdown("---")
 
 if uploaded_file:
