@@ -185,6 +185,16 @@ if uploaded_file:
         overflow: hidden;
     }}
 
+    .page-a4 {{
+        width: 210mm; /* Kích thước chuẩn A4 */
+        min-height: 297mm;
+        padding: 20mm;
+        margin: 10px auto;
+        background: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+        page-break-after: always;
+    }}
     .note-number {{ 
         font-size: 15px !important; 
         font-weight: bold !important; 
@@ -209,11 +219,19 @@ if uploaded_file:
             break-inside: avoid !important; 
             margin-bottom: 20px !important;
          }}
+
+         body {{ background: none; }}
+        .page-a4 {{
+            box-shadow: none;
+            margin: 0;
+        }}
          
         /* Ép bảng luôn nằm trọn vẹn */
         table {{ 
-            width: 100% !important; 
-            table-layout: fixed !important; 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin-bottom: 20px;
+            page-break-inside: avoid;
         }}
 
         /* Giữ số ở cỡ nhỏ vừa đọc */
