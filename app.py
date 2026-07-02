@@ -351,12 +351,12 @@ if uploaded_file:
         all_khuong_html.append(html_content)
         
     # =========================================================================
-    # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN ĐỂ ĐỦ 5 DÒNG
+    # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN (8 DÒNG/TRANG)
     # =========================================================================
     display_html = ""
-    lines_per_page = 8
+    lines_per_page = 8  # Đã đổi thành 8 dòng theo ý bạn nè!
     
-    # Danh sách chứa HTML của từng trang sau khi gom đủ 5 dòng
+    # Danh sách chứa HTML của từng trang sau khi gom đủ 8 dòng
     pages_list = []
     
     for idx in range(0, len(all_khuong_html), lines_per_page):
@@ -368,7 +368,7 @@ if uploaded_file:
         for khuong_html in chunk:
             page_content += f"<div class='khuong-wrapper'>{khuong_html}</div>"
         
-        # 2. TRƯỜNG HỢP TRANG CUỐI THIẾU DÒNG: Tự động bù các khuông nhạc ẩn
+        # 2. TRƯỜNG HỢP TRANG CUỐI THIẾU DÒNG: Tự động bù các khuông nhạc ẩn cho đủ 8 dòng
         if len(chunk) < lines_per_page:
             needed_lines = lines_per_page - len(chunk)
             
@@ -379,9 +379,9 @@ if uploaded_file:
                 empty_table += f"<td style='width: {cell_width_pct}%; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'><div style='min-height: 60px;'></div></td>"
             empty_table += "</tr></table>"
             
-            # Bù thêm số dòng ẩn cần thiết bằng cách ẩn visibility (vẫn chiếm không gian nhưng không hiện hình)
+            # Bù thêm số dòng ẩn cần thiết
             for _ in range(needed_lines):
-                page_content += f"<div class='khuong-wrapper' style='visibility: hidden; margin-bottom: 35px !important;'>{empty_table}</div>"
+                page_content += f"<div class='khuong-wrapper' style='visibility: hidden;'>{empty_table}</div>"
         
         page_content += "</div>"
         pages_list.append(page_content)
@@ -389,9 +389,9 @@ if uploaded_file:
     # Chuỗi HTML đầy đủ để hiển thị trên Web xem trước
     html_to_render = page_style + "".join(pages_list)
     
-    # Tính chiều cao hiển thị trên web
+    # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
-    calculated_height = total_pages * 1150 + 100
+    calculated_height = total_pages * 1200 + 100
     
     # Render nội dung chính lên màn hình Web hiển thị
     components.html(html_to_render, height=calculated_height, scrolling=False)
