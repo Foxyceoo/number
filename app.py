@@ -159,8 +159,8 @@ if st.session_state.uploaded_data is not None:
 
 if uploaded_file:
     data = json.load(uploaded_file)
-    song_data = data[0]
-    song_name = uploaded_file.name.replace(".json", "")
+    song_data = st.session_state.current_song
+    song_name = song_data.get("name", "Bài hát không tên")
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
