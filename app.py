@@ -225,7 +225,11 @@ if uploaded_file:
         box-sizing: border-box;
         width: 794px;
         min-height: 1123px;
-        padding: 40px 0px !important; /* Trả về 0px vì chúng ta đã đổi chiến thuật dùng margin cho table */
+        
+        /* CŨ: padding: 40px 0px !important; */
+        /* MỚI: Tăng lề trên và lề dưới lên 60px để tạo khoảng trống thoáng đãng */
+        padding: 60px 0px !important; 
+        
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
