@@ -168,16 +168,24 @@ if uploaded_file:
     style = """
     <style>
     ::-webkit-scrollbar { display: none !important; }
-    html, body { width: 100%; margin: 0; padding: 0; }
-
-    /* Định dạng khung trang A4 chuẩn hiển thị trên Web */
+    body { 
+        background-color: #f0f2f6; 
+        margin: 0; 
+        padding: 20px;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+    }
+    
+    /* Khung trang A4 Web chuẩn 96 DPI, SÁT LỀ TUYỆT ĐỐI */
     .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
-        width: 794px; /* Chiều rộng chuẩn A4 trên Web (96 DPI) */
-        min-height: 1123px; /* Chiều cao chuẩn A4 trên Web */
-        padding: 40px 0px !important; /* XÓA BỎ CĂN LỀ TRÁI PHẢI (= 0px) */
-        margin: 0 auto 20px auto;
+        width: 794px;
+        min-height: 1123px;
+        padding: 40px 0px !important; /* Không căn lề trái phải */
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
@@ -205,12 +213,12 @@ if uploaded_file:
         break-inside: avoid;
         page-break-inside: avoid;
     }
-
+    
     @media print {
+        body { background-color: #ffffff; padding: 0; }
+        .sheet-page { box-shadow: none; padding: 0; width: 100% !important; }
         .sidebar, header, .stAppDeployButton, footer { display: none !important; }
-        @page { size: A4; margin: 1cm 0cm 1cm 0cm; } /* Xóa lề khi in ấn */
-        .sheet-page { width: 100% !important; box-shadow: none !important; padding: 0 !important; }
-        table { page-break-inside: avoid !important; break-inside: avoid !important; }
+        @page { size: A4; margin: 1cm 0cm 1cm 0cm; }
     }
     </style>
     """
