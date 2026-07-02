@@ -206,17 +206,18 @@ if uploaded_file:
         /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
         .khuong-wrapper {{
             display: block !important;
+            break-inside: avoid !important; /* Quan trọng */
             page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            margin-bottom: 15px !important;
+            margin-bottom: 20px !important;
+            width: 100% !important;
          }}
          
         /* Ép bảng luôn nằm trọn vẹn */
         table {{ 
             width: 100% !important; 
             table-layout: fixed !important; 
-            page-break-inside: avoid !important; 
             break-inside: avoid !important;
+            page-break-inside: avoid !important;
         }}
 
         /* Giữ số ở cỡ nhỏ vừa đọc */
