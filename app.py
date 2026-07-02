@@ -5,8 +5,10 @@ import math
 import time
 import pyrebase
 import requests
+import os
 import streamlit.components.v1 as components
 
+SHEET_DIR = "Downloads/sheetkynber"
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
@@ -190,54 +192,38 @@ with st.sidebar:
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
-    # --- Danh sách bài hát Custom (Không còn nút xóa X) ---
-    st.write("**Danh sách bài hát:**")
-    
-    # CSS chỉ giữ lại phần căn chỉnh nút bài hát, bỏ qua phần nút xóa
-    st.markdown("""
-        <style>
-        /* Nút bài hát vẫn giữ nguyên sự mượt mà */
-        div[data-testid="stColumn"] button {
-            border: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            line-height: 40px !important;
-            font-size: 16px !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    # --- Danh sách bài hát (Đọc từ thư mục cố định) ---
+st.write("**Danh sách bài hát:**")
 
-    if not uploaded_files:
-        st.info("Chưa có bài hát nào được tải lên.")
-    else:
-        # Khởi tạo index
-        if "selected_song_index" not in st.session_state:
-            st.session_state.selected_song_index = 0
+# Lấy danh sách file .json từ thư mục
+if os.path.exists(SHEET_DIR):
+    all_files = [f for f in os.listdir(SHEET_DIR) if f.endswith('.json')]
+else:
+    all_files = []
+    st.warning("Không tìm thấy thư mục 'sheetkynber'!")
 
-        # Duyệt qua danh sách file
-        for idx, current_file in enumerate(uploaded_files):
-            display_name = current_file.name.replace(".json", "").replace("_", " ")
-            is_current = (st.session_state.selected_song_index == idx)
-            button_label = f"**{display_name}**" if is_current else f"**{display_name}**"
-            
-            # Giờ chỉ còn 1 cột duy nhất cho nút bài hát, không còn cột nút xóa nữa
-            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
-                st.session_state.selected_song_index = idx
-                st.rerun()
-            
-# Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
-# # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
-# Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
-if uploaded_files:
-    if st.session_state.selected_song_index >= len(uploaded_files):
-        st.session_state.selected_song_index = 0
+if not all_files:
+    st.info("Thư mục trống hoặc chưa tồn tại.")
+else:
+    if "selected_song" not in st.session_state:
+        st.session_state.selected_song = all_files[0]
+
+    for file_name in all_files:
+        display_name = file_name.replace(".json", "").replace("_", " ")
+        is_current = (st.session_state.selected_song == file_name)
+        button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
         
-    current_selected_file = uploaded_files[st.session_state.selected_song_index]
-    
-    # Tiếp tục luồng xử lý JSON của cậu
-    data = json.load(current_selected_file)
-    song_data = data[0]
-    song_name = current_selected_file.name.replace(".json", "")
+        if st.button(button_label, key=f"btn_{file_name}", use_container_width=True):
+            st.session_state.selected_song = file_name
+            st.rerun()
+
+# --- Logic đọc dữ liệu cho bài được chọn ---
+if "selected_song" in st.session_state:
+    file_path = os.path.join(SHEET_DIR, st.session_state.selected_song)
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        song_data = data[0]
+        song_name = st.session_state.selected_song.replace(".json", "")
     
  
     raw_columns = song_data.get("columns", [])
