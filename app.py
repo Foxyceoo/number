@@ -397,47 +397,61 @@ if uploaded_file:
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
     # =========================================================================
-        # 6. XỬ LÝ IN ẤN CHUẨN - KHÔNG BỊ KẸT KHI BẤM LẠI
-        # =========================================================================
-        st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
-        
-        # Khởi tạo trạng thái kích hoạt in nếu chưa có
-        if "trigger_print" not in st.session_state:
-            st.session_state.trigger_print = False
+    # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
+    # =========================================================================
+    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
+    
+    # 1. Khởi tạo trạng thái kích hoạt in nếu chưa tồn tại
+    if "trigger_print" not in st.session_state:
+        st.session_state.trigger_print = False
 
-        if st.button("Xuất PDF", key="btn_to_pdf_layout"):
+    # 2. Khi bấm nút, chỉ bật cờ trigger lên chứ không render components luôn tại đây
+    if st.button("Xuất PDF", key="btn_to_pdf_layout"):
+        if not pages_list:
+            st.error("Không có dữ liệu trang để in!")
+        else:
             st.session_state.trigger_print = True
 
-        # Nếu trạng thái in được kích hoạt
-        if st.session_state.trigger_print:
-            html_for_print = page_style + "".join(pages_list)
-            safe_html_json = json.dumps(html_for_print)
+    # 3. Khi cờ trigger được bật, tiến hành sinh JS với key độc nhất
+    if st.session_state.get("trigger_print", False):
+        # Giữ nguyên toàn bộ tất cả các trang, không trừ trang nào cả
+        html_for_print = page_style + "".join(pages_list)
+        
+        # Sử dụng json.dumps để mã hóa an toàn tuyệt đối, không lo lỗi ký tự đặc biệt
+        import json
+        safe_html_json = json.dumps(html_for_print)
+        
+        # Tạo một mã số duy nhất dựa trên thời gian để ép Streamlit tạo mới component HTML
+        print_id = int(time.time())
+        
+        # Đoạn lệnh JS mở cửa sổ mới chứa trọn vẹn nội dung và kích hoạt lệnh in
+        js_code_print = f"""
+        <script>
+        (function() {{
+            // ID duy nhất của lượt in này: {print_id}
+            var htmlContent = {safe_html_json};
             
-            # Tạo một timestamp độc nhất để ép trình duyệt phải chạy lại JS mỗi lần bấm
-            print_id = int(time.time())
+            // Mở cửa sổ in mới
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) {{
+                alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
+                return;
+            }}
             
-            js_code_print = f"""
-            <script>
-            (function() {{
-                // ID duy nhất của lượt in này: {print_id}
-                var htmlContent = {safe_html_json};
-                var printWindow = window.open('', '_blank');
-                if (!printWindow) {{
-                    alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
-                    return;
-                }}
-                printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
-                printWindow.document.close();
-                printWindow.focus();
-                setTimeout(function() {{
-                    printWindow.print();
-                    printWindow.close();
-                }}, 500);
-            }})();
-            </script>
-            """
-            # Truyền thêm tham số key động dựa trên thời gian để Streamlit reset hoàn toàn component HTML
-            components.html(js_code_print, height=0, key=f"print_component_{print_id}")
+            printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
             
-            # Reset lại trạng thái để sẵn sàng cho lần bấm tiếp theo
-            st.session_state.trigger_print = False
+            // Chờ 500ms để trình duyệt tải xong CSS rồi tự động gọi hộp thoại In
+            setTimeout(function() {{
+                printWindow.print();
+                printWindow.close();
+            }}, 500);
+        }})();
+        </script>
+        """
+        # Truyền thêm key động dựa vào print_id để giải phóng component cũ
+        components.html(js_code_print, height=0, key=f"print_component_{print_id}")
+        
+        # 4. Tắt cờ trigger để sẵn sàng đón nhận lượt bấm tiếp theo của cậu
+        st.session_state.trigger_print = False
