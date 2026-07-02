@@ -222,65 +222,41 @@ if uploaded_file:
        }}
     </style>
     """
-    
-    all_khuong_html = []
+    # --- LOGIC CHIA TRANG A4 ---
+    lines_per_page = 10  # Số dòng nhạc bạn muốn trên 1 trang
+    all_pages = []
+    current_page = []
     line_number = 1
     
+    # 1. Tạo danh sách các dòng nhạc trước
+    all_rows = [] 
     for i in range(0, len(columns), bits_per_page):
-        khuong_columns = columns[i : i + bits_per_page]
+        # ... (giữ nguyên đoạn tạo html_content từ code cũ của bạn) ...
+        # (Lưu ý: Đoạn này tạo html_content cho 1 dòng nhạc)
         
-        # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
-        if len(khuong_columns) < bits_per_page:
-            needed = bits_per_page - len(khuong_columns)
-            for _ in range(needed):
-                khuong_columns.append([0, []])
-
-        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
-        
-        for col_idx, col in enumerate(khuong_columns):
-            notes_in_col = col[1]
-            # Lấy danh sách số
-            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
-            
-            # --- TÍCH HỢP CHUYỂN ĐỔI ---
-            if display_mode == "1. 1.. 1..." or display_mode == "abc":
-                vals = [get_symbol(v, display_mode) for v in raw_vals]
-            else:
-                vals = raw_vals
-            
-            # ... (Phần logic kẻ bảng giữ nguyên)
-            is_new_line = (col_idx == 0)
-            is_beat_4 = ((col_idx + 1) % 8 == 0)
-            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
-            border_left = "0.5px solid #00008c" if is_new_line else "none"
-
-            if vals:
-                # Dùng join để nối các số/ký hiệu
-                all_nums = "<br>".join(map(str, vals))
-                cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
-                    <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
-                </div>
-                """
-            else:
-                cell_content = ""
-
-            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
-        
-        html_content += "</tr></table>"
-        all_khuong_html.append(html_content)
+        row_html = f"<div class='khuong-wrapper'>{html_content}</div>"
+        all_rows.append(row_html)
         line_number += 2
-        
-    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
-    
-    # Render HTML
-    for khuong_html in all_khuong_html:
-        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
+    # 2. Chia các dòng nhạc vào các trang
+    for i in range(0, len(all_rows), lines_per_page):
+        all_pages.append(all_rows[i : i + lines_per_page])
+
+    # 3. Render HTML với cấu trúc container A4
+    display_html = "<div class='a4-container'>"
+    for page in all_pages:
+        display_html += "<div class='a4-page'>"
+        for row in page:
+            display_html += row
+        display_html += "</div>" # Đóng trang A4
+    display_html += "</div>"
+
+    # Kết hợp với CSS cũ của bạn (cần thêm CSS .a4-page và .a4-container vào)
     html_to_render = style + display_html
     
-    total_height = (len(all_khuong_html) * 110) + 200
-    components.html(html_to_render, height=total_height, scrolling=False)
+    # Tính toán chiều cao (cho phép cuộn nhẹ hoặc fix cứng)
+    total_height = (len(all_pages) * 1150) # 1150px là chiều cao ước tính cho 1 trang A4
+    components.html(html_to_render, height=total_height, scrolling=True)
 
     
     # Tạo khoảng cách cố định 50px
