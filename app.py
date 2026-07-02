@@ -257,14 +257,14 @@ if uploaded_file:
             is_beat_4 = ((col_idx + 1) % 8 == 0)
             
             # Cấu hình vạch nhịp dọc màu xanh
-            border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
-            border_left = "1.5px solid #00008c" if is_new_line else "none"
+            border_right = "1px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
+            border_left = "1px solid #00008c" if is_new_line else "none"
 
             if vals:
                 all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 45px;'>
-                    <div style='font-size: 10.5px; font-weight: bold; line-height: 1.2; text-align: center;'>{all_nums}</div>
+                    <div style='font-size: 10px; font-weight: bold; line-height: 1.2; text-align: center;'>{all_nums}</div>
                 </div>
                 """
             else:
