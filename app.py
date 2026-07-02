@@ -205,18 +205,15 @@ if uploaded_file:
         
         /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
         .khuong-wrapper {{
-            display: block !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            margin-bottom: 15px !important;
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important; 
+            margin-bottom: 20px !important;
          }}
          
         /* Ép bảng luôn nằm trọn vẹn */
         table {{ 
             width: 100% !important; 
             table-layout: fixed !important; 
-            page-break-inside: avoid !important; 
-            break-inside: avoid !important;
         }}
 
         /* Giữ số ở cỡ nhỏ vừa đọc */
@@ -274,17 +271,16 @@ if uploaded_file:
         all_khuong_html.append(html_content)
         line_number += 2
         
-    display_html = f"<h1 style='text-align: center;'>{song_name}</h1>"
+    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
     
     # Render HTML
     for khuong_html in all_khuong_html:
-        # Bọc mỗi table vào một thẻ div có class cố định
         display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
-        html_to_render = style + display_html
+    html_to_render = style + display_html
     
-        total_height = (len(all_khuong_html) * 110) + 200
-        components.html(html_to_render, height=total_height, scrolling=False)
+    total_height = (len(all_khuong_html) * 110) + 200
+    components.html(html_to_render, height=total_height, scrolling=False)
 
     
     # Tạo khoảng cách cố định 50px
