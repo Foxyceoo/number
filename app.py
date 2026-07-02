@@ -41,17 +41,7 @@ check_login()
 
 #Lời chào sau đăng nhập
 if st.session_state.get('logged_in'):
-    # Tạo một vùng chứa trống
-    placeholder = st.empty()
-    
-    # Hiển thị lời chào trong vùng chứa đó
-    placeholder.title(f"Hello {st.session_state.user_name}!")
-    
-    # Sử dụng thư viện time để chờ 3 giây
-    import time
-    time.sleep(3)
-    
-    # Xóa sạch nội dung trong vùng chứa đó
+    st.toast(f"Hello {st.session_state.user_name}!", icon="👋") chứa đó
     placeholder.empty()"
 
 # Hàm chuyển đổi Key thành số 1-15
