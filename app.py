@@ -147,16 +147,19 @@ if uploaded_file:
     song_name = uploaded_file.name.replace(".json", "")
     columns = song_data.get("columns", [])
     bits_per_page = 32
-    
+  
+
     # Hàm lấy số thuần (cũ)
     def get_number_from_key(note_data):
         pitch = int(note_data[0])
         return pitch + 1
     
+
     # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
+
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
