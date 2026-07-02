@@ -147,30 +147,26 @@ if uploaded_file:
     columns = []
 
     if file_ext == "json":
-        data = json.load(uploaded_file)
-        song_data = data[0]
-        columns = song_data.get("columns", [])
+         data = json.load(uploaded_file)
+         song_data = data[0]
+         columns = song_data.get("columns", [])
     
-   elif file_ext == "txt":
-        # Đọc nội dung file dưới dạng text
-        content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-        try:
-            # Vì nội dung là JSON, ta parse nó bằng thư viện json
-            data = json.loads(content)
-            # Truy cập vào list songNotes bên trong
-            song_data = data[0]
-            raw_notes = song_data.get("songNotes", [])
+     elif file_ext == "txt":  # <--- Dòng này phải thẳng hàng với 'if' phía trên
+         content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
+         try:
+             data = json.loads(content)
+             song_data = data[0]
+             raw_notes = song_data.get("songNotes", [])
             
-            # Chuyển đổi sang định dạng columns để logic sau đó vẫn chạy đúng
-            # Định dạng yêu cầu: [time, [[pitch, key_str]]]
-            for n in raw_notes:
-                key_str = n["key"]
-                # Tách số từ chuỗi "1Key4" -> pitch = 4-1 = 3
-                pitch = int(key_str.split("Key")[1]) - 1
-                columns.append([n["time"], [[pitch, key_str]]])
-        except Exception as e:
-            st.error(f"Lỗi khi đọc định dạng file: {e}")
-            st.stop()
+             for n in raw_notes:
+                 key_str = n["key"]
+                 # Cẩn thận: kiểm tra nếu chuỗi chứa "Key" mới thực hiện lệnh dưới
+                 if "Key" in key_str:
+                     pitch = int(key_str.split("Key")[1]) - 1
+                     columns.append([n["time"], [[pitch, key_str]]])
+         except Exception as e:
+             st.error(f"Lỗi khi đọc định dạng file: {e}")
+             st.stop()
 
     # Kiểm tra nếu dữ liệu rỗng
     if not columns:
