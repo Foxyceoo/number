@@ -151,7 +151,7 @@ if uploaded_file:
     for khuong_html in all_khuong_html:
         display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
-    html_to_render = style + display_html + footer_link
+    html_to_render = style + display_html
     
     total_height = (len(all_khuong_html) * 110) + 200
     components.html(html_to_render, height=total_height, scrolling=False)
