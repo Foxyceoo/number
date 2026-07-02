@@ -171,7 +171,7 @@ if uploaded_file:
 
             # Logic kẻ bảng
             is_new_line = (col_idx == 0)
-            is_beat_4 = ((col_idx + 1) % 4 == 0)
+            is_beat_4 = ((col_idx + 1) % 12 == 0)
             border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
             border_left = "0.5px solid #00008c" if is_new_line else "none"
 
