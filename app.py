@@ -165,7 +165,7 @@ if uploaded_file:
             # Logic kẻ bảng
             is_new_line = (col_idx == 0)
             is_beat_4 = ((col_idx + 1) % 4 == 0)
-            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #d8d8d8"
+            border_right = "2px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #d8d8d8"
             border_left = "0.5px solid #00008c" if is_new_line else "none"
 
             # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
@@ -193,7 +193,7 @@ if uploaded_file:
         
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
-        line_number += 1
+        line_number += 2
         
     display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
     
