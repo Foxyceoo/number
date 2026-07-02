@@ -78,41 +78,29 @@ if st.session_state.user is not None:
             st.session_state.show_change_password = True
             
         # Logic đổi mật khẩu
-        if st.button("Xác nhận đổi"):
-            try:
-                # Lấy idToken từ session
-                id_token = st.session_state.user['idToken']
-                
-                # URL API cập nhật tài khoản của Firebase
-                api_key = st.secrets["FIREBASE_API_KEY"]
-                api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
-                
-                payload = {
-                    "idToken": id_token,
-                    "password": new_password,
-                    "returnSecureToken": True
-                }
-                
-                # Gửi request
-                response = requests.post(api_url, json=payload)
-                
-                # Kiểm tra kết quả
+        if st.session_state.get("show_change_password", False):
+            new_password = st.text_input("Nhập mật khẩu mới", type="password")
+            if st.button("Xác nhận đổi"):
                 try:
+                    id_token = st.session_state.user['idToken']
+                    api_key = st.secrets["FIREBASE_API_KEY"]
+                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
+                    
+                    response = requests.post(api_url, json=payload)
+                    
                     if response.status_code == 200:
                         st.success("Đổi mật khẩu thành công!")
                         st.session_state.show_change_password = False
                         st.rerun()
                     else:
-                        # Xử lý khi Firebase trả về lỗi
                         error_data = response.json()
-                        st.error(f"Lỗi từ Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                        st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                        
                 except Exception as e:
-                    # Xử lý khi có lỗi kết nối hoặc lỗi xử lý dữ liệu
-                    st.error(f"Lỗi kết nối hoặc xử lý: {e}")
+                    st.error(f"Lỗi hệ thống: {e}")
 
-                st.markdown("---")
-            
-        # Nút đăng xuất để bảo mật hơn
+        st.markdown("---")
         if st.button("Đăng xuất"):
             st.session_state.user = None
             st.rerun()
