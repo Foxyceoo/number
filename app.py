@@ -196,44 +196,46 @@ with st.sidebar:
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
-    # --- Danh sách bài hát (Đọc từ thư mục cố định - SỬA LỖI) ---
+    # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
     st.write("**Danh sách bài hát:**")
+    
+    # 1. Nút upload file
+    uploaded_files = st.file_uploader(
+        "Chọn file JSON để tải lên!",
+        type=["json"],
+        accept_multiple_files=True,
+        label_visibility="collapsed"
+    )
 
-    # 1. Đọc file từ thư mục và gán vào biến all_files
-    all_files = [f for f in os.listdir(SHEET_DIR) if f.endswith('.json')]
-
-    # 2. Kiểm tra nếu thư mục trống thì tạo file hướng dẫn
-    if not all_files:
-        if not os.path.exists(os.path.join(SHEET_DIR, "Huong_dan.json")):
-            with open(os.path.join(SHEET_DIR, "Huong_dan.json"), "w", encoding="utf-8") as f:
-                f.write('[{"note": "Chào mừng cậu đến với sheetkynber!"}]')
-        all_files = ["Huong_dan.json"] # Cập nhật lại list sau khi tạo file
-        st.info("Thư mục trống, đã tạo file hướng dẫn.")
+    # 2. Khởi tạo trạng thái chọn bài
+    if "selected_song_index" not in st.session_state:
+        st.session_state.selected_song_index = 0
 
     # 3. Hiển thị danh sách
-    if "selected_song" not in st.session_state:
-        st.session_state.selected_song = all_files[0]
+    if not uploaded_files:
+        st.info("Chưa có bài hát nào được tải lên.")
+    else:
+        for idx, current_file in enumerate(uploaded_files):
+            display_name = current_file.name.replace(".json", "").replace("_", " ")
+            is_current = (st.session_state.selected_song_index == idx)
+            button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
+            
+            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+                st.session_state.selected_song_index = idx
+                st.rerun()
 
-    for file_name in all_files:
-        display_name = file_name.replace(".json", "").replace("_", " ")
-        is_current = (st.session_state.selected_song == file_name)
-        # In đậm tên bài hát
-        button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
+# --- Logic đọc dữ liệu cho bài được chọn (Để ngoài Sidebar) ---
+if uploaded_files:
+    # Đảm bảo index không vượt quá số file hiện có
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
         
-        # Nút bấm bài hát
-        if st.button(button_label, key=f"btn_{file_name}", use_container_width=True):
-            st.session_state.selected_song = file_name
-            st.rerun()
-
-# --- Logic đọc dữ liệu cho bài được chọn (Đặt ở ngoài block with st.sidebar) ---
-if "selected_song" in st.session_state:
-    file_path = os.path.join(SHEET_DIR, st.session_state.selected_song)
-    # Thêm check tồn tại file để tránh crash khi vừa xóa/di chuyển file
-    if os.path.exists(file_path):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            song_data = data[0]
-            song_name = st.session_state.selected_song.replace(".json", "")
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
+    
+    # Đọc dữ liệu JSON
+    data = json.load(current_selected_file)
+    song_data = data[0] if isinstance(data, list) else data
+    song_name = current_selected_file.name.replace(".json", "")
     
  
     raw_columns = song_data.get("columns", [])
