@@ -227,16 +227,21 @@ with st.sidebar:
                         st.session_state.current_song = None
                     st.rerun()
 # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
-if uploaded_files:
-    if st.session_state.selected_song_index >= len(uploaded_files):
-        st.session_state.selected_song_index = 0
-        
-    current_selected_file = uploaded_files[st.session_state.selected_song_index]
+# # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
+if st.session_state.get("current_song") is not None:
+    current_song_name = st.session_state.current_song
     
-    # Tiếp tục luồng xử lý JSON của cậu
-    data = json.load(current_selected_file)
+    # Lấy dữ liệu bytes đã lưu trong session_state ra
+    file_bytes = st.session_state.playlist_files[current_song_name]
+    
+    # Giải mã bytes thành chuỗi JSON và ép kiểu về dict/list
+    data = json.loads(file_bytes.decode("utf-8"))
     song_data = data[0]
-    song_name = current_selected_file.name.replace(".json", "")
+    song_name = current_song_name.replace(".json", "")
+    
+    # =========================================================================
+    # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN... (Bắt đầu chạy tiếp từ đây)
+    # =========================================================================
     
     # =========================================================================
     # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN...
