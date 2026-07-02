@@ -150,10 +150,10 @@ with st.sidebar:
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
 
     if st.session_state.uploaded_data is not None:
-    data = st.session_state.uploaded_data
+        data = st.session_state.uploaded_data
     
-    st.markdown("---")
-    st.write("### Danh sách dữ liệu")
+        st.markdown("---")
+        st.write("### Danh sách dữ liệu")
     
     # Giả sử cấu trúc file JSON của bạn là một danh sách các bài hát
     # hoặc bạn muốn liệt kê tên các cột/thông tin trong file
