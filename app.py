@@ -24,28 +24,33 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# Quản lý trạng thái
+# 2. Quản lý trạng thái đăng nhập
 if 'user' not in st.session_state:
     st.session_state.user = None
 
-# Giao diện đăng nhập đơn giản, không lỗi thư viện
+# Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
     email = st.text_input("Email")
     password = st.text_input("Mật khẩu", type="password")
+    
     if st.button("Đăng nhập"):
         try:
+            # Sử dụng thư viện pyrebase để đăng nhập
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
             st.session_state.user_name = email.split('@')[0]
-            st.rerun()
+            st.rerun() # Tải lại trang để vào ứng dụng
         except:
             st.error("Email hoặc mật khẩu không đúng!")
 
+# Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
+    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
 else:
     st.write(f"Chào {st.session_state.user_name}!")
+    # Tiếp tục code chính của ứng dụng của bạn ở dưới này...
     
     # Hiển thị style và lời chào
     placeholder.markdown(style + f"<div class='big-colorful-hello'>Hello {st.session_state.user_name}!</div>", unsafe_allow_html=True)
