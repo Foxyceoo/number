@@ -191,6 +191,8 @@ if uploaded_file:
     .page {
         background-color: #ffffff;
         box-sizing: border-box;
+        width: 880px;
+        height: 850px;
         padding: 25px 35px;
         border-right: 1px solid #ddd;
         overflow: hidden;
@@ -260,7 +262,7 @@ if uploaded_file:
                 all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
-                    <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
+                    <div style='font-size: 10.5px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
                 </div>
                 """
             else:
