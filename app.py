@@ -84,7 +84,8 @@ if st.session_state.user is not None:
         id_token = st.session_state.user['idToken']
         
         # URL API cập nhật tài khoản của Firebase
-        api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={YOUR_FIREBASE_API_KEY}"
+        api_key = st.secrets["FIREBASE_API_KEY"]
+        api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
         
         payload = {
             "idToken": id_token,
