@@ -79,21 +79,21 @@ if st.session_state.user is not None:
             
         # Logic đổi mật khẩu
         if st.button("Xác nhận đổi"):
-    try:
-        # Lấy idToken từ session
-        id_token = st.session_state.user['idToken']
+            try:
+                # Lấy idToken từ session
+                id_token = st.session_state.user['idToken']
         
-        # URL API cập nhật tài khoản của Firebase
-        api_key = st.secrets["FIREBASE_API_KEY"]
-        api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                # URL API cập nhật tài khoản của Firebase
+                api_key = st.secrets["FIREBASE_API_KEY"]
+                api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
         
-        payload = {
-            "idToken": id_token,
-            "password": new_password,
-            "returnSecureToken": True
-        }
+                payload = {
+                    "idToken": id_token,
+                    "password": new_password,
+                    "returnSecureToken": True
+                }
         
-        response = requests.post(api_url, json=payload)
+                response = requests.post(api_url, json=payload)
         
         if response.status_code == 200:
             st.success("Đổi mật khẩu thành công!")
