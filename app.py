@@ -1,69 +1,129 @@
 import streamlit as st
+
 import pandas as pd
+
 import json
+
 import math
+
 import time
+
 import pyrebase
+
 import requests
+
 import streamlit.components.v1 as components
 
+
+
 # Sát lề trái, không thụt đầu dòng
+
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
+
+
 # Sát lề trái
+
 config = {
+
     "apiKey": st.secrets["FIREBASE_API_KEY"],
+
     "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
+
     "projectId": st.secrets["FIREBASE_PROJECT_ID"],
+
     "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
+
     "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
+
     "appId": st.secrets["FIREBASE_APP_ID"],
+
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
+
 }
 
+
+
 # Khởi tạo Auth
+
 firebase = pyrebase.initialize_app(config)
+
 auth = firebase.auth()
 
+
+
 # 2. Quản lý trạng thái đăng nhập
+
 if 'user' not in st.session_state:
+
     st.session_state.user = None
 
+
+
 # Giao diện đăng nhập đơn giản
+
 def login_form():
+
     st.title("Đăng nhập")
+
     # Dùng key để quản lý giá trị ô nhập liệu rõ ràng hơn
+
     email = st.text_input("Email", key="email_input")
+
     password = st.text_input("Mật khẩu", type="password", key="pass_input")
+
+    
 
     if st.button("Đăng nhập"):
 
         try:
+
             user = auth.sign_in_with_email_and_password(email, password)
+
             st.session_state.user = user
+
             st.session_state.user_name = email.split('@')[0]
+
             # Xóa sạch dữ liệu cũ trong bộ nhớ sau khi đăng nhập thành công
+
             st.rerun() 
-            
+
         except Exception as e:
+
             # Thông báo lỗi chi tiết hơn nếu cần
+
             st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
-     
+
+            
+
 # Luồng kiểm tra đăng nhập
+
 if st.session_state.user is None:
+
     login_form()
+
     st.stop() # Dừng ứng dụng nếu chưa đăng nhập
 
 else:
+
     # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
+
     if 'is_loaded' not in st.session_state:
+
         st.session_state.is_loaded = False
 
+    
+
     # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
+
     if not st.session_state.is_loaded:
+
         with st.spinner('Đang tải dữ liệu...'):
+
             time.sleep(2) # Giả lập thời gian tải
+
         st.session_state.is_loaded = True
+
         st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
 
     
@@ -207,74 +267,278 @@ with st.sidebar:
 
 
 if uploaded_file:
-    file_ext = uploaded_file.name.split('.')[-1].lower()
-    song_name = uploaded_file.name.rsplit('.', 1)[0]
-    columns = []
 
-    # Xử lý logic đọc file
-    if file_ext == "json":
-        data = json.load(uploaded_file)
-        if isinstance(data, list) and len(data) > 0:
-            song_data = data[0]
-            if "columns" in song_data:
-                columns = song_data["columns"]
-            elif "songNotes" in song_data:
-                for n in song_data["songNotes"]:
-                    key_str = n["key"]
-                    pitch = int(key_str.split("Key")[1]) - 1
-                    columns.append([n["time"], [[pitch, key_str]]])
-    elif file_ext == "txt":
-        content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-        for line in content.strip().split('\n'):
-            parts = line.split(',')
-            if len(parts) == 2:
-                t, k = parts
-                pitch = int(k.split("Key")[1]) - 1
-                columns.append([int(t), [[pitch, k]]])
+    data = json.load(uploaded_file)
 
-    if not columns:
-        st.error("Không thể đọc được dữ liệu từ file này! Hãy kiểm tra lại format.")
-    else:
-        # Bắt đầu phần hiển thị
-        bits_per_page = 32
-        all_khuong_html = []
-        line_number = 1
+    song_data = data[0]
+
+    song_name = uploaded_file.name.replace(".json", "")
+
+    columns = song_data.get("columns", [])
+
+    bits_per_page = 32
+
+    
+
+    # Hàm lấy số thuần (cũ)
+
+    def get_number_from_key(note_data):
+
+        pitch = int(note_data[0])
+
+        return pitch + 1
+
+    
+
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+
+    columns = song_data.get("columns", [])
+
+    bits_per_page = 32
+
+    
+
+    def get_number_from_data(note_data):
+
+        # note_data là list [pitch, key]
+
+        return int(note_data[1])
+
         
-        for i in range(0, len(columns), bits_per_page):
-            khuong_columns = columns[i : i + bits_per_page]
-            if len(khuong_columns) < bits_per_page:
-                for _ in range(bits_per_page - len(khuong_columns)):
-                    khuong_columns.append([0, []])
 
-            html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
-            
+    #CSS
+
+    style = f"""
+
+    <style>
+
+    ::-webkit-scrollbar {{ display: none !important; }}
+
+    html, body {{ width: 100%; margin: 0; padding: 0; overflow-y: hidden !important; }}
+
+
+
+    table {{ 
+
+        border-collapse: collapse; 
+
+        text-align: center; 
+
+        table-layout: fixed !important; 
+
+        width: {{margin_side}}; 
+
+        margin: 0 auto 30px auto; 
+
+        height: 60px !important; 
+
+    }}
+
+
+
+    td {{ 
+
+        padding: 2px !important;  
+
+        width: 20px !important; 
+
+        vertical-align: top !important; 
+
+        border-right: 1px solid #555; 
+
+        border-left: none; 
+
+        overflow: hidden;
+
+    }}
+
+
+
+    .note-number {{ 
+
+        font-size: 15px !important; 
+
+        font-weight: bold !important; 
+
+        line-height: 2 !important; 
+
+        display: block;
+
+    }}
+
+
+
+    @media print {{
+
+        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
+
+        @page {{ size: A4; margin: 1cm 1.2cm 1cm 0.8cm; }}
+
+        
+
+        /* Ẩn các thứ không cần thiết */
+
+        .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
+
+        
+
+        .note-number {{ font-size: 11px !important; }}
+
+        table {{ page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 56px !important; width: 100% !important; }}
+
+        td {{ width: 14px !important; min-width: 14px !important; max-width: 14px !important; padding: 0 !important; overflow: hidden !important; white-space: nowrap !important; }}
+
+        
+
+        /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
+
+        .khuong-wrapper {{
+
+            page-break-inside: avoid !important; 
+
+            break-inside: avoid !important; 
+
+            margin-bottom: 20px !important;
+
+         }}
+
+         
+
+        /* Ép bảng luôn nằm trọn vẹn */
+
+        table {{ 
+
+            width: 100% !important; 
+
+            table-layout: fixed !important; 
+
+        }}
+
+
+
+        /* Giữ số ở cỡ nhỏ vừa đọc */
+
+        .note-number {{ font-size: 10px !important; }}
+
+         
+
+       }}
+
+    </style>
+
+    """
+
+    
+
+    all_khuong_html = []
+
+    line_number = 1
+
+    
+
+    for i in range(0, len(columns), bits_per_page):
+
+        khuong_columns = columns[i : i + bits_per_page]
+
+        
+
+        # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
+
+        if len(khuong_columns) < bits_per_page:
+
+            needed = bits_per_page - len(khuong_columns)
+
+            for _ in range(needed):
+
+                khuong_columns.append([0, []])
+
+
+
+        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
+
+        
+
             for col_idx, col in enumerate(khuong_columns):
                 notes_in_col = col[1]
                 raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
-                
-                # Áp dụng chế độ hiển thị
-                if display_mode == "1 - 15":
-                    vals = raw_vals
-                else:
-                    vals = [get_symbol(v, display_mode) for v in raw_vals]
-                
-                is_new_line = (col_idx == 0)
-                is_beat_4 = ((col_idx + 1) % 8 == 0)
-                border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
-                border_left = "0.5px solid #00008c" if is_new_line else "none"
-
-                cell_content = f"<div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{'<br>'.join(map(str, vals))}</div>" if vals else ""
-                html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
             
-            html_content += "</tr></table>"
-            all_khuong_html.append(html_content)
-            line_number += 2
+            # --- CHỈ DÙNG ĐOẠN NÀY ĐỂ XỬ LÝ DỮ LIỆU ---
+            if display_mode == "1 - 15":
+                vals = raw_vals
+            else:
+                vals = [get_symbol(v, display_mode) for v in raw_vals]
             
-        display_html = f"<h1 style='text-align: center; font-size: 40px;'>{song_name}</h1>"
-        for khuong_html in all_khuong_html:
-            display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+            # ... tiếp tục giữ nguyên phần logic kẻ bảng phía dưới ...
+            is_new_line = (col_idx == 0)
+            # ...
+            
 
-        components.html(style + display_html, height=(len(all_khuong_html) * 110) + 100, scrolling=True)
+            # ... (Phần logic kẻ bảng giữ nguyên)
+
+            is_new_line = (col_idx == 0)
+
+            is_beat_4 = ((col_idx + 1) % 8 == 0)
+
+            border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
+
+            border_left = "0.5px solid #00008c" if is_new_line else "none"
+
+
+
+            if vals:
+
+                # Dùng join để nối các số/ký hiệu
+
+                all_nums = "<br>".join(map(str, vals))
+
+                cell_content = f"""
+
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
+
+                    <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
+
+                </div>
+
+                """
+
+            else:
+
+                cell_content = ""
+
+
+
+            html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
+
+        
+
+        html_content += "</tr></table>"
+
+        all_khuong_html.append(html_content)
+
+        line_number += 2
+
+        
+
+    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
+
+    
+
+    # Render HTML
+
+    for khuong_html in all_khuong_html:
+
+        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+
+
+
+    html_to_render = style + display_html
+
+    
+
+    total_height = (len(all_khuong_html) * 110) + 200
+
+    components.html(html_to_render, height=total_height, scrolling=False)
+
 
 
     
