@@ -21,14 +21,19 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
-# --- LOGIC XEM CÔNG KHAI QUA LINK ---
+# --- LOGIC XEM CÔNG KHAI ---
+# Bỏ qua yêu cầu đăng nhập nếu là chế độ xem công khai
 params = st.query_params
-is_public_view = "mode" in params # Nếu có mode trong link thì cho phép xem công khai
+is_public_view = "mode" in params 
 
-# Nếu không phải chế độ xem công khai và chưa đăng nhập thì mới bắt buộc login
-if not is_public_view and st.session_state.user is None:
-    login_form()
-    st.stop()
+# Chỉ bắt buộc đăng nhập nếu KHÔNG PHẢI chế độ công khai
+if not is_public_view:
+    if 'user' not in st.session_state:
+        st.session_state.user = None
+        
+    if st.session_state.user is None:
+        login_form()
+        st.stop()
 
 # Khởi tạo Auth
 firebase = pyrebase.initialize_app(config)
