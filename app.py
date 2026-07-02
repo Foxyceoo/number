@@ -21,6 +21,15 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
+# --- LOGIC XEM CÔNG KHAI QUA LINK ---
+params = st.query_params
+is_public_view = "mode" in params # Nếu có mode trong link thì cho phép xem công khai
+
+# Nếu không phải chế độ xem công khai và chưa đăng nhập thì mới bắt buộc login
+if not is_public_view and st.session_state.user is None:
+    login_form()
+    st.stop()
+
 # Khởi tạo Auth
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
@@ -140,6 +149,17 @@ with st.sidebar:
     # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
+
+    # Nút chọn chế độ tự chọn index dựa trên URL
+    display_mode = st.radio("Chế độ hiển thị:", options, index=options.index(default_mode))
+    
+    # Nút tạo link chia sẻ
+    if st.button("Tạo link chia sẻ"):
+        share_url = f"{st.query_params.get_all()}?mode={display_mode}" 
+        # Lưu ý: Bạn cần thay bằng URL thực tế của app bạn
+        st.info("Copy link này để gửi cho bạn bè:")
+        st.code(f"https://your-app-name.streamlit.app/?mode={display_mode}")
+        
 
 if uploaded_file:
     data = json.load(uploaded_file)
