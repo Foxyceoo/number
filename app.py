@@ -160,6 +160,29 @@ if uploaded_file:
             columns[bit_pos] = col
     else:
         columns = []
+
+    # =========================================================================
+    # TỰ ĐỘNG TÍNH SỐ DÒNG MỖI TRANG DỰA VÀO HỢP ÂM DÀY NHẤT
+    # =========================================================================
+    # Tìm số lượng số (nốt) lớn nhất xuất hiện trong cùng một cột
+    max_notes_in_col = 1
+    if raw_columns:
+        max_notes_in_col = max([len(col[1]) for col in raw_columns if len(col) > 1])
+
+    # Thiết lập số dòng mỗi trang dựa theo độ dày của cột (Như ảnh 2 và ảnh 3)
+    if max_notes_in_col <= 3:
+        lines_per_page = 10  # 3 số 1 cột -> 10 dòng/trang (ảnh 2)
+        min_cell_height = 50 # Chiều cao ô nhỏ hơn vì ít nốt xếp chồng
+        margin_bottom_val = "12px"
+    elif max_notes_in_col == 4:
+        lines_per_page = 8   # 4 số 1 cột -> 8 dòng/trang (ảnh 3)
+        min_cell_height = 65 
+        margin_bottom_val = "15px"
+    else:
+        # Dự phòng nếu hợp âm dày hơn nữa (5 nốt trở lên)
+        lines_per_page = 5   
+        min_cell_height = 80
+        margin_bottom_val = "25px"
   
 
     # Hàm lấy số thuần (cũ)
@@ -351,49 +374,44 @@ if uploaded_file:
         all_khuong_html.append(html_content)
         
     # =========================================================================
-    # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN (8 DÒNG/TRANG)
+    # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN LỰA THEO FILE
     # =========================================================================
     display_html = ""
-    lines_per_page = 8  # Đã đổi thành 8 dòng theo ý bạn nè!
+    # Biến lines_per_page lúc này đã được tự động quyết định ở trên (10 hoặc 8)
     
-    # Danh sách chứa HTML của từng trang sau khi gom đủ 8 dòng
+    # Cập nhật động chiều cao ô nhịp trong cấu trúc bảng trống để đồng bộ
+    cell_width_pct = 100.0 / bits_per_page
+    empty_table = f"<table style='table-layout: fixed; width: 94% !important; border-collapse: collapse; margin: 0 auto !important; padding: 0;'><tr>"
+    for _ in range(bits_per_page):
+        empty_table += f"<td style='width: {cell_width_pct}%; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'><div style='min-height: {min_cell_height}px;'></div></td>"
+    empty_table += "</tr></table>"
+
     pages_list = []
-    
     for idx in range(0, len(all_khuong_html), lines_per_page):
         chunk = all_khuong_html[idx : idx + lines_per_page]
         
         page_content = "<div class='sheet-page'>"
         
-        # 1. Chèn các khuông nhạc có dữ liệu thực tế vào trước
+        # 1. Chèn các khuông nhạc thực tế
         for khuong_html in chunk:
-            page_content += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+            page_content += f"<div class='khuong-wrapper' style='margin-bottom: {margin_bottom_val} !important;'>{khuong_html}</div>"
         
-        # 2. TRƯỜNG HỢP TRANG CUỐI THIẾU DÒNG: Tự động bù các khuông nhạc ẩn cho đủ 8 dòng
+        # 2. Tự động bù các khuông nhạc ẩn dựa theo lines_per_page tương ứng của bài
         if len(chunk) < lines_per_page:
             needed_lines = lines_per_page - len(chunk)
-            
-            # Tạo một khung bảng trống có kích thước y hệt khuông thật để giữ dáng hàng
-            cell_width_pct = 100.0 / bits_per_page
-            empty_table = "<table style='table-layout: fixed; width: 94% !important; border-collapse: collapse; margin: 0 auto !important; padding: 0;'><tr>"
-            for _ in range(bits_per_page):
-                empty_table += f"<td style='width: {cell_width_pct}%; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'><div style='min-height: 60px;'></div></td>"
-            empty_table += "</tr></table>"
-            
-            # Bù thêm số dòng ẩn cần thiết
             for _ in range(needed_lines):
-                page_content += f"<div class='khuong-wrapper' style='visibility: hidden;'>{empty_table}</div>"
+                page_content += f"<div class='khuong-wrapper' style='visibility: hidden; margin-bottom: {margin_bottom_val} !important;'>{empty_table}</div>"
         
         page_content += "</div>"
         pages_list.append(page_content)
         
-    # Chuỗi HTML đầy đủ để hiển thị trên Web xem trước
+    # Chuỗi HTML đầy đủ hiển thị
     html_to_render = page_style + "".join(pages_list)
     
-    # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
+    # Tính chiều cao hiển thị trên web động theo số trang
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
     
-    # Render nội dung chính lên màn hình Web hiển thị
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
     # =========================================================================
