@@ -205,34 +205,23 @@ if uploaded_file:
         
         /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
         .khuong-wrapper {{
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            margin-bottom: 10px !important;
-         }}
-
-         .song-title {{
-            display: none !important;
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important; 
+            margin-bottom: 20px !important;
          }}
          
-         /* Ép bảng luôn nằm trọn vẹn */
-         table {{ 
-             width: 100% !important; 
-             table-layout: fixed !important;
-             page-break-inside: avoid !important;
-             break-inside: avoid !important; 
-         }}
-
-         .force-page-break {{
-             page-break-after: always !important;
-             break-after: always !important;
-             display: block !important;
-         }}
-         /* Giữ số ở cỡ nhỏ vừa đọc */
-         .note-number {{ font-size: 10px !important; }}
-         
+        /* Ép bảng luôn nằm trọn vẹn */
+        table {{ 
+            width: 100% !important; 
+            table-layout: fixed !important; 
         }}
-     </style>
-     """
+
+        /* Giữ số ở cỡ nhỏ vừa đọc */
+        .note-number {{ font-size: 10px !important; }}
+         
+       }}
+    </style>
+    """
     
     all_khuong_html = []
     line_number = 1
@@ -240,51 +229,49 @@ if uploaded_file:
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
         
-        # Đệm nhịp
+        # Kiểm tra đệm nhịp (đã có trong code cũ của bạn)
         if len(khuong_columns) < bits_per_page:
             needed = bits_per_page - len(khuong_columns)
             for _ in range(needed):
                 khuong_columns.append([0, []])
 
-        # Tạo bảng
         html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
         
         for col_idx, col in enumerate(khuong_columns):
             notes_in_col = col[1]
+            # Lấy danh sách số
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
+            # --- TÍCH HỢP CHUYỂN ĐỔI ---
             if display_mode == "1. 1.. 1..." or display_mode == "abc":
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
             
+            # ... (Phần logic kẻ bảng giữ nguyên)
             is_new_line = (col_idx == 0)
             is_beat_4 = ((col_idx + 1) % 8 == 0)
             border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #ff0000"
             border_left = "0.5px solid #00008c" if is_new_line else "none"
 
             if vals:
+                # Dùng join để nối các số/ký hiệu
                 all_nums = "<br>".join(map(str, vals))
-                cell_content = f"<div style='font-size: 12px; font-weight: bold;'>{all_nums}</div>"
+                cell_content = f"""
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px;'>
+                    <div style='font-size: 12px; font-weight: bold; line-height: 1.4;'>{all_nums}</div>
+                </div>
+                """
             else:
                 cell_content = ""
 
             html_content += f"<td style='border-right: {border_right}; border-left: {border_left};'>{cell_content}</td>"
         
         html_content += "</tr></table>"
-        
-        # Thêm wrapper và kiểm tra ngắt trang sau mỗi 10 dòng
-        line_index = (i // bits_per_page) + 1
-        wrapper_html = f"<div class='khuong-wrapper'>{html_content}</div>"
-        
-        # Nếu là dòng thứ 10, 20, 30... thì chèn thêm div ngắt trang
-        if line_index % 10 == 0:
-            wrapper_html += "<div class='force-page-break'></div>"
-            
-        all_khuong_html.append(wrapper_html)
+        all_khuong_html.append(html_content)
         line_number += 2
         
-    display_html = f"<h1 style='text-align: center; font-size: 30px; margin-top: 20px; margin-bottom: 50px;'>{song_name}</h1>"
+    display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
     
     # Render HTML
     for khuong_html in all_khuong_html:
