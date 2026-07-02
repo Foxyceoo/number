@@ -9,15 +9,13 @@ import streamlit.components.v1 as components
 # 1. Thêm thư viện quản lý Cookie
 from streamlit_cookies_manager import EncryptedCookiesManager
 
-# Khởi tạo bộ quản lý Cookie (Thay chuỗi mật mã bằng bất kỳ chuỗi bảo mật nào của cậu)
+# Khởi tạo bộ quản lý Cookie
 cookies = EncryptedCookiesManager(prefix="my_sheet_app_", password="thay_doi_mat_ma_bao_mat_o_day_nhe_123456")
 if not cookies.ready():
     st.stop() # Đợi cookie sẵn sàng tải
 
-# Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
-# Sát lề trái
 config = {
     "apiKey": st.secrets["FIREBASE_API_KEY"],
     "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
@@ -35,7 +33,6 @@ auth = firebase.auth()
 # 2. KHÔI PHỤC TRẠNG THÁI ĐĂNG NHẬP TỪ COOKIE (NẾU CÓ)
 if 'user' not in st.session_state:
     if "user_token" in cookies and "user_name" in cookies:
-        # Khôi phục thông tin đăng nhập mà không bắt nhập lại form
         st.session_state.user = {"idToken": cookies["user_token"]}
         st.session_state.user_name = cookies["user_name"]
     else:
@@ -54,10 +51,10 @@ def login_form():
             user_name = email.split('@')[0]
             st.session_state.user_name = user_name
             
-            # LƯU VÀO COOKIE ĐỂ KHI F5 KHÔNG BỊ MẤT
+            # LƯU VÀO COOKIE
             cookies["user_token"] = user['idToken']
             cookies["user_name"] = user_name
-            cookies.save() # Lưu lại thay đổi vào trình duyệt
+            cookies.save() 
             
             st.rerun() 
         except Exception as e:
@@ -79,46 +76,42 @@ else:
     
     st.success(f"hello, {st.session_state.user_name}!")
 
-# Kiểm tra nếu người dùng đã đăng nhập thành công
-if st.session_state.user is not None:
-    with st.sidebar:
-        st.markdown("---")
-        st.write(f"**Người dùng:** {st.session_state.user_name}")
+# Sidebar người dùng & Đổi mật khẩu / Đăng xuất
+with st.sidebar:
+    st.markdown("---")
+    st.write(f"**Người dùng:** {st.session_state.user_name}")
+    
+    if st.button("Đổi mật khẩu"):
+        st.session_state.show_change_password = True
         
-        if st.button("Đổi mật khẩu"):
-            st.session_state.show_change_password = True
-            
-        if st.session_state.get("show_change_password", False):
-            new_password = st.text_input("Nhập mật khẩu mới", type="password")
-            if st.button("Xác nhận đổi"):
-                try:
-                    id_token = st.session_state.user['idToken']
-                    api_key = st.secrets["FIREBASE_API_KEY"]
-                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
-                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
-                    
-                    response = requests.post(api_url, json=payload)
-                    
-                    if response.status_code == 200:
-                        st.success("Đổi mật khẩu thành công!")
-                        st.session_state.show_change_password = False
-                        st.rerun()
-                    else:
-                        error_data = response.json()
-                        st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
-                        
-                except Exception as e:
-                    st.error(f"Lỗi hệ thống: {e}")
-                    
-        if st.button("Đăng xuất"):
-            st.session_state.user = None
-            # XÓA SẠCH COOKIE KHI ĐĂNG XUẤT
-            if "user_token" in cookies:
-                del cookies["user_token"]
-            if "user_name" in cookies:
-                del cookies["user_name"]
-            cookies.save()
-            st.rerun()
+    if st.session_state.get("show_change_password", False):
+        new_password = st.text_input("Nhập mật khẩu mới", type="password")
+        if st.button("Xác nhận đổi"):
+            try:
+                id_token = st.session_state.user['idToken']
+                api_key = st.secrets["FIREBASE_API_KEY"]
+                api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
+                
+                response = requests.post(api_url, json=payload)
+                if response.status_code == 200:
+                    st.success("Đổi mật khẩu thành công!")
+                    st.session_state.show_change_password = False
+                    st.rerun()
+                else:
+                    error_data = response.json()
+                    st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+            except Exception as e:
+                st.error(f"Lỗi hệ thống: {e}")
+                
+    if st.button("Đăng xuất"):
+        st.session_state.user = None
+        if "user_token" in cookies:
+            del cookies["user_token"]
+        if "user_name" in cookies:
+            del cookies["user_name"]
+        cookies.save()
+        st.rerun()
             
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
