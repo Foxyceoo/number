@@ -28,25 +28,17 @@ if 'user' not in st.session_state:
     st.session_state.user = None
 
 def login_form():
-    st.title("Đăng nhập")
-    email = st.text_input("Email")
-    password = st.text_input("Mật khẩu", type="password")
-    
-    if st.button("Đăng nhập"):
-        try:
-            user = auth.sign_in_with_email_and_password(email, password)
-            st.session_state.user_name = user['email'].split('@')[0]
-            st.success("Đăng nhập thành công!")
-            st.rerun()
-        except:
-            st.error("Sai email hoặc mật khẩu!")
+    user_info = authenticate_google(
+        client_id=st.secrets["GOOGLE_CLIENT_ID"], 
+        client_secret=st.secrets["GOOGLE_CLIENT_SECRET"]
+    )
 
-    if st.button("Tạo tài khoản mới"):
-        try:
-            auth.create_user_with_email_and_password(email, password)
-            st.success("Tạo tài khoản thành công! Hãy đăng nhập.")
-        except:
-            st.error("Lỗi: Email không hợp lệ hoặc mật khẩu quá ngắn.")
+    if user_info:
+        st.write(f"Chào {user_info['name']}!")
+        st.session_state.user = user_info
+    else:
+        st.write("Vui lòng đăng nhập bằng Google bên dưới:")
+        # Ở đây thư viện sẽ tự vẽ ra cái nút Google cho bạn
 
 # 3. Luồng chính của app
 if st.session_state.user is None:
