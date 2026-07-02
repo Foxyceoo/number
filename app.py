@@ -238,6 +238,14 @@ if uploaded_files:
     # =========================================================================
     page_style = """
     <style>
+    /* ========================================================================= */
+    /* MỚI: Ẩn danh sách file upload mặc định của Streamlit (tránh lặp 2 lần) */
+    /* ========================================================================= */
+    [data-testid="stFileUploaderFile"], 
+    [data-testid="stUploadedFile"],
+    section[data-testid="stFileUploadDropzone"] + div { 
+        display: none !important; 
+    }
     ::-webkit-scrollbar { display: none !important; }
     
     body { 
