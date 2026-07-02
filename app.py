@@ -160,9 +160,6 @@ with st.sidebar:
         
     # --- RENDER DANH SÁCH ---
     if st.session_state.uploaded_data is not None:
-        st.markdown("---")
-        st.write("### Danh sách dữ liệu")
-        st.info(f"Đang xem: {st.session_state.file_name}")
     
     st.markdown("---")
     # Nút chọn chế độ
