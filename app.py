@@ -198,30 +198,43 @@ with st.sidebar:
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
     # --- Danh sách bài hát Custom ---
+    st.markdown("""
+        <style>
+        div[data-testid="stColumn"] button {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            line-height: 40px !important; /* Cân bằng chiều cao với nút bài hát */
+            color: #ff4b4b !important;
+            font-size: 16px !important;
+        }
+        div[data-testid="stColumn"] button:hover {
+            color: #ff1a1a !important;
+            background: transparent !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
     st.write("**Danh sách bài hát:**")
     
     if not st.session_state.playlist_files:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
-        # Hiển thị vòng lặp danh sách bài hát đẹp đẽ
         for name in list(st.session_state.playlist_files.keys()):
-            # Làm sạch tên hiển thị cho nút bấm
             display_name = name.replace(".json", "").replace("_", " ")
+            is_current = (st.session_state.current_song == name)
+            button_label = f"🎵 {display_name}" if is_current else display_name
             
-            # Chia hàng thành 2 cột: Cột nút chọn bài và Cột nút xóa bài (❌)
-            col_btn, col_del = st.columns([0.85, 0.15])
+            # Chia cột: Cột nút bài hát chiếm 90%, cột nút xóa chiếm 10%
+            col_btn, col_del = st.columns([0.9, 0.1])
             
             with col_btn:
-                # Nếu bài hát đang được chọn, in đậm nút bấm lên để phân biệt
-                is_current = (st.session_state.current_song == name)
-                button_label = f"🎵 {display_name}" if is_current else display_name
-                
                 if st.button(button_label, key=f"btn_{name}", use_container_width=True):
                     st.session_state.current_song = name
-                    # (Tại đây cậu thêm logic đọc nội dung file từ st.session_state.playlist_files[name] để render sheet nhé)
             
             with col_del:
-                if st.button("❌", key=f"del_{name}", help="Xóa bài này"):
+                # Nút bấm bây giờ chỉ là chữ x màu đỏ thuần túy, tự động căn thẳng hàng
+                if st.button("✕", key=f"del_{name}"):
                     del st.session_state.playlist_files[name]
                     if st.session_state.current_song == name:
                         st.session_state.current_song = None
