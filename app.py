@@ -222,6 +222,11 @@ with st.sidebar:
             color: #ff1a1a !important;
             background: transparent !important;
         }
+
+        [data-testid="stSidebar"] {
+        min-width: 350px !important;
+        max-width: 350px !important;
+        
         </style>
     """, unsafe_allow_html=True)
 
