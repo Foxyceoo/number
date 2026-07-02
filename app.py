@@ -189,13 +189,14 @@ with st.sidebar:
     # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
     
-# --- Cấu hình File Uploader cho phép tải nhiều bài ---
+    # 1. Nút upload file
     uploaded_files = st.file_uploader(
-        "Chọn nhiều file JSON cùng lúc!",
+        "Chọn file JSON để tải lên!",
         type=["json"],
         accept_multiple_files=True,
         label_visibility="collapsed"
-        
+    )
+
     st.markdown(
         """
         <style>
@@ -263,19 +264,18 @@ with st.sidebar:
                 st.session_state.selected_song_index = idx
                 st.rerun()
 
+# --- Logic đọc dữ liệu cho bài được chọn (Để ngoài Sidebar) ---
 if uploaded_files:
-        # Cập nhật index nếu danh sách thay đổi
-        if "selected_song_index" not in st.session_state or st.session_state.selected_song_index >= len(uploaded_files):
-            st.session_state.selected_song_index = 0
-
-        for idx, current_file in enumerate(uploaded_files):
-            display_name = current_file.name.replace(".json", "").replace("_", " ")
-            is_current = (st.session_state.selected_song_index == idx)
-            button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
-            
-            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
-                st.session_state.selected_song_index = idx
-                st.rerun()
+    # Đảm bảo index không vượt quá số file hiện có
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
+        
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
+    
+    # Đọc dữ liệu JSON
+    data = json.load(current_selected_file)
+    song_data = data[0] if isinstance(data, list) else data
+    song_name = current_selected_file.name.replace(".json", "")
     
  
     raw_columns = song_data.get("columns", [])
