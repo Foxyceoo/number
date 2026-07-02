@@ -4,6 +4,7 @@ import json
 import math
 import time
 import pyrebase
+import requests
 import streamlit.components.v1 as components
 
 # Sát lề trái, không thụt đầu dòng
@@ -77,23 +78,32 @@ if st.session_state.user is not None:
             st.session_state.show_change_password = True
             
         # Logic đổi mật khẩu
-        if st.session_state.get("show_change_password", False):
-            new_password = st.text_input("Nhập mật khẩu mới", type="password")
-            if st.button("Xác nhận đổi"):
-                try:
-                    # Lấy idToken từ phiên đăng nhập hiện tại
-                    id_token = st.session_state.user['idToken']
-                    
-                    # Sử dụng hàm update_profile hoặc update_email_or_password tùy phiên bản pyrebase
-                    # Với pyrebase4, dùng:
-                    auth.update_password(id_token, new_password)
-                    
-                    st.success("Đổi mật khẩu thành công!")
-                    st.session_state.show_change_password = False
-                    st.rerun()
-                except Exception as e:
-                    # Ghi lỗi ra để kiểm tra nếu cần
-                    st.error(f"Lỗi: {e}")
+        if st.button("Xác nhận đổi"):
+    try:
+        # Lấy idToken từ session
+        id_token = st.session_state.user['idToken']
+        
+        # URL API cập nhật tài khoản của Firebase
+        api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={YOUR_FIREBASE_API_KEY}"
+        
+        payload = {
+            "idToken": id_token,
+            "password": new_password,
+            "returnSecureToken": True
+        }
+        
+        response = requests.post(api_url, json=payload)
+        
+        if response.status_code == 200:
+            st.success("Đổi mật khẩu thành công!")
+            st.session_state.show_change_password = False
+            st.rerun()
+        else:
+            error_data = response.json()
+            st.error(f"Lỗi từ Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+            
+    except Exception as e:
+        st.error(f"Lỗi kết nối: {e}")
         
         st.markdown("---")
         # Nút đăng xuất để bảo mật hơn
