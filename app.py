@@ -178,7 +178,7 @@ if uploaded_file:
         iframe {
             display: block;
             margin: 0 auto !important;
-            width: 94% !important;
+            width: 90% !important;
         }
         </style>
         """,
@@ -267,7 +267,7 @@ if uploaded_file:
                 khuong_columns.append([0, []])
 
         # MỚI: Ép chiều rộng bảng nhạc co lại còn 94% và căn giữa để tự tạo lề trái/phải đều nhau
-        html_content = "<table style='table-layout: fixed; width: 94% !important; border-collapse: collapse; margin: 0 auto !important; padding: 0;'><tr>"
+        html_content = "<table style='table-layout: fixed; width: 90% !important; border-collapse: collapse; margin: 0 auto !important; padding: 0;'><tr>"
         cell_width_pct = 100.0 / bits_per_page
 
         for col_idx, col in enumerate(khuong_columns):
