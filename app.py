@@ -80,7 +80,7 @@ if uploaded_file:
     
     # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = song_data.get("columns", [])
-    bits_per_page = song_data.get("bitsPerPage", 36)
+    bits_per_page = song_data.get("bitsPerPage", 32)
     
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
