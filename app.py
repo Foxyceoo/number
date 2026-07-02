@@ -99,8 +99,7 @@ if st.session_state.user is not None:
                         
                 except Exception as e:
                     st.error(f"Lỗi hệ thống: {e}")
-
-        st.markdown("---")
+                    
         if st.button("Đăng xuất"):
             st.session_state.user = None
             st.rerun()
