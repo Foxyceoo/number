@@ -65,6 +65,7 @@ else:
     # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
     st.success(f"hello, {st.session_state.user_name}!")
     # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
+
 # Kiểm tra nếu người dùng đã đăng nhập thành công
 if st.session_state.user is not None:
     with st.sidebar:
@@ -80,12 +81,18 @@ if st.session_state.user is not None:
             new_password = st.text_input("Nhập mật khẩu mới", type="password")
             if st.button("Xác nhận đổi"):
                 try:
-                    # Lấy user localId từ session_state.user
-                    user_id_token = st.session_state.user['idToken']
-                    auth.update_user(new_password=new_password, id_token=user_id_token)
+                    # Lấy idToken từ phiên đăng nhập hiện tại
+                    id_token = st.session_state.user['idToken']
+                    
+                    # Sử dụng hàm update_profile hoặc update_email_or_password tùy phiên bản pyrebase
+                    # Với pyrebase4, dùng:
+                    auth.update_email_or_password(id_token, password=new_password)
+                    
                     st.success("Đổi mật khẩu thành công!")
                     st.session_state.show_change_password = False
+                    st.rerun()
                 except Exception as e:
+                    # Ghi lỗi ra để kiểm tra nếu cần
                     st.error(f"Lỗi: {e}")
         
         st.markdown("---")
