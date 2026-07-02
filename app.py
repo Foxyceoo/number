@@ -6,7 +6,6 @@ import time
 import pyrebase
 import streamlit.components.v1 as components
 
-from streamlit_firebase_auth import FirebaseAuth 
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
@@ -21,43 +20,32 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
-# Sát lề trái
+# Khởi tạo Auth
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# Sát lề trái
-auth = FirebaseAuth(firebase_config)
+# Quản lý trạng thái
+if 'user' not in st.session_state:
+    st.session_state.user = None
 
-# Hiển thị nút đăng nhập Google
-user = auth.login()
+# Giao diện đăng nhập đơn giản, không lỗi thư viện
+def login_form():
+    st.title("Đăng nhập")
+    email = st.text_input("Email")
+    password = st.text_input("Mật khẩu", type="password")
+    if st.button("Đăng nhập"):
+        try:
+            user = auth.sign_in_with_email_and_password(email, password)
+            st.session_state.user = user
+            st.session_state.user_name = email.split('@')[0]
+            st.rerun()
+        except:
+            st.error("Email hoặc mật khẩu không đúng!")
 
-if user:
-    st.write(f"Chào {user['displayName']}!")
-    st.session_state.user_name = user['displayName']
-    st.session_state.logged_in = True
+if st.session_state.user is None:
+    login_form()
 else:
-    st.write("Vui lòng đăng nhập để bắt đầu.")
-
-
-#Lời chào sau đăng nhập
-if st.session_state.get('logged_in'):
-    # Tạo vùng chứa trống
-    placeholder = st.empty()
-    
-    # Định nghĩa màu sắc và kích thước bằng CSS
-    # Bạn có thể thay đổi "blue" thành màu khác như "red", "green", "orange", "purple", v.v.
-    # Hoặc dùng mã màu hex như "#FF69B4" (Hồng)
-    style = """
-    <style>
-        .big-colorful-hello {
-            text-align: center;
-            color: #00008c; /* Đổi màu tại đây */
-            font-size: 80px; /* Tăng kích thước tại đây (px) */
-            font-weight: bold;
-            margin-top: 100px; /* Khoảng cách từ trên xuống */
-        }
-    </style>
-    """
+    st.write(f"Chào {st.session_state.user_name}!")
     
     # Hiển thị style và lời chào
     placeholder.markdown(style + f"<div class='big-colorful-hello'>Hello {st.session_state.user_name}!</div>", unsafe_allow_html=True)
