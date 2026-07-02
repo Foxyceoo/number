@@ -100,7 +100,7 @@ if st.session_state.user is not None:
                 except Exception as e:
                     st.error(f"Lỗi hệ thống: {e}")
                     
-        if st.button("Đăng xuất"):
+        if st.button("Đăng logout"):
             st.session_state.user = None
             st.rerun()
             
@@ -130,11 +130,11 @@ def get_symbol(value, mode):
         
     return mapping.get(value, str(value))
 
-# 2. Thêm nút chọn chế độ vào Sidebar
-
+# ==========================================
+# GOM TOÀN BỘ SIDEBAR VÀO ĐÂY ĐỂ TRÁNH LỖI NHẢY ELEMENT
+# ==========================================
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    # Thay đổi cấu hình để nhận nhiều file cùng lúc
     uploaded_files = st.file_uploader(
         "Nhập file của bạn", 
         type=["json"], 
@@ -142,32 +142,29 @@ with st.sidebar:
     )
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
+    
     # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-if uploaded_files:
-    # 1. Khởi tạo bài hát được chọn trong session_state nếu chưa có
-    if "selected_song_index" not in st.session_state:
-        st.session_state.selected_song_index = 0
-        
-    # ĐƯA CÁC NÚT BẤM CHỌN BÀI HÁT VÀO TRONG SIDEBAR TẠI ĐÂY
-    with st.sidebar:
+    # HIỂN THỊ DANH SÁCH BÀI HÁT NGAY TRONG BLOCK SIDEBAR CHÍNH
+    if uploaded_files:
+        if "selected_song_index" not in st.session_state:
+            st.session_state.selected_song_index = 0
+            
         st.write("**Danh sách bài hát:**")
         for index, file in enumerate(uploaded_files):
             display_name = file.name.replace(".json", "")
             
-            # Nếu là file đang được chọn, nút bấm sẽ có màu xanh/đỏ nổi bật (primary)
             is_selected = st.session_state.selected_song_index == index
             btn_type = "primary" if is_selected else "secondary"
             
-            # Tạo nút bấm cho từng file
             if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
                 st.session_state.selected_song_index = index
                 st.rerun()
-            
-    # 2. Lấy dữ liệu của file đang được lựa chọn để vẽ sheet nhạc
-    # Nếu lỡ xóa file làm index vượt quá số lượng hiện tại, đưa về 0
+
+# Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
+if uploaded_files:
     if st.session_state.selected_song_index >= len(uploaded_files):
         st.session_state.selected_song_index = 0
         
@@ -196,6 +193,18 @@ if uploaded_files:
             columns[bit_pos] = col
     else:
         columns = []
+  
+
+    # Hàm lấy số thuần (cũ)
+    def get_number_from_key(note_data):
+        pitch = int(note_data[0])
+        return pitch + 1
+    
+
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+    columns = song_data.get("columns", [])
+    bits_per_page = 32
+    
 
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
@@ -274,7 +283,7 @@ if uploaded_files:
     }
 
     td { 
-        padding: 2px 0 !important;   
+        padding: 2px 0 !important;  
         vertical-align: top !important; 
         overflow: hidden;
         box-sizing: border-box !important;
@@ -361,7 +370,7 @@ if uploaded_files:
                 all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
                 <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 60px;'>
-                    <!-- Font-size 15px và line-height thoáng -->
+                    <!-- Yaoyao đã tăng font-size từ 10px lên 15px và chỉnh lại line-height cho thoáng -->
                     <div style='font-size: 15px; font-weight: bold; line-height: 1.3; text-align: center; font-family: monospace, sans-serif;'>{all_nums}</div>
                 </div>
                 """
