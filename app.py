@@ -146,15 +146,27 @@ with st.sidebar:
     if uploaded_file is not None:
         st.session_state.song_data = json.load(uploaded_file)
         st.session_state.song_name = uploaded_file.name.replace(".json", "")
-    
-    # Nút xóa dữ liệu (nếu đã có dữ liệu)
-    if st.session_state.song_data is not None:
-        if st.button("Xóa file hiện tại"):
-            st.session_state.song_data = None
-            st.session_state.song_name = None
-            st.rerun()
             
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
+
+    if st.session_state.uploaded_data is not None:
+    data = st.session_state.uploaded_data
+    
+    st.markdown("---")
+    st.write("### Danh sách dữ liệu")
+    
+    # Giả sử cấu trúc file JSON của bạn là một danh sách các bài hát
+    # hoặc bạn muốn liệt kê tên các cột/thông tin trong file
+    if isinstance(data, list):
+        # Ví dụ: Liệt kê tên các bài hát nếu mỗi phần tử trong list là 1 bài hát
+        for i, item in enumerate(data):
+            # Thay 'song_name' bằng khóa (key) thực tế trong file JSON của bạn
+            song_name = item.get("name", f"Bài hát {i+1}")
+            st.write(f"- {song_name}")
+    
+    # Hoặc nếu bạn muốn hiển thị nhanh thông tin file
+    st.info(f"Đang xem: {st.session_state.file_name}")
+    
     st.markdown("---")
     # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
