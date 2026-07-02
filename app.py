@@ -130,56 +130,23 @@ def get_symbol(value, mode):
         
     return mapping.get(value, str(value))
 
-# 1. Khởi tạo session_state (phải đồng nhất tên)
-if 'uploaded_data' not in st.session_state:
-    st.session_state.uploaded_data = None
-if 'song_data' not in st.session_state:
-    st.session_state.song_data = None
-if 'file_name' not in st.session_state:
-    st.session_state.file_name = None
-if 'song_name' not in st.session_state:
-    st.session_state.song_name = None
-
+# 2. Thêm nút chọn chế độ vào Sidebar
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
-    
-    if uploaded_file is not None:
-        st.session_state.uploaded_data = json.load(uploaded_file)
-        st.session_state.file_name = uploaded_file.name
-    elif uploaded_file is None:
-        st.session_state.uploaded_data = None
-        st.session_state.file_name = None
+    st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
+    st.markdown("---")
+    # Nút chọn chế độ
+    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
+    st.markdown("---")
 
-# 3. Xử lý Màn hình chính (Main Area - Nơi hiển thị sheet nhạc)
-# Đảm bảo khối này KHÔNG nằm trong 'with st.sidebar'
-if st.session_state.uploaded_data is not None:
-    st.write(f"### Đang hiển thị: {st.session_state.file_name}")
-    
-    # Lấy dữ liệu
-    data = st.session_state.uploaded_data
-    
-    # Code vẽ bảng/sheet của bạn ở đây
-    if isinstance(data, list) and len(data) > 0:
-        song_data = data[0]
-        # ... logic render bảng của bạn ...
-        st.write("Dữ liệu đã được tải thành công!") 
-        # (Thêm các lệnh st.table hoặc st.dataframe vào đây)
-else:
-    st.info("Hãy chọn file JSON ở thanh bên để bắt đầu!")
-        
-# 3. Sử dụng đúng tên biến đã khởi tạo
-if st.session_state.song_data is not None:
-    # Lấy dữ liệu từ state
-    data = st.session_state.song_data
-    
-    # Kiểm tra xem file có cấu trúc list không để tránh lỗi
-    if isinstance(data, list) and len(data) > 0:
-        song_data = data[0]
-        song_name = st.session_state.song_name
-        columns = song_data.get("columns", [])
-        bits_per_page = 32
+if uploaded_file:
+    data = json.load(uploaded_file)
+    song_data = data[0]
+    song_name = uploaded_file.name.replace(".json", "")
+    columns = song_data.get("columns", [])
+    bits_per_page = 32
     
     # Hàm lấy số thuần (cũ)
     def get_number_from_key(note_data):
@@ -238,7 +205,6 @@ if st.session_state.song_data is not None:
         
         /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
         .khuong-wrapper {{
-            margin-top: 50px !important;
             page-break-inside: avoid !important; 
             break-inside: avoid !important; 
             margin-bottom: 20px !important;
@@ -304,10 +270,6 @@ if st.session_state.song_data is not None:
         html_content += "</tr></table>"
         all_khuong_html.append(html_content)
         line_number += 2
-
-    # Tạo khoảng trắng 50px phía trên tên bài hát
-    st.markdown("---")
-    st.write('<div style="height: 50px;"></div>', unsafe_allow_html=True)
         
     display_html = f"<h1 style='text-align: center; font-size: 40px; margin-top: 20px; margin-bottom: 70px;'>{song_name}</h1>"
     
@@ -322,7 +284,7 @@ if st.session_state.song_data is not None:
 
     
     # Tạo khoảng cách cố định 50px
-    st.write('<div style="height: 1000px;"></div>', unsafe_allow_html=True)    
+    st.write('<div style="height: 700px;"></div>', unsafe_allow_html=True)    
     if st.button("to PDF"):
         js_code = "<script>window.parent.window.print();</script>"
         components.html(js_code, height=0)
