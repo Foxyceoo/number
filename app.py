@@ -70,10 +70,30 @@ if uploaded_file:
     @media print {{
         .sidebar, header, .stAppDeployButton, footer {{ display: none !important; }}
         @page {{ size: A4; margin: 1cm 1.2cm 1cm 0.8cm; }}
+        
+        /* Ẩn các thứ không cần thiết */
+        .sidebar, header, .stAppDeployButton, footer { display: none !important; }
+        
         .note-number {{ font-size: 11px !important; }}
         table {{ page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 56px !important; width: 100% !important; }}
         td {{ width: 14px !important; min-width: 14px !important; max-width: 14px !important; padding: 0 !important; overflow: hidden !important; white-space: nowrap !important; }}
-        .khuong-wrapper:last-child {{ padding-bottom: 250mm !important; }}
+        
+        /* Đảm bảo mỗi dòng nhạc không bị cắt ngang */
+        .khuong-wrapper {{
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important; 
+            margin-bottom: 20px !important;
+         }}
+         
+        /* Ép bảng luôn nằm trọn vẹn */
+        table {{ 
+            width: 100% !important; 
+            table-layout: fixed !important; 
+        }}
+
+        /* Giữ số ở cỡ nhỏ vừa đọc */
+        .note-number {{ font-size: 10px !important; }}
+         
         .print-footer {{ display: block !important; position: fixed !important; bottom: 10px !important; left: 10px !important; width: 100% !important; }}
     }}
     </style>
@@ -98,6 +118,13 @@ if uploaded_file:
             is_beat_4 = ((col_idx + 1) % 4 == 0)
             border_right = "0.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "0px solid #d8d8d8"
             border_left = "0.5px solid #00008c" if is_new_line else "none"
+
+            # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
+            # Kiểm tra xem khuông cuối cùng có thiếu nhịp không
+            if len(khuong_columns) < bits_per_page:
+                needed = bits_per_page - len(khuong_columns)
+                for _ in range(needed):
+                    khuong_columns.append([0, []]) # Thêm cột rỗng
 
             if vals:
                 # Dùng join để nối các số bằng thẻ <br>
