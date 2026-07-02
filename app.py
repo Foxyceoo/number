@@ -278,13 +278,13 @@ if uploaded_file:
     
     # Render HTML
     for khuong_html in all_khuong_html:
-    # Bọc mỗi table vào một thẻ div có class cố định
-    display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+        # Bọc mỗi table vào một thẻ div có class cố định
+        display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
 
-    html_to_render = style + display_html
+        html_to_render = style + display_html
     
-    total_height = (len(all_khuong_html) * 110) + 200
-    components.html(html_to_render, height=total_height, scrolling=False)
+        total_height = (len(all_khuong_html) * 110) + 200
+        components.html(html_to_render, height=total_height, scrolling=False)
 
     
     # Tạo khoảng cách cố định 50px
