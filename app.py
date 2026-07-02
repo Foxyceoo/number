@@ -152,28 +152,22 @@ if uploaded_file:
     line_number = 1
     
     # Duyệt theo từng trang (bits_per_page)
-    for i in range(0, len(columns), bits_per_page):
-        khuong_columns = columns[i : i + bits_per_page]
+    # Sửa đoạn logic kẻ bảng của bạn thành:
+    for col_idx, col in enumerate(khuong_columns):
+        # Khai báo phach dựa trên vị trí cột
+        phach = col_idx
+    
+        # Bây giờ bạn có thể dùng 'phach' thoải mái mà không bị lỗi
+        is_beat_4 = ((phach + 1) % 4 == 0)
+        is_beat_16 = ((phach + 1) % 16 == 0)
+    
+        # Xác định đường kẻ
+        border_right = "0px solid #d8d8d8"
+        if is_beat_4 or is_beat_16:
+            border_right = "0.5px solid #00008c"
         
-        html_content = f"<table><tr><td style='color: red; border: none; vertical-align: middle; font-size: 10px;'>{line_number}</td>"
-        
-        for col_idx, col in enumerate(khuong_columns):
-            # col là [time, [[pitch, key], ...]]
-            notes_in_col = col[1]
-            vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
-
-            # Logic kẻ bảng
-            is_new_line = (col_idx == 0)
-            is_beat_4 = ((col_idx + 1) % 4 == 0)
-            border_right = " 0px solid #d8d8d8"
-
-            if (phach + 1) % 4 == 0:
-                border_right = "0.5px solid #00008c"
-
-            if (phach + 1) % 16 == 0:
-                border_right = "0.5px solid #00008c"
-
-            border_left = "0.5px solid #00008c" if phach == khuong else "none"
+     v   # Logic cho đường viền trái (nếu là cột đầu tiên của khuông)
+        border_left = "0.5px solid #00008c" if col_idx == 0 else "none"
             
             # --- BỔ SUNG ĐOẠN NÀY ĐỂ ĐỆM CHO ĐỦ NHỊP ---
             # Kiểm tra xem khuông cuối cùng có thiếu nhịp không
