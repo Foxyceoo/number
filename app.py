@@ -190,7 +190,7 @@ with st.sidebar:
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
     st.write("**Chế độ hiển thị:**")
-    view_mode = st.radio(
+    display_mode = st.radio(
         "Chọn chế độ hiển thị",
         options=["1-15", "1. 1.. 1...", "abc"],
         label_visibility="collapsed"
