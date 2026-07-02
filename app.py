@@ -145,8 +145,21 @@ if uploaded_file:
     data = json.load(uploaded_file)
     song_data = data[0]
     song_name = uploaded_file.name.replace(".json", "")
-    columns = song_data.get("columns", [])
-    bits_per_page = 32
+    
+    # =========================================================================
+    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
+    # =========================================================================
+    raw_columns = song_data.get("columns", [])
+    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
+    
+    if raw_columns:
+        max_bit_index = max([col[0] for col in raw_columns])
+        columns = [[i, []] for i in range(max_bit_index + 1)]
+        for col in raw_columns:
+            bit_pos = col[0]
+            columns[bit_pos] = col
+    else:
+        columns = []
   
 
     # Hàm lấy số thuần (cũ)
