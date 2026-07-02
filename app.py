@@ -7,9 +7,10 @@ import pyrebase
 import requests
 import streamlit.components.v1 as components
 
-# 1. CẤU HÌNH & KHỞI TẠO FIREBASE
+# Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
+# Sát lề trái
 config = {
     "apiKey": st.secrets["FIREBASE_API_KEY"],
     "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
@@ -20,15 +21,18 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
+# Khởi tạo Auth
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# 2. QUẢN LÝ TRẠNG THÁI ĐĂNG NHẬP
+# 2. Quản lý trạng thái đăng nhập
 if 'user' not in st.session_state:
     st.session_state.user = None
 
+# Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
+    # Dùng key để quản lý giá trị ô nhập liệu rõ ràng hơn
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Mật khẩu", type="password", key="pass_input")
     
@@ -37,38 +41,77 @@ def login_form():
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
             st.session_state.user_name = email.split('@')[0]
+            # Xóa sạch dữ liệu cũ trong bộ nhớ sau khi đăng nhập thành công
             st.rerun() 
         except Exception as e:
+            # Thông báo lỗi chi tiết hơn nếu cần
             st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
             
+# Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
-    st.stop() 
+    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
 else:
+    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
     if 'is_loaded' not in st.session_state:
         st.session_state.is_loaded = False
     
+    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
     if not st.session_state.is_loaded:
         with st.spinner('Đang tải dữ liệu...'):
-            time.sleep(2) 
+            time.sleep(2) # Giả lập thời gian tải
         st.session_state.is_loaded = True
-        st.rerun() 
+        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
     
+    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
     st.success(f"hello, {st.session_state.user_name}!")
+    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
 
-# --- HÀM BỔ TRỢ ĐỔI KEY VÀ KÝ TỰ ---
+# Kiểm tra nếu người dùng đã đăng nhập thành công
+if st.session_state.user is not None:
+    with st.sidebar:
+        st.markdown("---")
+        st.write(f"**Người dùng:** {st.session_state.user_name}")
+        
+        # Nút đổi mật khẩu
+        if st.button("Đổi mật khẩu"):
+            st.session_state.show_change_password = True
+            
+        # Logic đổi mật khẩu
+        if st.session_state.get("show_change_password", False):
+            new_password = st.text_input("Nhập mật khẩu mới", type="password")
+            if st.button("Xác nhận đổi"):
+                try:
+                    id_token = st.session_state.user['idToken']
+                    api_key = st.secrets["FIREBASE_API_KEY"]
+                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
+                    
+                    response = requests.post(api_url, json=payload)
+                    
+                    if response.status_code == 200:
+                        st.success("Đổi mật khẩu thành công!")
+                        st.session_state.show_change_password = False
+                        st.rerun()
+                    else:
+                        error_data = response.json()
+                        st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                        
+                except Exception as e:
+                    st.error(f"Lỗi hệ thống: {e}")
+                    
+        if st.button("Đăng xuất"):
+            st.session_state.user = None
+            st.rerun()
+            
+# Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
-    try:
-        if isinstance(note_data, (list, tuple)):
-            pitch = int(note_data[0])
-            return pitch + 1
-        elif isinstance(note_data, dict):
-            pitch = int(note_data.get("key", note_data.get("pitch", 0)))
-            return pitch + 1
-        return int(note_data) + 1
-    except:
-        return 1
+    # note_data là list [pitch, layer], ví dụ: [7, "2"]
+    # Pitch (note_data[0]) chính là vị trí phím 0-14
+    pitch = int(note_data[0])
+    return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 1-15
 
+#Hiển thị
 def get_symbol(value, mode):
     if mode == "1. 1.. 1...":
         mapping = {
@@ -82,77 +125,67 @@ def get_symbol(value, mode):
             6: "b1", 7: "b2", 8: "b3", 9: "b4", 10: "b5",
             11: "c1", 12: "c2", 13: "c3", 14: "c4", 15: "c5"
         }
-    else: 
+    else: # Chế độ "1 - 15" mặc định
         return str(value)
+        
     return mapping.get(value, str(value))
 
-# --- CẤU HÌNH GIAO DIỆN THANH SIDEBAR ---
-display_mode = "1-15" # Khai báo mặc định tránh lỗi luồng đọc dữ liệu
+# 2. Thêm nút chọn chế độ vào Sidebar
 
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
+    # Thay đổi cấu hình để nhận nhiều file cùng lúc
     uploaded_files = st.file_uploader(
         "Nhập file của bạn", 
         type=["json"], 
-        accept_multiple_files=True 
+        accept_multiple_files=True  # Thêm dòng này nha cậu
     )
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
-    
-    if uploaded_files:
-        if "selected_song_index" not in st.session_state:
-            st.session_state.selected_song_index = 0
-            
-        if st.session_state.selected_song_index >= len(uploaded_files):
-            st.session_state.selected_song_index = 0
+    st.markdown("---")
+    # Nút chọn chế độ
+    display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
+    st.markdown("---")
 
-        # Menu chọn bài hát động bằng nút nhấn trực quan
-        st.markdown("---")
-        st.write("**Danh sách bài hát:**")
-        for index, file in enumerate(uploaded_files):
-            display_name = file.name.replace(".json", "")
-            is_selected = (st.session_state.selected_song_index == index)
-            btn_type = "primary" if is_selected else "secondary"
-            if st.button(display_name, key=f"sidebar_song_{index}", type=btn_type, use_container_width=True):
-                st.session_state.selected_song_index = index
-                st.rerun()
-
-        st.markdown("---")
-        display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"], key="mode_radio")
-        st.markdown("---")
-    
-    st.write(f"**Người dùng:** {st.session_state.user_name}")
-    if st.button("Đổi mật khẩu", use_container_width=True):
-        st.session_state.show_change_password = not st.session_state.get("show_change_password", False)
+if uploaded_files:
+    # 1. Khởi tạo bài hát được chọn trong session_state nếu chưa có
+    if "selected_song_index" not in st.session_state:
+        st.session_state.selected_song_index = 0
         
-    if st.session_state.get("show_change_password", False):
-        with st.form("change_password_inner"):
-            new_password = st.text_input("Nhập mật khẩu mới", type="password")
-            if st.form_submit_button("Xác nhận đổi"):
-                try:
-                    id_token = st.session_state.user['idToken']
-                    api_key = st.secrets["FIREBASE_API_KEY"]
-                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
-                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
-                    response = requests.post(api_url, json=payload)
-                    
-                    if response.status_code == 200:
-                        st.success("Đổi mật khẩu thành công!")
-                        st.session_state.show_change_password = False
-                    else:
-                        st.error("Có lỗi xảy ra khi đổi mật khẩu.")
-                except Exception as e:
-                    st.error(f"Lỗi hệ thống: {e}")
-                    
-    if st.button("Đăng xuất", use_container_width=True):
-        st.session_state.user = None
-        st.session_state.is_loaded = False
-        st.rerun()
+    # Tạo một vùng sidebar hoặc main tùy thuộc vị trí cậu đặt uploader trước đó
+    # Ở đây Yaoyao tạo các nút bấm xếp dọc sát nhau y hệt ảnh 2
+    for index, file in enumerate(uploaded_files):
+        display_name = file.name.replace(".json", "")
+        
+        # Nếu là file đang được chọn, nút bấm sẽ có màu xanh/đỏ nổi bật (primary)
+        is_selected = st.session_state.selected_song_index == index
+        btn_type = "primary" if is_selected else "secondary"
+        
+        # Tạo nút bấm cho từng file
+        if st.button(display_name, key=f"btn_song_{index}", type=btn_type, use_container_width=True):
+            st.session_state.selected_song_index = index
+            st.rerun()
+            
+    # 2. Lấy dữ liệu của file đang được lựa chọn để vẽ sheet nhạc
+    # Nếu lỡ xóa file làm index vượt quá số lượng hiện tại, đưa về 0
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
+        
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
+    
+    # Tiếp tục luồng xử lý JSON của cậu
+    data = json.load(current_selected_file)
+    song_data = data[0]
+    song_name = current_selected_file.name.replace(".json", "")
     
     # =========================================================================
-    # THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Phải thụt lề vào trong lệnh IF này)
+    # CÁC THUẬT TOÁN ĐẰNG SAU GIỮ NGUYÊN HOÀN TOÀN...
+    # =========================================================================
+    
+    # =========================================================================
+    # 1. THUẬT TOÁN KHÔI PHỤC KHOẢNG LẶNG (Điền đầy đủ các phách trống bị thiếu)
     # =========================================================================
     raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  
+    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
     
     if raw_columns:
         max_bit_index = max([col[0] for col in raw_columns])
