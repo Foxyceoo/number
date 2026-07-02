@@ -159,9 +159,10 @@ with st.sidebar:
     st.markdown("---")
 
 # Thay vì if uploaded_file: thì dùng:
-if st.session_state.song_data_content is not None:
-    data = st.session_state.song_data_content
-    song_name = st.session_state.file_name_info.replace(".json", "")
+if st.session_state.song_data is not None:
+    data = st.session_state.song_data
+    song_data = data[0]
+    song_name = st.session_state.song_name
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
