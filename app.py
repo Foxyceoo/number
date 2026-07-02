@@ -305,12 +305,14 @@ if uploaded_file:
             if vals:
                 all_nums = "<br>".join(map(str, vals))
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 45px;'>
-                    <div style='font-size: 10px; font-weight: bold; line-height: 1.2; text-align: center;'>{all_nums}</div>
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 60px;'>
+                    <!-- Yaoyao đã tăng font-size từ 10px lên 15px và chỉnh lại line-height cho thoáng -->
+                    <div style='font-size: 15px; font-weight: bold; line-height: 1.3; text-align: center; font-family: monospace, sans-serif;'>{all_nums}</div>
                 </div>
                 """
             else:
-                cell_content = "<div style='min-height: 45px;'></div>"
+                # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
+                cell_content = "<div style='min-height: 60px;'></div>"
 
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
