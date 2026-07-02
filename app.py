@@ -144,20 +144,20 @@ with st.sidebar:
     
     # Render danh sách nút chọn bài hát ngay trong sidebar cho gọn gàng
     if uploaded_files:
-    # 1. Lấy file đang chọn
-    if "selected_song_index" not in st.session_state:
-        st.session_state.selected_song_index = 0
+        # 1. Lấy file đang chọn
+        if "selected_song_index" not in st.session_state:
+            st.session_state.selected_song_index = 0
         
-    current_selected_file = uploaded_files[st.session_state.selected_song_index]
-    current_selected_file.seek(0) # Đảm bảo đọc file từ đầu
+        current_selected_file = uploaded_files[st.session_state.selected_song_index]
+        current_selected_file.seek(0) # Đảm bảo đọc file từ đầu
     
-    # 2. Định nghĩa song_data tại đây
-    data = json.load(current_selected_file)
-    song_data = data[0] if isinstance(data, list) else data
+        # 2. Định nghĩa song_data tại đây
+        data = json.load(current_selected_file)
+        song_data = data[0] if isinstance(data, list) else data
 
-    st.markdown("---")
-    display_mode = st.sidebar.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
-    st.markdown("---")
+        st.markdown("---")
+        display_mode = st.sidebar.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
+        st.markdown("---")
     
     # Tiện ích tài khoản
     st.write(f"**Người dùng:** {st.session_state.user_name}")
