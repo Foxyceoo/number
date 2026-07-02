@@ -132,37 +132,19 @@ def get_symbol(value, mode):
 
 # 2. Thêm nút chọn chế độ vào Sidebar
 
-if 'uploaded_data' not in st.session_state:
-    st.session_state.uploaded_data = None
-
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    file = st.file_uploader("**Nhập file của bạn**", type=["json"])
-    if file is not None:
-        # Nếu có file mới, lưu vào session_state
-        st.session_state.uploaded_data = json.load(file)
-        st.session_state.file_name = file.name
-    
-    # Nếu file bị xóa ở widget (bấm x), thì xóa cả trong session_state
-    if file is None and st.session_state.uploaded_data is not None:
-        if st.button("Xóa dữ liệu hiện tại"):
-            st.session_state.uploaded_data = None
-            st.rerun()
-
-    if st.session_state.uploaded_data is not None:
-        data = st.session_state.uploaded_data
-        song_name = st.session_state.file_name.replace(".json", "")
-
+    uploaded_file = st.file_uploader("**Nhập file của bạn**", type=["json"])
     st.caption("Hãy chọn file JSON của bạn để bắt đầu!")
     st.markdown("---")
     # Nút chọn chế độ
     display_mode = st.radio("Chế độ hiển thị:", ["1-15", "1. 1.. 1...", "abc"])
     st.markdown("---")
 
-if file:
-    data = json.load(file)
+if uploaded_file:
+    data = json.load(uploaded_file)
     song_data = data[0]
-    song_name = file.name.replace(".json", "")
+    song_name = uploaded_file.name.replace(".json", "")
     columns = song_data.get("columns", [])
     bits_per_page = 32
     
