@@ -191,22 +191,17 @@ with st.sidebar:
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
     
     # 3. Logic xử lý nạp file và tự động reset trạng thái ô nhập an toàn
-    if uploaded_file is not None:
-        file_name = uploaded_file.name
-        if file_name not in st.session_state.playlist_files:
-            st.session_state.playlist_files[file_name] = uploaded_file.getvalue()
-            st.session_state.current_song = file_name
-            st.toast(f"Đã nạp bài: {file_name.replace('.json', '')}", icon="✅")
-            
-            # Thay vì dùng 'del' gây lỗi docstring, ta dùng rerun để reset widget sạch sẽ
-            st.rerun()
+    # Xử lý logic đọc dữ liệu sau khi Sidebar đã dựng xong ổn định
+if uploaded_files:
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
+        
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
-    # Tự động nạp file vào danh sách lưu trữ tạm thời khi người dùng chọn file
-    if uploaded_file is not None:
-        file_name = uploaded_file.name
-        if file_name not in st.session_state.playlist_files:
-            st.session_state.playlist_files[file_name] = uploaded_file.getvalue()
-            st.toast(f"Đã nạp bài: {file_name.replace('.json', '')}", icon="✅")
+    # Tiếp tục luồng xử lý JSON của cậu
+    data = json.load(current_selected_file)
+    song_data = data[0]
+    song_name = current_selected_file.name.replace(".json", "")
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
