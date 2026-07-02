@@ -74,7 +74,7 @@ if st.session_state.user is not None:
         st.write(f"**Người dùng:** {st.session_state.user_name}")
         
         # Nút đổi mật khẩu
-        if st.button("🔑 Đổi mật khẩu"):
+        if st.button("Đổi mật khẩu"):
             st.session_state.show_change_password = True
             
         # Logic đổi mật khẩu
