@@ -297,9 +297,11 @@ if uploaded_file:
     # Tạo khoảng cách cố định 50px
     st.write('<div style="height: 700px;"></div>', unsafe_allow_html=True)    
     if st.button("Tải PDF xịn"):
-    # Tạo nội dung HTML hoàn chỉnh (CSS + Body)
+        # Biến full_html chỉ được tạo ra KHI NGƯỜI DÙNG BẤM NÚT
         full_html = style + display_html 
     
+    # Dòng này nằm NGOÀI câu lệnh if, chạy ngay khi vừa load trang 
+    # Lúc này người dùng chưa bấm nút -> full_html chưa tồn tại -> Gây lỗi NameError
     pdf_data = generate_pdf(full_html)
     
     st.download_button(
