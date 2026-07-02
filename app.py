@@ -6,6 +6,13 @@ import time
 import pyrebase
 import requests
 import streamlit.components.v1 as components
+# 1. Thêm thư viện quản lý Cookie
+from streamlit_cookies_manager import EncryptedCookiesManager
+
+# Khởi tạo bộ quản lý Cookie (Thay chuỗi mật mã bằng bất kỳ chuỗi bảo mật nào của cậu)
+cookies = EncryptedCookiesManager(prefix="my_sheet_app_", password="thay_doi_mat_ma_bao_mat_o_day_nhe_123456")
+if not cookies.ready():
+    st.stop() # Đợi cookie sẵn sàng tải
 
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
@@ -25,14 +32,18 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# 2. Quản lý trạng thái đăng nhập
+# 2. KHÔI PHỤC TRẠNG THÁI ĐĂNG NHẬP TỪ COOKIE (NẾU CÓ)
 if 'user' not in st.session_state:
-    st.session_state.user = None
+    if "user_token" in cookies and "user_name" in cookies:
+        # Khôi phục thông tin đăng nhập mà không bắt nhập lại form
+        st.session_state.user = {"idToken": cookies["user_token"]}
+        st.session_state.user_name = cookies["user_name"]
+    else:
+        st.session_state.user = None
 
 # Giao diện đăng nhập đơn giản
 def login_form():
     st.title("Đăng nhập")
-    # Dùng key để quản lý giá trị ô nhập liệu rõ ràng hơn
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Mật khẩu", type="password", key="pass_input")
     
@@ -40,32 +51,33 @@ def login_form():
         try:
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
-            st.session_state.user_name = email.split('@')[0]
-            # Xóa sạch dữ liệu cũ trong bộ nhớ sau khi đăng nhập thành công
+            user_name = email.split('@')[0]
+            st.session_state.user_name = user_name
+            
+            # LƯU VÀO COOKIE ĐỂ KHI F5 KHÔNG BỊ MẤT
+            cookies["user_token"] = user['idToken']
+            cookies["user_name"] = user_name
+            cookies.save() # Lưu lại thay đổi vào trình duyệt
+            
             st.rerun() 
         except Exception as e:
-            # Thông báo lỗi chi tiết hơn nếu cần
             st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
             
 # Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
-    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
+    st.stop() 
 else:
-    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
     if 'is_loaded' not in st.session_state:
         st.session_state.is_loaded = False
     
-    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
     if not st.session_state.is_loaded:
         with st.spinner('Đang tải dữ liệu...'):
-            time.sleep(2) # Giả lập thời gian tải
+            time.sleep(2) 
         st.session_state.is_loaded = True
-        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
+        st.rerun() 
     
-    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
     st.success(f"hello, {st.session_state.user_name}!")
-    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
 
 # Kiểm tra nếu người dùng đã đăng nhập thành công
 if st.session_state.user is not None:
@@ -73,11 +85,9 @@ if st.session_state.user is not None:
         st.markdown("---")
         st.write(f"**Người dùng:** {st.session_state.user_name}")
         
-        # Nút đổi mật khẩu
         if st.button("Đổi mật khẩu"):
             st.session_state.show_change_password = True
             
-        # Logic đổi mật khẩu
         if st.session_state.get("show_change_password", False):
             new_password = st.text_input("Nhập mật khẩu mới", type="password")
             if st.button("Xác nhận đổi"):
@@ -102,6 +112,12 @@ if st.session_state.user is not None:
                     
         if st.button("Đăng xuất"):
             st.session_state.user = None
+            # XÓA SẠCH COOKIE KHI ĐĂNG XUẤT
+            if "user_token" in cookies:
+                del cookies["user_token"]
+            if "user_name" in cookies:
+                del cookies["user_name"]
+            cookies.save()
             st.rerun()
             
 # Hàm chuyển đổi Key thành số 1-15
