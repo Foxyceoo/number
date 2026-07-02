@@ -328,84 +328,128 @@ if uploaded_file:
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 25px; /* Khoảng cách giữa các trang giấy */
+        gap: 25px;
     }
     
-    /* Định hình từng trang giấy trắng riêng biệt */
+    /* Trang A4 chuẩn Web: Rộng đúng 794px, KHÔNG CĂN LỀ TRÁI PHẢI */
     .sheet-page {
         background-color: #ffffff;
         box-sizing: border-box;
-        width: 800px;
-        min-height: 850px; /* Chiều cao vừa vặn cho 5 dòng nhạc */
-        padding: 40px 35px;
+        width: 794px;
+        min-height: 1123px;
+        padding: 40px 0px !important; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
-        page-break-after: always; /* Lệnh cài đặt giúp trình duyệt tự cắt trang chuẩn khi in PDF */
-    }
-    
-    /* Thiết kế tiêu đề trang bìa / đầu trang */
-    .sheet-header {
-        text-align: center;
-        margin-bottom: 30px;
-        border-bottom: 2px solid #333;
-        padding-bottom: 10px;
+        page-break-after: always;
     }
 
     table { 
-        border-collapse: collapse; 
+        border-collapse: collapse !important; 
         text-align: center; 
         table-layout: fixed !important; 
-        width: 100%; 
-        margin: 0 auto 25px auto; 
+        width: 100% !important; 
+        margin: 0 padding: 0 !important;
     }
 
     td { 
-        padding: 2px !important;  
-        width: 20px !important; 
+        padding: 2px 0 !important;  
         vertical-align: top !important; 
-        border-right: 1px solid #ccc; 
+        overflow: hidden;
+        box-sizing: border-box !important;
+    }
+
+    .khuong-wrapper {
+        width: 100% !important;
+        padding: 0 !important;
+        margin-bottom: 35px !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
     
-    /* Khi bấm In/Xuất PDF, ẩn bớt bóng đổ nền để trang in sạch đẹp */
     @media print {
         body { background-color: #ffffff; padding: 0; }
-        .sheet-page { box-shadow: none; padding: 0; width: 100%; }
+        .sheet-page { box-shadow: none; padding: 0; width: 100% !important; }
+        .sidebar, header, .stAppDeployButton, footer { display: none !important; }
+        @page { size: A4; margin: 1cm 0cm 1cm 0cm; }
     }
     </style>
     """
     
-    # 2. Bắt đầu xây dựng chuỗi HTML hiển thị tất cả các trang
-    # 2. Bắt đầu xây dựng chuỗi HTML hiển thị tất cả các trang (ĐÃ BỎ ĐẦU TRANG)
-    display_html = ""
+    # ==========================================
+    # 3. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU %
+    # ==========================================
+    all_khuong_html = []
     
-    # Thiết lập số dòng nhạc trên mỗi trang là 5
+    for i in range(0, len(columns), bits_per_page):
+        khuong_columns = columns[i : i + bits_per_page]
+        
+        # Điền nốt trống cho đủ 32 bit nếu là khuông cuối cùng
+        if len(khuong_columns) < bits_per_page:
+            needed = bits_per_page - len(khuong_columns)
+            for _ in range(needed):
+                khuong_columns.append([0, []])
+
+        # Tạo bảng tràn viền cố định layout
+        html_content = "<table style='table-layout: fixed; width: 100%; border-collapse: collapse; margin: 0; padding: 0;'><tr>"
+        cell_width_pct = 100.0 / bits_per_page
+
+        for col_idx, col in enumerate(khuong_columns):
+            notes_in_col = col[1] if len(col) > 1 else []
+            raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
+            
+            if display_mode == "1. 1.. 1..." or display_mode == "abc":
+                vals = [get_symbol(v, display_mode) for v in raw_vals]
+            else:
+                vals = raw_vals
+            
+            is_new_line = (col_idx == 0)
+            is_beat_4 = ((col_idx + 1) % 8 == 0)
+            
+            # Vạch nhịp dọc màu xanh
+            border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
+            border_left = "1.5px solid #00008c" if is_new_line else "none"
+
+            if vals:
+                all_nums = "<br>".join(map(str, vals))
+                cell_content = f"""
+                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 45px;'>
+                    <div style='font-size: 10px; font-weight: bold; line-height: 1.2; text-align: center;'>{all_nums}</div>
+                </div>
+                """
+            else:
+                cell_content = "<div style='min-height: 45px;'></div>"
+
+            # Ép cứng tỷ lệ % theo chiều rộng cột
+            html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
+        
+        html_content += "</tr></table>"
+        all_khuong_html.append(html_content)
+        
+    # ==========================================
+    # 4. CHIA 5 DÒNG NHẠC VÀO TRANG GIẤY A4
+    # ==========================================
+    display_html = ""
     lines_per_page = 5
     
-    # Vòng lặp chia cụm all_khuong_html, mỗi cụm lấy đúng 5 dòng
     for idx in range(0, len(all_khuong_html), lines_per_page):
         chunk = all_khuong_html[idx : idx + lines_per_page]
         
-        # Mở một trang giấy mới
         display_html += "<div class='sheet-page'>"
-            
-        # Thêm thẳng lần lượt 5 khuông nhạc thuộc trang này vào mà không chèn tiêu đề/số trang nữa
         for khuong_html in chunk:
             display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
-            
-        # Đóng trang giấy
         display_html += "</div>"
         
-    # 3. Gom style và toàn bộ các trang giấy để render lên Streamlit
+    # Hợp nhất CSS và nội dung HTML
     html_to_render = page_style + display_html
     
-    # Tính toán chiều cao tổng thể để khung components mở rộng tối đa theo số lượng trang
+    # Tính toán chiều cao hợp lý cho iframe components của Streamlit (Tránh xuất hiện scrollbar phụ)
     total_pages = math.ceil(len(all_khuong_html) / lines_per_page)
-    calculated_height = total_pages * 900 + 100
+    calculated_height = total_pages * 1150 + 100
     
-    # Render toàn bộ các trang nhạc ra màn hình
+    # Đẩy HTML sạch lên giao diện
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
-    # 4. Nút bấm xuất sang PDF của Streamlit đặt ở cuối cùng
+    # Nút bấm in ấn / Xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
     if st.button("Xuất PDF / In Sheet nhạc 🖨️", key="btn_to_pdf_layout"):
         js_code_print = "<script>window.parent.window.print();</script>"
