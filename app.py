@@ -240,12 +240,18 @@ if uploaded_file:
         # Tạo HTML cho từng cột trong dòng này
         html_content = ""
         for col in chunk:
-            notes = col.get("notes", [])
-            # Tạo các số cho ô (nếu có nhiều nốt trong 1 cột thì dùng <br>)
-            note_strings = [get_symbol(get_number_from_data(n), display_mode) for n in notes]
-            notes_html = "<br>".join([f"<span class='note-number'>{n}</span>" for n in note_strings])
+            # DEBUG: In ra để xem cấu trúc thực tế của col
+            # st.write(f"DEBUG: loại dữ liệu của col là {type(col)}, giá trị: {col}")
             
-            html_content += f"<td>{notes_html}</td>"
+            # Kiểm tra nếu col là dictionary thì mới lấy "notes"
+            if isinstance(col, dict):
+                notes = col.get("notes", [])
+                note_strings = [get_symbol(get_number_from_data(n), display_mode) for n in notes]
+                notes_html = "<br>".join([f"<span class='note-number'>{n}</span>" for n in note_strings])
+                html_content += f"<td>{notes_html}</td>"
+            else:
+                # Nếu col không phải dict, xử lý theo cách khác hoặc bỏ qua
+                html_content += "<td></td>"
         
         # Bọc thêm div wrapper để in ấn tốt hơn
         full_row_html = f"<div class='khuong-wrapper'>{row_html}</div>"
