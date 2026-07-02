@@ -49,17 +49,15 @@ if st.session_state.user is None:
     login_form()
     st.stop() # Dừng ứng dụng nếu chưa đăng nhập
 else:
-    st.write(f"Chào {st.session_state.user_name}!")
-    # Tiếp tục code chính của ứng dụng của bạn ở dưới này...
+    st.success(f"Chào {st.session_state.user_name}!")
     
-    # Hiển thị style và lời chào
-    placeholder.markdown(style + f"<div class='big-colorful-hello'>Hello {st.session_state.user_name}!</div>", unsafe_allow_html=True)
+    # Thay vì dùng placeholder.markdown(...), hãy dùng st.empty() nếu muốn xóa
+    # Hoặc đơn giản là hiển thị lời chào và đợi 3 giây rồi dùng st.empty()
+    hello_msg = st.empty()
+    hello_msg.markdown(f"<h2 style='text-align: center;'>Hello {st.session_state.user_name}!</h2>", unsafe_allow_html=True)
     
-    # Đợi 3 giây
     time.sleep(3)
-    
-    # Xóa sạch lời chào khỏi giao diện
-    placeholder.empty()
+    hello_msg.empty() # Xóa lời chào sau 3 giây
 
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
