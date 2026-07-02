@@ -354,7 +354,7 @@ if uploaded_file:
     # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN ĐỂ ĐỦ 5 DÒNG
     # =========================================================================
     display_html = ""
-    lines_per_page = 9
+    lines_per_page = 8
     
     # Danh sách chứa HTML của từng trang sau khi gom đủ 5 dòng
     pages_list = []
