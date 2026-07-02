@@ -190,65 +190,40 @@ with st.sidebar:
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
-    # --- Danh sách bài hát Custom (Nút đen cũ, chỉ có x là text thuần) ---
+    # --- Danh sách bài hát Custom (Không còn nút xóa X) ---
     st.write("**Danh sách bài hát:**")
     
-    # CSS ẩn hoàn toàn danh sách file lỗi của Streamlit và làm đẹp nút xóa x
+    # CSS chỉ giữ lại phần căn chỉnh nút bài hát, bỏ qua phần nút xóa
     st.markdown("""
         <style>
-        /* Ẩn triệt để danh sách file mặc định lem nhem của Streamlit */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section ~ div,
-        [data-testid="stSidebar"] [data-testid="stFileUploaderFilesContainer"],
-        [data-testid="stSidebar"] .uploadedFiles,
-        [data-testid="stSidebar"] .uploadedFile {
-            display: none !important;
-            height: 0px !important;
-            padding: 0px !important;
-            margin: 0px !important;
-            overflow: hidden !important;
-        }
-        
-        /* Biến nút xóa ở cột bên phải thành text thuần, không viền, không nền */
-        div[data-testid="stColumn"] button[key^="del_"] {
+        /* Nút bài hát vẫn giữ nguyên sự mượt mà */
+        div[data-testid="stColumn"] button {
             border: none !important;
-            background: transparent !important;
             padding: 0 !important;
             margin: 0 !important;
-            line-height: 40px !important; /* Cân bằng chiều cao với nút bài hát */
-            color: #ff4b4b !important;
+            line-height: 40px !important;
             font-size: 16px !important;
         }
-        div[data-testid="stColumn"] button[key^="del_"]:hover {
-            color: #ff1a1a !important;
-            background: transparent !important;
-        }
-
         </style>
     """, unsafe_allow_html=True)
 
     if not uploaded_files:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
-        # Khởi tạo index bài hát được chọn nếu chưa có
+        # Khởi tạo index
         if "selected_song_index" not in st.session_state:
             st.session_state.selected_song_index = 0
 
-        # Duyệt qua danh sách file đang có trong uploader
+        # Duyệt qua danh sách file
         for idx, current_file in enumerate(uploaded_files):
             display_name = current_file.name.replace(".json", "").replace("_", " ")
-            
-            # Kiểm tra xem bài hát này có đang được chọn không
             is_current = (st.session_state.selected_song_index == idx)
             button_label = f"🎵 **{display_name}**" if is_current else f"**{display_name}**"
             
-            # Chia cột: Cột nút bài hát chiếm 90%, cột nút xóa chiếm 10%
-            col_btn, col_del = st.columns([0.9, 0.1])
-            
-            with col_btn:
-                # Nút đen truyền thống của Streamlit, bấm phát ăn ngay
-                if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
-                    st.session_state.selected_song_index = idx
-                    st.rerun()
+            # Giờ chỉ còn 1 cột duy nhất cho nút bài hát, không còn cột nút xóa nữa
+            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+                st.session_state.selected_song_index = idx
+                st.rerun()
             
             with col_del:
                 # Nút xóa x là text thuần màu đỏ, không bị lệch dòng
