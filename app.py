@@ -321,7 +321,7 @@ if uploaded_file:
     # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN ĐÃ ĐƯỢC CĂN GIỮA
     # =========================================================================
     display_html = ""
-    lines_per_page = 12
+    lines_per_page = 10
     
     for idx in range(0, len(all_khuong_html), lines_per_page):
         chunk = all_khuong_html[idx : idx + lines_per_page]
