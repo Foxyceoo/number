@@ -41,8 +41,7 @@ check_login()
 
 #Lời chào sau đăng nhập
 if st.session_state.get('logged_in'):
-    st.toast(f"Hello {st.session_state.user_name}!", icon="👋") chứa đó
-    placeholder.empty()
+    st.toast(f"Hello {st.session_state.user_name}!", icon="👋")
 
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
