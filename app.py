@@ -314,72 +314,117 @@ if uploaded_file:
         
     # === THAY THẾ TOÀN BỘ ĐOẠN CUỐI TỪ ĐÂY ĐẾN HẾT FILE ===
     
-    # 1. Tạo cấu trúc lật trang và trang bìa đầu tiên
-    display_html = f"""
-    <div id="flipbook">
-        <div class="page cover-page">
-            <h1 style="font-size: 32px; margin-bottom: 10px; font-weight: bold;">{song_name}</h1>
-            <p style="font-size: 14px; opacity: 0.8; font-style: italic;">Nhấp vào mép giấy bên phải hoặc dùng nút bên dưới để lật</p>
-        </div>
+    # 1. Định nghĩa lại Style để hiển thị dạng trang giấy trải dài (A4-like style)
+    # Bỏ thư viện turn.js cũ, chỉ giữ lại CSS tạo khung trang giấy đẹp mắt
+    page_style = """
+    <style>
+    ::-webkit-scrollbar { display: none !important; }
+    body { 
+        background-color: #f0f2f6; 
+        margin: 0; 
+        padding: 20px;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px; /* Khoảng cách giữa các trang giấy */
+    }
+    
+    /* Định hình từng trang giấy trắng riêng biệt */
+    .sheet-page {
+        background-color: #ffffff;
+        box-sizing: border-box;
+        width: 800px;
+        min-height: 850px; /* Chiều cao vừa vặn cho 5 dòng nhạc */
+        padding: 40px 35px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        page-break-after: always; /* Lệnh cài đặt giúp trình duyệt tự cắt trang chuẩn khi in PDF */
+    }
+    
+    /* Thiết kế tiêu đề trang bìa / đầu trang */
+    .sheet-header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+    }
+
+    table { 
+        border-collapse: collapse; 
+        text-align: center; 
+        table-layout: fixed !important; 
+        width: 100%; 
+        margin: 0 auto 25px auto; 
+    }
+
+    td { 
+        padding: 2px !important;  
+        width: 20px !important; 
+        vertical-align: top !important; 
+        border-right: 1px solid #ccc; 
+    }
+    
+    /* Khi bấm In/Xuất PDF, ẩn bớt bóng đổ nền để trang in sạch đẹp */
+    @media print {
+        body { background-color: #ffffff; padding: 0; }
+        .sheet-page { box-shadow: none; padding: 0; width: 100%; }
+    }
+    </style>
     """
     
-    # 2. Chia các khuông nhạc vào từng trang (mỗi trang chứa đúng 3 dòng nhạc để vừa khung)
-    lines_per_page = 3
+    # 2. Bắt đầu xây dựng chuỗi HTML hiển thị tất cả các trang
+    display_html = ""
+    
+    # Thiết lập số dòng nhạc trên mỗi trang là 5
+    lines_per_page = 5
+    page_count = 1
+    
+    # Vòng lặp chia cụm all_khuong_html, mỗi cụm lấy đúng 5 dòng
     for idx in range(0, len(all_khuong_html), lines_per_page):
         chunk = all_khuong_html[idx : idx + lines_per_page]
         
-        display_html += "<div class='page'>"
+        # Mở một trang giấy mới
+        display_html += "<div class='sheet-page'>"
+        
+        # Nếu là trang đầu tiên (Trang 1), chèn thêm Tiêu đề bài hát làm trang bìa đầu sheet
+        if page_count == 1:
+            display_html += f"""
+            <div class='sheet-header'>
+                <h1 style="font-size: 32px; margin: 0 0 5px 0; color: #1a2a4a; font-weight: bold;">{song_name}</h1>
+                <p style="font-size: 13px; color: #666; font-style: italic; margin: 0;">Bộ chuyển đổi sheet số điện tử</p>
+            </div>
+            """
+        else:
+            # Từ trang 2 trở đi, chèn một tiêu đề nhỏ (Header) ở góc trên cho chuyên nghiệp
+            display_html += f"""
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 20px; border-bottom: 1px dashed #ccc; padding-bottom: 5px;">
+                <span>{song_name}</span>
+                <span>Trang {page_count}</span>
+            </div>
+            """
+            
+        # Thêm lần lượt 5 khuông nhạc thuộc trang này vào
         for khuong_html in chunk:
             display_html += f"<div class='khuong-wrapper'>{khuong_html}</div>"
+            
+        # Đóng trang giấy
         display_html += "</div>"
+        page_count += 1
         
-    # 3. Đóng thẻ flipbook và tạo luôn các nút bấm Lật trang bằng HTML điều khiển Turn.js
-    display_html += """
-    </div>
+    # 3. Gom style và toàn bộ các trang giấy để render lên Streamlit
+    html_to_render = page_style + display_html
     
-    <!-- Thanh điều hướng lật trang tích hợp trực tiếp -->
-    <div style="display: flex; gap: 10px; justify-content: flex-start; margin-top: 15px; font-family: sans-serif;">
-        <button id="prev-btn" style="padding: 8px 16px; font-size: 14px; font-weight: 500; border: 1px solid #dcdfe6; background: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s;">⬅️ Trang trước</button>
-        <button id="next-btn" style="padding: 8px 16px; font-size: 14px; font-weight: 500; border: 1px solid #dcdfe6; background: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s;">Trang kế tiếp ➡️</button>
-    </div>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            // Khởi tạo hiệu ứng lật sách
-            var book = $('#flipbook');
-            book.turn({
-                width: 800,
-                height: 550,
-                autoCenter: true,
-                duration: 800
-            });
-            
-            // Xử lý sự kiện khi bấm nút trực tiếp trong HTML công khai
-            $('#prev-btn').click(function() {
-                book.turn('previous');
-            });
-            
-            $('#next-btn').click(function() {
-                book.turn('next');
-            });
-            
-            // Thêm hiệu ứng hover nhỏ cho nút bấm xinh xắn hơn
-            $('#prev-btn, #next-btn').hover(
-                function() { $(this).style.background = '#f5f7fa'; },
-                function() { $(this).style.background = '#fff'; }
-            );
-        });
-    </script>
-    """
-
-    # 4. Gom cấu trúc style + body lật trang để hiển thị lên màn hình
-    html_to_render = style + display_html
+    # Tính toán chiều cao tổng thể để khung components mở rộng tối đa theo số lượng trang, không bị xuất hiện thanh cuộn bên trong khung
+    # Trung bình mỗi trang giấy kèm khoảng cách rộng tầm 900px
+    total_pages = math.ceil(len(all_khuong_html) / lines_per_page)
+    calculated_height = total_pages * 900 + 100
     
-    # Tăng nhẹ chiều cao khung lên 640px để chứa vừa vặn cả cuốn sách và hàng nút bấm mới
-    components.html(html_to_render, height=640, scrolling=False)
+    # Render toàn bộ các trang nhạc ra màn hình
+    components.html(html_to_render, height=calculated_height, scrolling=False)
     
-    # 5. Giữ lại duy nhất một nút to PDF của Streamlit ở cuối cùng tách biệt
-    st.write('<div style="height: 5px;"></div>', unsafe_allow_html=True)    
-    if st.button("to PDF 🖨️", key="btn_to_pdf_final"):
+    # 4. Nút bấm xuất sang PDF của Streamlit đặt ở cuối cùng
+    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
+    if st.button("Xuất PDF / In Sheet nhạc 🖨️", key="btn_to_pdf_layout"):
         js_code_print = "<script>window.parent.window.print();</script>"
         components.html(js_code_print, height=0)
