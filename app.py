@@ -117,6 +117,32 @@ def get_number_from_key(note_data):
     pitch = int(note_data[0])
     return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 1-15
 
+def load_and_normalize(file_obj):
+    filename = file_obj.name
+    # Đọc nội dung file
+    content = file_obj.read().decode('utf-8')
+    
+    # Nếu là JSON
+    if filename.endswith('.json'):
+        data = json.loads(content)
+        # Giả sử cấu trúc JSON là một list hoặc object chứa "songNotes"
+        song_data = data[0] if isinstance(data, list) else data
+        bpm = song_data.get("bpm", 240)
+        notes = song_data.get("songNotes", [])
+        return bpm, notes
+        
+    # Nếu là TXT
+    elif filename.endswith('.txt'):
+        # Giả sử file txt chứa các dòng JSON hoặc cấu trúc riêng
+        # Tớ giả định TXT của cậu có dạng: time:100,key:1Key0
+        bpm = 240 # Hoặc đọc từ dòng đầu tiên nếu có
+        notes = []
+        for line in content.splitlines():
+            # Xử lý parse dòng txt của cậu ở đây
+            # Ví dụ: {'time': 100, 'key': '1Key0'}
+            pass 
+        return bpm, notes
+
 #Hiển thị
 def get_symbol(value, mode):
     if mode == "1. 1.. 1...":
@@ -191,14 +217,14 @@ with st.sidebar:
     
     # 1. Nút upload file
     uploaded_files = st.file_uploader(
-        "Chọn file JSON để tải lên!",
-        type=["json"],
+        "Chọn file JSON hoặc TXT để tải lên!",
+        type=["json", "txt"],
         accept_multiple_files=True,
         label_visibility="collapsed"
     )
 
     st.write("**Note**")
-    st.write("Chỉ nhập được sheet json chính thống không nhận đuôi .txt hoặc .txt đổi đuôi sang .json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi .json") 
+    st.write("Loading...") 
 
     st.markdown(
         """
@@ -249,6 +275,26 @@ with st.sidebar:
         """,
         unsafe_allow_html=True
     )
+
+    # 1. Tính step
+    bpm, song_notes = normalize_data(current_selected_file)
+    step = 60000 / bpm
+
+    # 2. Xây dựng grid (như chúng ta đã bàn)
+    max_time = max([n['time'] for n in notes])
+    timeline = range(0, max_time + step, int(step))
+
+    # 3. Gom nhóm theo phách (chord logic)
+    processed_grid = []
+    for t in timeline:
+        # Lọc nốt nằm trong khoảng 250ms
+        notes_at_t = [n for n in notes if t <= n['time'] < t + step]
+    
+    # Chuyển key (ví dụ '1Key0' -> 1) và sắp xếp giảm dần (số to trước)
+    # logic: int(key_str.split('Key')[1]) + 1
+    chord = sorted([int(n['key'].split('Key')[1]) + 1 for n in notes_at_t], reverse=True)
+    
+    processed_grid.append(chord)
 
     # 2. Khởi tạo trạng thái chọn bài
     if "selected_song_index" not in st.session_state:
