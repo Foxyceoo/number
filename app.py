@@ -298,32 +298,23 @@ if uploaded_files:
                 return {"columns": []} # Tạm thời để trống tránh lỗi
 
     song_data = read_file(current_selected_file)
-    columns = song_data.get("columns", [])
-            else:
-        # XỬ LÝ TXT: Bạn tự định nghĩa cấu trúc file txt tại đây
-                content = current_selected_file.read().decode('utf-8')
-        # Ví dụ: parse từng dòng hoặc logic riêng cho txt của bạn
-        # Sau khi parse, cần tạo ra biến 'columns' giống cấu trúc của JSON
-                columns = parse_txt_to_columns(content) 
+    
+    # Kiểm tra nếu là file có cấu trúc columns (JSON)
+    if isinstance(song_data, dict) and "columns" in song_data:
+        raw_columns = song_data.get("columns", [])
+    else:
+        # XỬ LÝ TXT: Bạn lấy nội dung file và convert thành danh sách columns
+        # Giả sử file txt của bạn có cấu trúc trả về là list columns
+        content = current_selected_file.read().decode('utf-8')
+        raw_columns = parse_txt_to_columns(content) 
 
-# Đảm bảo hàm get_number_from_key không bị lỗi với data mới
-def get_number_from_key(note_data):
-    # Kiểm tra nếu note_data là list [pitch, layer] thì xử lý cũ
-    if isinstance(note_data, list) and len(note_data) > 0:
-        return int(note_data[0]) + 1
-    # Nếu note_data là dict hoặc dạng khác, hãy xử lý ở đây
-    return 1 # Mặc định an toàn
-    
- 
-    raw_columns = song_data.get("columns", [])
-    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
-    
+    # Dựng bảng columns từ raw_columns
+    bits_per_page = 32
     if raw_columns:
         max_bit_index = max([col[0] for col in raw_columns])
         columns = [[i, []] for i in range(max_bit_index + 1)]
         for col in raw_columns:
-            bit_pos = col[0]
-            columns[bit_pos] = col
+            columns[col[0]] = col
     else:
         columns = []
   
