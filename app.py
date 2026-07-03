@@ -219,8 +219,8 @@ with st.sidebar:
         label_visibility="collapsed"
        
     if "uploaded_files" in st.session_state and st.session_state.uploaded_files:
-    # 1. Lấy file hiện tại
-    file = st.session_state.uploaded_files[st.session_state.selected_song_index]
+        # 1. Lấy file hiện tại
+        file = st.session_state.uploaded_files[st.session_state.selected_song_index]
     
     # 2. CHỈ CẦN 1 DÒNG NÀY ĐỂ CÓ CẤU TRÚC COLUMNS CHUẨN
     columns = process_file_to_columns(file)
