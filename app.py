@@ -314,7 +314,7 @@ if uploaded_files:
     if file.name.endswith('.json'):
         data = json.loads(content.decode('utf-8'))
         # Giả sử cấu trúc json là list có phần tử đầu tiên chứa "columns"
-        return data[0].get("columns", []) if isinstance(data, list) else data.get("columns", [])
+    return data[0].get("columns", []) if isinstance(data, list) else data.get("columns", [])
     
     # LUỒNG 2: Xử lý TXT
     elif file.name.endswith('.txt'):
