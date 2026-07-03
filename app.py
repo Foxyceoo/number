@@ -190,16 +190,12 @@ with st.sidebar:
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
     
     # 1. Nút upload file
-    # Trong Sidebar
     uploaded_files = st.file_uploader(
-        "Tải lên file JSON hoặc TXT",
-         type=["json", "txt"],
-        accept_multiple_files=True
+        "Chọn file JSON để tải lên!",
+        type=["json"],
+        accept_multiple_files=True,
+        label_visibility="collapsed"
     )
-    st.session_state.uploaded_files = uploaded_files
-    
-    # Logic chọn file ưu tiên
-    current_selected_file = json_file if json_file else txt_file
 
     st.write("**Note**")
     st.write("Chỉ nhập được sheet json chính thống không nhận đuôi .txt hoặc .txt đổi đuôi sang .json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi .json") 
@@ -257,23 +253,19 @@ with st.sidebar:
     # 2. Khởi tạo trạng thái chọn bài
     if "selected_song_index" not in st.session_state:
         st.session_state.selected_song_index = 0
-        if "uploaded_files" not in st.session_state:
-            st.session_state.uploaded_files = []
+
     # 3. Hiển thị danh sách
-    # 3. Hiển thị danh sách
-    if not st.session_state.uploaded_files:
+    if not uploaded_files:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
-        for idx, current_file in enumerate(st.session_state.uploaded_files):
-            # Dùng replace cho cả 2 đuôi file
-            display_name = current_file.name.replace(".json", "").replace(".txt", "").replace("_", " ")
+        for idx, current_file in enumerate(uploaded_files):
+            display_name = current_file.name.replace(".json", "").replace("_", " ")
             is_current = (st.session_state.selected_song_index == idx)
-            # ... giữ nguyên phần code nút bấm của bạn ...
             button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
             
-        if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
-             st.session_state.selected_song_index = idx
-             st.rerun()
+            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+                st.session_state.selected_song_index = idx
+                st.rerun()
 
 # --- Logic đọc dữ liệu cho bài được chọn (Để ngoài Sidebar) ---
 if uploaded_files:
@@ -284,37 +276,20 @@ if uploaded_files:
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
     # Đọc dữ liệu JSON
-    if st.session_state.uploaded_files:
-        current_selected_file = st.session_state.uploaded_files[st.session_state.selected_song_index]
+    data = json.load(current_selected_file)
+    song_data = data[0] if isinstance(data, list) else data
+    song_name = current_selected_file.name.replace(".json", "")
     
-    # Hàm đọc an toàn
-        def read_file(file):
-            content = file.read()
-            if file.name.endswith('.json'):
-                return json.loads(content)
-            else:
-            # Ở đây bạn viết logic parse file TXT thành dạng dict giống JSON
-            # Ví dụ: return {"columns": [...]}
-                return {"columns": []} # Tạm thời để trống tránh lỗi
-
-    song_data = read_file(current_selected_file)
+ 
+    raw_columns = song_data.get("columns", [])
+    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
     
-    # Kiểm tra nếu là file có cấu trúc columns (JSON)
-    if isinstance(song_data, dict) and "columns" in song_data:
-        raw_columns = song_data.get("columns", [])
-    else:
-        # XỬ LÝ TXT: Bạn lấy nội dung file và convert thành danh sách columns
-        # Giả sử file txt của bạn có cấu trúc trả về là list columns
-        content = current_selected_file.read().decode('utf-8')
-        raw_columns = parse_txt_to_columns(content) 
-
-    # Dựng bảng columns từ raw_columns
-    bits_per_page = 32
     if raw_columns:
         max_bit_index = max([col[0] for col in raw_columns])
         columns = [[i, []] for i in range(max_bit_index + 1)]
         for col in raw_columns:
-            columns[col[0]] = col
+            bit_pos = col[0]
+            columns[bit_pos] = col
     else:
         columns = []
   
