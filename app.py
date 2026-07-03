@@ -308,7 +308,7 @@ if uploaded_files:
 
     def get_columns_from_selected(file):
     # Đọc nội dung file
-    content = file.read()
+        content = file.read()
     
     # LUỒNG 1: Xử lý JSON
     if file.name.endswith('.json'):
