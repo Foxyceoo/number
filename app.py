@@ -8,9 +8,6 @@ import requests
 import os
 import streamlit.components.v1 as components
 
-
-if 'uploaded_files' not in st.session_state:
-    st.session_state.uploaded_files = []
 # --- Tự động tạo thư mục lưu trữ ---
 # Lấy đường dẫn thư mục Downloads của người dùng hiện tại
 downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -171,6 +168,13 @@ st.markdown(
 # =========================================================================
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
+    
+    # Khởi tạo danh sách lưu trữ file trong Session State nếu chưa có
+    if "playlist_files" not in st.session_state:
+        st.session_state.playlist_files = {}
+        
+    if "current_song" not in st.session_state:
+        st.session_state.current_song = None
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -185,17 +189,13 @@ with st.sidebar:
     # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
     
-    # Nút upload JSON
-    json_files = st.file_uploader("Tải lên file JSON", type=["json"], accept_multiple_files=True)
-    
-    # Nút upload TXT
-    txt_files = st.file_uploader("Tải lên file TXT", type=["txt"], accept_multiple_files=True)
-    
-    # Gộp danh sách vào session_state để quản lý chung
-    if json_files or txt_files:
-        st.session_state.all_files = (json_files or []) + (txt_files or [])
-    else:
-        st.session_state.all_files = []
+    # 1. Nút upload file
+    uploaded_files = st.file_uploader(
+        "Chọn file JSON để tải lên!",
+        type=["json"],
+        accept_multiple_files=True,
+        label_visibility="collapsed"
+    )
 
     st.write("**Note**")
     st.write("Chỉ nhập được sheet json chính thống không nhận đuôi .txt hoặc .txt đổi đuôi sang .json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi .json") 
@@ -308,45 +308,6 @@ if uploaded_files:
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
-
-    def get_columns_from_selected(file):
-    # Đọc nội dung file
-        content = file.read()
-    
-    def process_file_to_columns(file_obj):
-        # Đọc nội dung file một lần duy nhất
-        content = file_obj.read()
-    
-        # LUỒNG 1: Xử lý JSON
-        if file_obj.name.endswith('.json'):
-            try:
-                data = json.loads(content.decode('utf-8'))
-                return data[0].get("columns", []) if isinstance(data, list) else data.get("columns", [])
-            except:
-                return []
-
-    # LUỒNG 2: Xử lý TXT
-        elif file_obj.name.endswith('.txt'):
-        # Nếu là txt, return [] tạm thời để không lỗi syntax
-        # Sau này khi có cấu trúc file, bạn viết logic parse vào đây
-            return []
-    
-    # Trả về rỗng nếu không phải 2 định dạng trên
-        return []
-    # 3. Hiển thị danh sách và xử lý
-    if "all_files" in st.session_state and st.session_state.all_files:
-        # Chọn file hiện tại
-        current_file = st.session_state.all_files[st.session_state.selected_song_index]
-    
-        # Gọi hàm xử lý (tự động chọn luồng JSON hoặc TXT)
-        columns = get_columns_from_selected(current_file)
-    
-        # Vẽ bảng bằng biến 'columns' đã có
-        if columns:
-            # Code vẽ bảng của bạn ở đây...
-            st.write("Đã load dữ liệu thành công!")
-    else:
-        st.info("Hãy tải lên file JSON hoặc TXT để bắt đầu.")
         
     #CSS
     # =========================================================================
