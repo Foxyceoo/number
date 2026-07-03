@@ -198,7 +198,7 @@ with st.sidebar:
     )
 
     st.write("**Note**")
-    st.write("Chỉ nhập được sheet json chính thống không nhận sheet txt hoặc sheets txt đổi tên sang sheet json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi json") 
+    st.write("Chỉ nhập được sheet json chính thống không nhận đuôi .txt hoặc .txt đổi đuối sang .json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi .json") 
 
     st.markdown(
         """
