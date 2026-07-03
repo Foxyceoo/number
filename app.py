@@ -310,21 +310,26 @@ if uploaded_files:
     # Đọc nội dung file
         content = file.read()
     
-    # LUỒNG 1: Xử lý JSON
-    if file.name.endswith('.json'):
-        data = json.loads(content.decode('utf-8'))
-        # Giả sử cấu trúc json là list có phần tử đầu tiên chứa "columns"
-    return data[0].get("columns", []) if isinstance(data, list) else data.get("columns", [])
+    def process_file_to_columns(file_obj):
+        # Đọc nội dung file một lần duy nhất
+        content = file_obj.read()
     
-    # LUỒNG 2: Xử lý TXT
-    elif file.name.endswith('.txt'):
-        text = content.decode('utf-8')
-        # TẠM ĐỂ ĐÂY: Bạn thay logic parse dòng TXT của bạn vào đây
-        # Ví dụ: return parse_my_txt_format(text)
-        return [] 
-    
-    return []
+        # LUỒNG 1: Xử lý JSON
+        if file_obj.name.endswith('.json'):
+            try:
+                data = json.loads(content.decode('utf-8'))
+                return data[0].get("columns", []) if isinstance(data, list) else data.get("columns", [])
+            except:
+                return []
 
+    # LUỒNG 2: Xử lý TXT
+        elif file_obj.name.endswith('.txt'):
+        # Nếu là txt, return [] tạm thời để không lỗi syntax
+        # Sau này khi có cấu trúc file, bạn viết logic parse vào đây
+            return []
+    
+    # Trả về rỗng nếu không phải 2 định dạng trên
+        return []
     # 3. Hiển thị danh sách và xử lý
     if "all_files" in st.session_state and st.session_state.all_files:
         # Chọn file hiện tại
