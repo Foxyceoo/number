@@ -299,12 +299,12 @@ if uploaded_files:
 
     song_data = read_file(current_selected_file)
     columns = song_data.get("columns", [])
-        else:
+            else:
         # XỬ LÝ TXT: Bạn tự định nghĩa cấu trúc file txt tại đây
-            content = current_selected_file.read().decode('utf-8')
+                content = current_selected_file.read().decode('utf-8')
         # Ví dụ: parse từng dòng hoặc logic riêng cho txt của bạn
         # Sau khi parse, cần tạo ra biến 'columns' giống cấu trúc của JSON
-            columns = parse_txt_to_columns(content) 
+                columns = parse_txt_to_columns(content) 
 
 # Đảm bảo hàm get_number_from_key không bị lỗi với data mới
 def get_number_from_key(note_data):
