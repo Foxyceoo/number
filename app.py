@@ -8,6 +8,9 @@ import requests
 import os
 import streamlit.components.v1 as components
 
+
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = []
 # --- Tự động tạo thư mục lưu trữ ---
 # Lấy đường dẫn thư mục Downloads của người dùng hiện tại
 downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
