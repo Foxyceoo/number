@@ -190,11 +190,13 @@ with st.sidebar:
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
     
     # 1. Nút upload file
-    st.write("**Nhập dữ liệu:**")
-    # Nút cho JSON
-    json_file = st.file_uploader("Nhập file JSON", type=["json"])
-    # Nút cho TXT
-    txt_file = st.file_uploader("Nhập file TXT", type=["txt"])
+    # Trong Sidebar
+    uploaded_files = st.file_uploader(
+        "Tải lên file JSON hoặc TXT",
+         type=["json", "txt"],
+        accept_multiple_files=True
+    )
+    st.session_state.uploaded_files = uploaded_files
     
     # Logic chọn file ưu tiên
     current_selected_file = json_file if json_file else txt_file
@@ -255,19 +257,23 @@ with st.sidebar:
     # 2. Khởi tạo trạng thái chọn bài
     if "selected_song_index" not in st.session_state:
         st.session_state.selected_song_index = 0
-
+        if "uploaded_files" not in st.session_state:
+            st.session_state.uploaded_files = []
     # 3. Hiển thị danh sách
-    if not uploaded_files:
+    # 3. Hiển thị danh sách
+    if not st.session_state.uploaded_files:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
-        for idx, current_file in enumerate(uploaded_files):
-            display_name = current_file.name.replace(".json", "").replace("_", " ")
+        for idx, current_file in enumerate(st.session_state.uploaded_files):
+            # Dùng replace cho cả 2 đuôi file
+            display_name = current_file.name.replace(".json", "").replace(".txt", "").replace("_", " ")
             is_current = (st.session_state.selected_song_index == idx)
+            # ... giữ nguyên phần code nút bấm của bạn ...
             button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
             
-            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
-                st.session_state.selected_song_index = idx
-                st.rerun()
+        if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+             st.session_state.selected_song_index = idx
+           st.rerun()
 
 # --- Logic đọc dữ liệu cho bài được chọn (Để ngoài Sidebar) ---
 if uploaded_files:
@@ -278,14 +284,21 @@ if uploaded_files:
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
     # Đọc dữ liệu JSON
-    if current_selected_file:
-        # Xác định loại file
-        is_json = current_selected_file.name.endswith('.json')
+    if st.session_state.uploaded_files:
+        current_selected_file = st.session_state.uploaded_files[st.session_state.selected_song_index]
     
-        if is_json:
-            data = json.load(current_selected_file)
-            song_data = data[0] if isinstance(data, list) else data
-            columns = song_data.get("columns", [])
+    # Hàm đọc an toàn
+        def read_file(file):
+            content = file.read()
+            if file.name.endswith('.json'):
+                return json.loads(content)
+        else:
+            # Ở đây bạn viết logic parse file TXT thành dạng dict giống JSON
+            # Ví dụ: return {"columns": [...]}
+            return {"columns": []} # Tạm thời để trống tránh lỗi
+
+    song_data = read_file(current_selected_file)
+    columns = song_data.get("columns", [])
         else:
         # XỬ LÝ TXT: Bạn tự định nghĩa cấu trúc file txt tại đây
             content = current_selected_file.read().decode('utf-8')
