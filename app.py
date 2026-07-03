@@ -292,7 +292,7 @@ if uploaded_files:
             content = file.read()
             if file.name.endswith('.json'):
                 return json.loads(content)
-        else:
+            else:
             # Ở đây bạn viết logic parse file TXT thành dạng dict giống JSON
             # Ví dụ: return {"columns": [...]}
             return {"columns": []} # Tạm thời để trống tránh lỗi
