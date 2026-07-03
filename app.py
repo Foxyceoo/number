@@ -8,6 +8,34 @@ import requests
 import os
 import streamlit.components.v1 as components
 
+def process_file_to_columns(file_obj):
+    filename = file_obj.name
+    content = file_obj.read().decode('utf-8')
+    
+    # 1. Xử lý JSON
+    if filename.endswith('.json'):
+        data = json.loads(content)
+        song_data = data[0] if isinstance(data, list) else data
+        return song_data.get("columns", [])
+        
+    # 2. Xử lý TXT (Đây là nơi bạn tùy chỉnh)
+    elif filename.endswith('.txt'):
+        # Giả sử file txt của bạn có dòng: "bit_index,key"
+        # Ví dụ: "0,1Key0"
+        parsed_columns = []
+        lines = content.splitlines()
+        for line in lines:
+            # Logic parse dòng txt thành [bit_index, [key_data]]
+            # Đây là ví dụ, bạn hãy sửa phần split cho đúng định dạng của file txt
+            parts = line.split(',')
+            if len(parts) >= 2:
+                bit_idx = int(parts[0])
+                key = parts[1].strip()
+                # Thêm vào danh sách (đơn giản hóa)
+                parsed_columns.append([bit_idx, [[key, "1"]]]) # Cấu trúc giả định
+        return parsed_columns
+    
+    return []
 # --- Tự động tạo thư mục lưu trữ ---
 # Lấy đường dẫn thư mục Downloads của người dùng hiện tại
 downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -168,13 +196,6 @@ st.markdown(
 # =========================================================================
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
-    
-    # Khởi tạo danh sách lưu trữ file trong Session State nếu chưa có
-    if "playlist_files" not in st.session_state:
-        st.session_state.playlist_files = {}
-        
-    if "current_song" not in st.session_state:
-        st.session_state.current_song = None
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -190,12 +211,23 @@ with st.sidebar:
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
     
     # 1. Nút upload file
-    uploaded_files = st.file_uploader(
-        "Chọn file JSON để tải lên!",
-        type=["json"],
+    uploaded_files = st.file_uploader("Chọn file (JSON hoặc TXT)", type=["json", "txt"], accept_multiple_files=True)
+    
+    if uploaded_files:
+        st.session_state.uploaded_files = uploaded_files
         accept_multiple_files=True,
         label_visibility="collapsed"
     )
+
+    if "uploaded_files" in st.session_state and st.session_state.uploaded_files:
+    # 1. Lấy file hiện tại
+    file = st.session_state.uploaded_files[st.session_state.selected_song_index]
+    
+    # 2. CHỈ CẦN 1 DÒNG NÀY ĐỂ CÓ CẤU TRÚC COLUMNS CHUẨN
+    columns = process_file_to_columns(file)
+    
+    # 3. Tiếp tục logic vẽ bảng HTML (code vẽ bảng cũ của bạn giữ nguyên)
+    # Vì columns đã có định dạng chuẩn rồi, phần vẽ bảng sẽ không lỗi nữa!
 
     st.write("**Note**")
     st.write("Chỉ nhập được sheet json chính thống không nhận đuôi .txt hoặc .txt đổi đuôi sang .json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi .json") 
