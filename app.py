@@ -197,8 +197,9 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    st.write("**chú ý: chỉ nhập được sheet json chính thống không nhận sheet txt hoặc sheets txt đổi tên sang sheet json") 
-    st.write("**trước khi nhập hãy chắc chắn rằng file bạn có đuôi json")
+    st.write("**chú ý**")
+    st.write("chỉ nhập được sheet json chính thống không nhận sheet txt hoặc sheets txt đổi tên sang sheet json") 
+    st.write("trước khi nhập hãy chắc chắn rằng file bạn có đuôi json")
 
     st.markdown(
         """
