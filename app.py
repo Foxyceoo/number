@@ -190,11 +190,14 @@ with st.sidebar:
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
     
     # 1. Nút upload file
-    uploaded_files = st.file_uploader(
-        "Chọn file JSON hoặc TXT để tải lên!",
-        type=["json","txt"],
-        accept_multiple_files=True,
-        label_visibility="collapsed"
+    st.write("**Nhập dữ liệu:**")
+    # Nút cho JSON
+    json_file = st.file_uploader("Nhập file JSON", type=["json"])
+    # Nút cho TXT
+    txt_file = st.file_uploader("Nhập file TXT", type=["txt"])
+    
+    # Logic chọn file ưu tiên
+    current_selected_file = json_file if json_file else txt_file
     )
 
     st.write("**Note**")
@@ -275,41 +278,52 @@ if uploaded_files:
         
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
-    # 1. Đọc dữ liệu (Hỗ trợ JSON)
-    data = json.load(current_selected_file)
-    song_data = data[0] if isinstance(data, list) else data
+    # Đọc dữ liệu JSON
+    if current_selected_file:
+        # Xác định loại file
+        is_json = current_selected_file.name.endswith('.json')
     
-    # 2. Lấy BPM từ file, mặc định 240
-    bpm = song_data.get("bpm", 240)
-    step_ms = 60000 / bpm  # Ví dụ 240 BPM => 250ms
-    
-    song_notes = song_data.get("songNotes", [])
-    
-    # 3. Xây dựng Grid theo thời gian (Timeline)
-    if song_notes:
-        max_time = max([n['time'] for n in song_notes])
-        # Tạo danh sách các cột thời gian: 0, 250, 500, 750...
-        time_points = range(0, max_time + int(step_ms), int(step_ms))
-        
-        # Hàm lấy vị trí phím (1-15) từ key (VD: "1Key0" -> 1)
-        def get_pos(key_str):
-            # Tách lấy số sau chữ "Key"
-            num = int(key_str.split('Key')[1])
-            return num + 1
+        if is_json:
+            data = json.load(current_selected_file)
+            song_data = data[0] if isinstance(data, list) else data
+            columns = song_data.get("columns", [])
+        else:
+        # XỬ LÝ TXT: Bạn tự định nghĩa cấu trúc file txt tại đây
+            content = current_selected_file.read().decode('utf-8')
+        # Ví dụ: parse từng dòng hoặc logic riêng cho txt của bạn
+        # Sau khi parse, cần tạo ra biến 'columns' giống cấu trúc của JSON
+            columns = parse_txt_to_columns(content) 
 
-        # Tạo cấu trúc columns để dùng cho vòng lặp phía dưới
-        columns = []
-        for t in time_points:
-            # Lọc các nốt rơi vào khung thời gian [t, t + step_ms)
-            notes_in_beat = [n for n in song_notes if t <= n['time'] < t + step_ms]
-            
-            # Chuyển thành list vị trí và sắp xếp giảm dần (số to trước)
-            pos_list = sorted([get_pos(n['key']) for n in notes_in_beat], reverse=True)
-            columns.append([t, pos_list])
+# Đảm bảo hàm get_number_from_key không bị lỗi với data mới
+def get_number_from_key(note_data):
+    # Kiểm tra nếu note_data là list [pitch, layer] thì xử lý cũ
+    if isinstance(note_data, list) and len(note_data) > 0:
+        return int(note_data[0]) + 1
+    # Nếu note_data là dict hoặc dạng khác, hãy xử lý ở đây
+    return 1 # Mặc định an toàn
+    
+ 
+    raw_columns = song_data.get("columns", [])
+    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
+    
+    if raw_columns:
+        max_bit_index = max([col[0] for col in raw_columns])
+        columns = [[i, []] for i in range(max_bit_index + 1)]
+        for col in raw_columns:
+            bit_pos = col[0]
+            columns[bit_pos] = col
     else:
         columns = []
+  
 
-    # bits_per_page giữ nguyên để chia trang
+    # Hàm lấy số thuần (cũ)
+    def get_number_from_key(note_data):
+        pitch = int(note_data[0])
+        return pitch + 1
+    
+
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+    columns = song_data.get("columns", [])
     bits_per_page = 32
     
 
