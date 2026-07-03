@@ -198,7 +198,6 @@ with st.sidebar:
     
     # Logic chọn file ưu tiên
     current_selected_file = json_file if json_file else txt_file
-    )
 
     st.write("**Note**")
     st.write("Chỉ nhập được sheet json chính thống không nhận đuôi .txt hoặc .txt đổi đuôi sang .json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi .json") 
