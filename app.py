@@ -273,7 +273,7 @@ with st.sidebar:
             
         if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
              st.session_state.selected_song_index = idx
-           st.rerun()
+             st.rerun()
 
 # --- Logic đọc dữ liệu cho bài được chọn (Để ngoài Sidebar) ---
 if uploaded_files:
