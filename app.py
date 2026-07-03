@@ -295,7 +295,7 @@ if uploaded_files:
             else:
             # Ở đây bạn viết logic parse file TXT thành dạng dict giống JSON
             # Ví dụ: return {"columns": [...]}
-            return {"columns": []} # Tạm thời để trống tránh lỗi
+                return {"columns": []} # Tạm thời để trống tránh lỗi
 
     song_data = read_file(current_selected_file)
     columns = song_data.get("columns", [])
