@@ -217,8 +217,7 @@ with st.sidebar:
         st.session_state.uploaded_files = uploaded_files
         accept_multiple_files=True,
         label_visibility="collapsed"
-    )
-
+       
     if "uploaded_files" in st.session_state and st.session_state.uploaded_files:
     # 1. Lấy file hiện tại
     file = st.session_state.uploaded_files[st.session_state.selected_song_index]
