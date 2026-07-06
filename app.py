@@ -136,6 +136,26 @@ def get_symbol(value, mode):
         
     return mapping.get(value, str(value))
 
+# 1. Để hàm ở trên cùng (sau các hàm tiện ích)
+def xu_ly_nhat_ky(song_data):
+    bpm = song_data.get("bpm", 240)
+    if 'songNotes' not in song_data:
+        return song_data.get("columns", [])
+    
+    beat_duration = 60000 / bpm
+    temp_dict = {}
+    for note in song_data['songNotes']:
+        pitch = int(note['key'].split('Key')[1])
+        bit_pos = int(note['time'] / beat_duration)
+        if bit_pos not in temp_dict: temp_dict[bit_pos] = []
+        temp_dict[bit_pos].append([pitch, "1"])
+    
+    columns = []
+    if temp_dict:
+        for i in range(max(temp_dict.keys()) + 1):
+            columns.append([i, temp_dict.get(i, [])])
+    return columns
+
 # ==========================================
 # GOM TOÀN BỘ SIDEBAR VÀO ĐÂY ĐỂ TRÁNH LỖI NHẢY ELEMENT
 # ==========================================
@@ -191,8 +211,8 @@ with st.sidebar:
     
     # 1. Nút upload file
     uploaded_files = st.file_uploader(
-        "Chọn file JSON để tải lên!",
-        type=["json"],
+        "Chọn file JSON hoặc TXT để tải lên!",
+        type=["json", "txt"],
         accept_multiple_files=True,
         label_visibility="collapsed"
     )
@@ -283,16 +303,7 @@ if uploaded_files:
  
     raw_columns = song_data.get("columns", [])
     bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
-    
-    if raw_columns:
-        max_bit_index = max([col[0] for col in raw_columns])
-        columns = [[i, []] for i in range(max_bit_index + 1)]
-        for col in raw_columns:
-            bit_pos = col[0]
-            columns[bit_pos] = col
-    else:
-        columns = []
-  
+      
 
     # Hàm lấy số thuần (cũ)
     def get_number_from_key(note_data):
@@ -301,7 +312,7 @@ if uploaded_files:
     
 
     # Lấy danh sách các cột và số bit mỗi trang từ file
-    columns = song_data.get("columns", [])
+    columns = xu_ly_nhat_ky(song_data)
     bits_per_page = 32
     
 
@@ -558,6 +569,5 @@ if uploaded_files:
         """
         # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
         components.html(js_code_print, height=0)
-        
-        # 4. Tắt cờ trigger để sẵn sàng cho lần bấm tiếp theo
-        st.session_state.trigger_print = False
+
+    
