@@ -204,6 +204,7 @@ with st.sidebar:
 
     # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
     st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
+    st.write("Chọn file **JSON** hoặc **TXT** để tải lên!")
     
     # 1. Nút upload file
     uploaded_files = st.file_uploader(
@@ -212,8 +213,6 @@ with st.sidebar:
         accept_multiple_files=True,
         label_visibility="collapsed"
     )
-
-    st.write("Chọn file **JSON** hoặc **TXT** để tải lên!") 
 
     st.markdown(
         """
