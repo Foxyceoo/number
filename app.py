@@ -40,13 +40,20 @@ def login_form():
     st.title("Đăng nhập")
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Mật khẩu", type="password", key="pass_input")
+    
     if st.button("Đăng nhập"):
         try:
+            # 1. Gọi Firebase
             user = auth.sign_in_with_email_and_password(email, password)
+            
+            # 2. Cập nhật Session State ngay lập tức
             st.session_state.user = user
             st.session_state.user_name = email.split('@')[0]
+            
+            # 3. QUAN TRỌNG: Rerun ngay sau khi cập nhật để ứng dụng vẽ lại giao diện mới
             st.rerun() 
-        except:
+            
+        except Exception as e:
             st.error("Email hoặc mật khẩu không chính xác.")
 
 # Luồng kiểm tra đăng nhập
