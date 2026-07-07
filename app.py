@@ -23,6 +23,10 @@ config = {
     "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
 }
 
+@st.cache_resource
+def get_firebase():
+    return pyrebase.initialize_app(config)
+
 # Khởi tạo Auth
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
@@ -31,23 +35,31 @@ auth = firebase.auth()
 if 'user' not in st.session_state:
     st.session_state.user = None
 
-# Giao diện đăng nhập đơn giản
+# Khởi tạo trạng thái
+if 'user' not in st.session_state:
+    st.session_state.user = None
+
+# Giao diện đăng nhập
 def login_form():
     st.title("Đăng nhập")
-    # Dùng key để quản lý giá trị ô nhập liệu rõ ràng hơn
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Mật khẩu", type="password", key="pass_input")
-    
     if st.button("Đăng nhập"):
         try:
             user = auth.sign_in_with_email_and_password(email, password)
             st.session_state.user = user
             st.session_state.user_name = email.split('@')[0]
-            # Xóa sạch dữ liệu cũ trong bộ nhớ sau khi đăng nhập thành công
             st.rerun() 
-        except Exception as e:
-            # Thông báo lỗi chi tiết hơn nếu cần
-            st.error("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!")
+        except:
+            st.error("Email hoặc mật khẩu không chính xác.")
+
+# Gatekeeper: Nếu chưa đăng nhập thì dừng tại đây
+if st.session_state.user is None:
+    login_form()
+    st.stop() # Dừng toàn bộ code phía dưới
+
+# Chỉ khi qua được dòng trên, code mới chạy tiếp phần dưới
+st.success(f"Hello, {st.session_state.user_name}!")
             
 # Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
