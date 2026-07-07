@@ -344,6 +344,17 @@ if uploaded_files:
         justify-content: center;
         width: 100%;
     }
+
+    .text-label {
+        font-family: Calibri, 'Segoe UI Light', sans-serif;
+        font-weight: 300; /* Đây là độ đậm của "Light" */
+    }
+
+    /* 3. Style cho SỐ (Dữ liệu trong ô nhạc) - Dùng Calibri đậm/thường */
+    .number-data {
+        font-family: Calibri, sans-serif;
+        font-weight: 600; /* Đậm hơn một chút để nổi bật trên nền nhạc */
+    }
     
     /* Trang A4 chuẩn Web - Đã thêm căn giữa trên/dưới */
     .sheet-page {
