@@ -200,16 +200,6 @@ with st.sidebar:
     if "current_song" not in st.session_state:
         st.session_state.current_song = None
 
-    # --- Cấu hình chế độ hiển thị ---
-    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
-    st.write("**Chế độ hiển thị:**")
-    display_mode = st.radio(
-        "Chọn chế độ hiển thị",
-        options=["1-15", "1. 1.. 1...", "abc"],
-        label_visibility="collapsed"
-    )
-    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
-
     # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
     
     st.write("Chọn file **JSON** hoặc **TXT** để tải lên! (nhấp khoảng trắng để nhập bài hát)")
@@ -221,6 +211,16 @@ with st.sidebar:
         accept_multiple_files=True,
         label_visibility="collapsed"
     )
+
+    # --- Cấu hình chế độ hiển thị ---
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+    st.write("**Chế độ hiển thị:**")
+    display_mode = st.radio(
+        "Chọn chế độ hiển thị",
+        options=["1-15", "1. 1.. 1...", "abc"],
+        label_visibility="collapsed"
+    )
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
     st.write("**Danh sách bài hát**")
     st.write("_*tải lại trang sẽ làm mới danh sách_")
