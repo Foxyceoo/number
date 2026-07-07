@@ -35,10 +35,6 @@ auth = firebase.auth()
 if 'user' not in st.session_state:
     st.session_state.user = None
 
-# Khởi tạo trạng thái
-if 'user' not in st.session_state:
-    st.session_state.user = None
-
 # Giao diện đăng nhập
 def login_form():
     st.title("Đăng nhập")
@@ -53,14 +49,6 @@ def login_form():
         except:
             st.error("Email hoặc mật khẩu không chính xác.")
 
-# Gatekeeper: Nếu chưa đăng nhập thì dừng tại đây
-if st.session_state.user is None:
-    login_form()
-    st.stop() # Dừng toàn bộ code phía dưới
-
-# Chỉ khi qua được dòng trên, code mới chạy tiếp phần dưới
-st.success(f"Hello, {st.session_state.user_name}!")
-            
 # Luồng kiểm tra đăng nhập
 if st.session_state.user is None:
     login_form()
