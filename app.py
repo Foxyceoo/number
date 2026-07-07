@@ -203,8 +203,8 @@ with st.sidebar:
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
     # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
-    st.write("**Danh sách bài hát** (nhấp khoảng trắng để nhập bài hát)")
-    st.write("Chọn file **JSON** hoặc **TXT** để tải lên!")
+    
+    st.write("Chọn file **JSON** hoặc **TXT** để tải lên! (nhấp khoảng trắng để nhập bài hát)")
     
     # 1. Nút upload file
     uploaded_files = st.file_uploader(
@@ -213,6 +213,8 @@ with st.sidebar:
         accept_multiple_files=True,
         label_visibility="collapsed"
     )
+
+    st.write("**Danh sách bài hát**")
 
     st.markdown(
         """
