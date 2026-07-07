@@ -223,7 +223,7 @@ with st.sidebar:
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
     st.write("**Danh sách bài hát**")
-    st.markdown("<p style='color:#0008c;'><em>*tải lại trang sẽ làm mới danh sách")
+    st.markdown("<p style='color:#0008c;'><em>*tải lại trang sẽ làm mới danh sách</em></p>")
 
     st.markdown(
         """
