@@ -74,7 +74,7 @@ else:
     
     # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
     st.success(f"hello, {st.session_state.user_name}!")
-    st.write("   mở **sidebar** để bắt đầu")
+    st.write("_mở **sidebar** để bắt đầu_")
     # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
 
 # Kiểm tra nếu người dùng đã đăng nhập thành công
