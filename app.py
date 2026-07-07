@@ -213,8 +213,7 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    st.write("**Note**")
-    st.write("Chỉ nhập được sheet json chính thống không nhận đuôi .txt hoặc .txt đổi đuôi sang .json, trước khi nhập hãy chắc chắn rằng file bạn có đuôi .json") 
+    st.write("Chọn file **JSON** hoặc **TXT** để tải lên!") 
 
     st.markdown(
         """
