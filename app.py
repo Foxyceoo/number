@@ -257,20 +257,20 @@ if uploaded_files:
     /* Trang A4 chuẩn Web - Đã thêm căn giữa trên/dưới */
     .sheet-page {
         width: 210mm !important;
+        min-width: 210mm !important;
         height: 297mm !important;
         min-height: 297mm !important;
         max-width: none !important;
+        flex: 0 0 297mm !important;
         box-sizing: border-box !important;
-
-        box-shadow: none !important;
-        border: none !important;
-        margin: 0 !important;
+        background: white !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15) !important;
+        border: 1px solid #d0d0d0 !important;
+        margin: 0 auto 20px auto !important;
         padding: 0 !important;
-
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
-
         page-break-after: always !important;
         break-after: page !important;
     }
@@ -558,8 +558,90 @@ if uploaded_files:
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
     
-    # Render nội dung chính lên màn hình Web hiển thị
+    # Render nội dung chính lên màn hình Web hiển thị (GIỮ NGUYÊN CODE CŨ)
     components.html(html_to_render, height=calculated_height, scrolling=True)
+
+    # =========================================================================
+    # 5B. CỬA SỔ RV MỚI: CSS RIÊNG, TỰ CẬP NHẬT KHI TẢI/ĐỔI BÀI
+    # Không sửa page_style hoặc luồng xuất PDF ở bên dưới.
+    # =========================================================================
+    rv_style = """
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; }
+      body {
+        background: #e8eaf0; padding: 18px 12px 28px;
+        font-family: sans-serif; display: flex; flex-direction: column;
+        align-items: center; gap: 20px; overflow-x: auto;
+      }
+      .sheet-page {
+        width: 210mm !important; min-width: 210mm !important;
+        height: 297mm !important; min-height: 297mm !important;
+        max-width: none !important; flex: 0 0 297mm !important;
+        box-sizing: border-box !important; background: #fff !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2) !important;
+        border: 1px solid #d0d0d0 !important; margin: 0 auto !important;
+        padding: 0 !important; display: flex !important;
+        flex-direction: column !important; justify-content: center !important;
+      }
+      .khuong-wrapper { width: 100% !important; padding: 0 !important;
+        margin-bottom: 45px !important; break-inside: avoid; }
+      table { border-collapse: collapse !important; text-align: center;
+        table-layout: fixed !important; width: 94% !important;
+        margin: 0 auto !important; padding: 0 !important; }
+      td { padding: 2px 0 !important; vertical-align: top !important;
+        overflow: hidden; box-sizing: border-box !important; }
+      .text-label { font-family: Calibri, 'Segoe UI Light', sans-serif; font-weight: 300; }
+      .number-data { font-family: Calibri, sans-serif; font-weight: 600; }
+      @media (max-width: 900px) { body { align-items: flex-start; } }
+    </style>
+    """
+    rv_document = (
+        '<!DOCTYPE html><html><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        '<title>RV - Xem trước bản nhạc</title></head><body>'
+        + rv_style + ''.join(pages_list) + '</body></html>'
+    )
+    rv_safe_html = json.dumps(rv_document)
+    rv_js = f"""
+    <script>
+    (function() {{
+      const rvHtml = {rv_safe_html};
+      // Ẩn phần iframe xem trước cũ nhưng giữ nguyên code và dữ liệu của nó.
+      // Tìm iframe đứng ngay trước iframe RV hiện tại.
+      const currentFrame = window.frameElement;
+      const frames = Array.from(window.parent.document.querySelectorAll('iframe'));
+      const currentIndex = frames.indexOf(currentFrame);
+      if (currentIndex > 0) {{
+        const oldFrame = frames[currentIndex - 1];
+        oldFrame.style.visibility = 'hidden';
+        oldFrame.style.height = '0px';
+        oldFrame.style.minHeight = '0px';
+        oldFrame.style.margin = '0';
+        oldFrame.style.padding = '0';
+        const oldWrapper = oldFrame.parentElement;
+        if (oldWrapper) {{
+          oldWrapper.style.height = '0px';
+          oldWrapper.style.minHeight = '0px';
+          oldWrapper.style.margin = '0';
+          oldWrapper.style.padding = '0';
+          oldWrapper.style.overflow = 'hidden';
+        }}
+      }}
+      // Nội dung RV có CSS độc lập; tự cập nhật mỗi lần Streamlit dựng lại bài.
+      document.open();
+      document.write(rvHtml);
+      document.close();
+      if (currentFrame) {{
+        currentFrame.style.width = '100%';
+        currentFrame.style.maxWidth = '100%';
+        currentFrame.style.display = 'block';
+        currentFrame.style.margin = '0 auto';
+      }}
+    }})();
+    </script>
+    """
+    components.html(rv_js, height=calculated_height, scrolling=True)
     
     # =========================================================================
     # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
