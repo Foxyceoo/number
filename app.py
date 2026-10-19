@@ -625,6 +625,7 @@ if uploaded_files:
 
     # 3. Khi cờ trigger được bật, tiến hành sinh JS
     if st.session_state.get("trigger_print", False):
+        st.session_state.trigger_print = False
         html_for_print = page_style + "".join(pages_list)
         
         import json
@@ -679,40 +680,6 @@ if uploaded_files:
         else:
             st.session_state.trigger_print = True
 
-    # 3. Khi cờ trigger được bật, tiến hành sinh JS
-    if st.session_state.get("trigger_print", False):
-        html_for_print = page_style + "".join(pages_list)
-        
-        import json
-        safe_html_json = json.dumps(html_for_print)
-        
-        # Tạo mã số duy nhất dựa trên thời gian
-        print_id = int(time.time())
-        
-        # Chèn thẳng print_id vào comment của JS để thay đổi nội dung chuỗi, ép Streamlit reload lại component này
-        js_code_print = f"""
-        <script>
-        (function() {{
-            // ID lượt in: {print_id}
-            var htmlContent = {safe_html_json};
-            
-            var printWindow = window.open('', '_blank');
-            if (!printWindow) {{
-                alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
-                return;
-            }}
-            
-            printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            
-            setTimeout(function() {{
-                printWindow.print();
-                printWindow.close();
-            }}, 500);
-        }})();
-        </script>
-        """
         # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
         components.html(js_code_print, height=0)
 
