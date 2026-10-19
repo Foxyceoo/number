@@ -607,7 +607,10 @@ if uploaded_files:
             justify-content: center !important;
             page-break-after: always !important;
             break-after: page !important;
-            overflow: hidden !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            /* Không cắt khuông nếu WeasyPrint tính chiều cao hơi khác trình duyệt. */
+            overflow: visible !important;
         }
         table {
             border-collapse: collapse !important;
@@ -620,7 +623,7 @@ if uploaded_files:
         td {
             padding: 2px 0 !important;
             vertical-align: top !important;
-            overflow: hidden;
+            overflow: visible !important;
             box-sizing: border-box !important;
         }
         
