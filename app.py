@@ -477,9 +477,18 @@ if uploaded_files:
     # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN (8 DÒNG/TRANG)
     # =========================================================================
     display_html = ""
-    lines_per_page = 5 if display_mode == "1. 1.. 1..." else 11  # Đã đổi thành 8 dòng theo ý bạn nè!
-    
-    # Danh sách chứa HTML của từng trang sau khi gom đủ 8 dòng
+
+    # Số dòng mỗi trang theo chế độ hiển thị
+    if display_mode == "1. 1.. 1...":
+        lines_per_page = 5
+    else:
+        max_notes_in_song = max(
+            (len(col[1]) for col in columns if len(col) > 1),
+            default=0
+        )
+        lines_per_page = max(1, 14 - max_notes_in_song)
+
+    # Danh sách chứa HTML của từng trang
     pages_list = []
     
     for idx in range(0, len(all_khuong_html), lines_per_page):
