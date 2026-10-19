@@ -339,12 +339,6 @@ if uploaded_files:
     # =========================================================================
     all_khuong_html = []
 
-    # Tìm số nốt lớn nhất trong một cột của toàn bộ bài nhạc
-    max_notes_in_song = max(
-        (len(col[1]) for col in columns if len(col) > 1),
-        default=0
-    )
-
     # Chiều cao mỗi nốt tùy theo chế độ hiển thị
     note_item_height = 32 if display_mode == "1. 1.. 1..." else 20
 
@@ -402,7 +396,7 @@ if uploaded_files:
                             <div style="
                                 position: relative;
                                 width: 100%;
-                                height: 32px;
+                                height: {note_item_height}px;
                                 text-align: center;
                                 font-family: Calibri, sans-serif;
                                 font-weight: 600;
@@ -441,7 +435,9 @@ if uploaded_files:
                             </div>
                         """)
                     else:
-                        note_html.append(f"<div>{val}</div>")
+                        note_html.append(
+                            f"<div style='height:{note_item_height}px; line-height:{note_item_height}px;'>{val}</div>"
+                    )
                 all_nums = "".join(note_html)
 
                 cell_content = f"""
