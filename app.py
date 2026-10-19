@@ -171,11 +171,17 @@ with st.sidebar:
             pointer-events: none;
         }
 
-        /* Ẩn tên file đã tải lên, giữ nguyên vùng nhập bài */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] [data-testid="stFileUploaderFile"],
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section + div,
+        /* Ẩn phần hiển thị file đã tải lên, nhưng giữ nguyên vùng bấm dấu cộng */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] [data-testid*="FileUploaderFile"],
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] [data-testid*="FileName"],
         [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] li,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section ~ div {
+            display: none !important;
+        }
+
+        /* Một số phiên bản Streamlit bọc tên file trong container riêng */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] div:has(> [data-testid="stFileUploaderFile"]) {
             display: none !important;
         }
         </style>
