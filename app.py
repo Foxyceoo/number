@@ -182,7 +182,7 @@ with st.sidebar:
 
     # 3. Hiển thị danh sách
     if not uploaded_files:
-        st.info("Chưa có bài hát nào được tải lên.")
+        st.info("Chưa có bài hát nào được tải lên")
     else:
         for idx, current_file in enumerate(uploaded_files):
             display_name = current_file["name"].replace(".json", "").replace(".txt", "").replace("_", " ")
