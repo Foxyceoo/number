@@ -7,6 +7,13 @@ import os
 import re
 import streamlit.components.v1 as components
 
+
+# Tạo PDF một lần và lưu cache để xuất lại cùng một sheet nhanh hơn.
+@st.cache_data(show_spinner=False)
+def tao_pdf_tu_html(html_for_pdf):
+    from weasyprint import HTML
+    return HTML(string=html_for_pdf).write_pdf()
+
 # Mặc định mở sidebar khi truy cập ứng dụng; người dùng vẫn có thể thu gọn bằng nút <<.
 st.set_page_config(initial_sidebar_state="expanded")
 
@@ -531,9 +538,7 @@ if uploaded_files:
             st.error("Không có dữ liệu trang để xuất PDF!")
         else:
             try:
-                from weasyprint import HTML
-
-                # CSS rieng cho PDF: giu dung kich thuoc A4, tranh flex/padding cua ban xem truoc lam lech trang.
+                # CSS riêng cho PDF: giữ đúng kích thước A4, tránh flex/padding của bản xem trước làm lệch trang.
                 pdf_style = """
                 <style>
                     @page { size: A4 portrait; margin: 0; }
@@ -575,7 +580,9 @@ if uploaded_files:
                     + pdf_style + "</head><body>"
                     + html_to_render + "</body></html>"
                 )
-                pdf_bytes = HTML(string=html_for_pdf).write_pdf()
+                # Báo trạng thái khi tạo lần đầu; những lần xuất lại cùng sheet sẽ dùng cache.
+                with st.spinner("Đang tạo PDF, Cáo chờ một chút nhé..."):
+                    pdf_bytes = tao_pdf_tu_html(html_for_pdf)
 
                 # Làm sạch ký tự không phù hợp trong tên file
                 safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
