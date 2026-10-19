@@ -214,15 +214,18 @@ with st.sidebar:
 
     uploaded_files = list(st.session_state.playlist_files.values())
 
-    # --- Cấu hình chế độ hiển thị ---
-    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
-    st.write("**Chế độ hiển thị:**")
-    display_mode = st.radio(
-        "Chọn chế độ hiển thị",
-        options=["115", "111", "abc"],
-        label_visibility="collapsed"
-    )
-    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+        # --- Cấu hình chế độ hiển thị ---
+        st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+        st.write("**Chế độ hiển thị:**")
+
+        display_mode = st.radio(
+            "Chọn chế độ hiển thị",
+            options=["115", "111", "abc"],
+            label_visibility="collapsed",
+            key="display_mode"
+        )
+
+        st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
     st.write("**Danh sách bài hát**")
     st.markdown("<em>*tải lại trang sẽ làm mới danh sách</em>",unsafe_allow_html=True)
@@ -317,6 +320,17 @@ if uploaded_files:
     # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = xu_ly_nhat_ky(song_data)
     bits_per_page = 32
+
+    # Đếm số nốt chồng tối đa trong một ô của bài hát
+    max_notes_in_song = max(
+        (len(col[1]) for col in columns if len(col) > 1),
+        default=0
+    )
+
+    # Nếu bài có 8–13 nốt chồng thì không cho chọn chế độ 111
+    if 8 <= max_notes_in_song <= 13 and st.session_state.display_mode == "111":
+        st.session_state.display_mode = "115"
+        st.rerun()
     
 
     def get_number_from_data(note_data):
@@ -460,11 +474,26 @@ if uploaded_files:
     # Chiều cao mỗi nốt tùy theo chế độ hiển thị
     note_item_height = 32 if display_mode == "111" else 20
 
-    # Chiều cao thống nhất cho các cột trong toàn bài
+    # Đếm số nốt chồng tối đa trong một ô
     max_notes_in_song = max(
         (len(col[1]) for col in columns if len(col) > 1),
         default=0
     )
+
+    # Kiểm tra giới hạn số nốt chồng trong một ô
+    if display_mode == "111" and max_notes_in_song > 7:
+        st.error(
+            f"Không thể đọc file {current_selected_file['name']}: "
+            "Lỗi không thể đọc file"
+        )
+        st.stop()
+
+    elif display_mode in ("115", "abc") and max_notes_in_song > 13:
+        st.error(
+            f"Không thể đọc file {current_selected_file['name']}: "
+            "Lỗi không thể đọc file"
+        )
+        st.stop()
 
     note_height = max(75, max_notes_in_song * note_item_height)
     
@@ -585,13 +614,20 @@ if uploaded_files:
 
     # Số dòng mỗi trang theo chế độ hiển thị
     if display_mode == "111":
-        lines_per_page = 11
-    else:
-        max_notes_in_song = max(
-            (len(col[1]) for col in columns if len(col) > 1),
-            default=0
-        )
+        if max_notes_in_song <= 2:
+            lines_per_page = 11
+        elif max_notes_in_song == 3:
+            lines_per_page = 9
+        elif max_notes_in_song == 4:
+            lines_per_page = 7
+        elif max_notes_in_song == 5:
+            lines_per_page = 5
+        elif max_notes_in_song == 6:
+            lines_per_page = 3
+        elif max_notes_in_song == 7:
+            lines_per_page = 1
 
+    else:
         if max_notes_in_song == 3:
             lines_per_page = 11
         elif max_notes_in_song == 4:
@@ -612,11 +648,9 @@ if uploaded_files:
             lines_per_page = 3
         elif max_notes_in_song == 12:
             lines_per_page = 2
-        elif max_notes_in_song >= 13:
-            lines_per_page = 1
         else:
             lines_per_page = 11
-
+    
     # Danh sách chứa HTML của từng trang
     pages_list = []
     
