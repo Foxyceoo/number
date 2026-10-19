@@ -3,27 +3,116 @@ import pandas as pd
 import json
 import math
 import time
+import pyrebase
+import requests
 import os
-import re
-import base64
 import streamlit.components.v1 as components
-from concurrent.futures import ThreadPoolExecutor
-
-
-# Tạo PDF trong luồng nền để không chặn giao diện khi đổi chế độ.
-_pdf_executor = ThreadPoolExecutor(max_workers=1)
-
-@st.cache_data(show_spinner=False)
-def tao_pdf_tu_html(html_for_pdf):
-    from weasyprint import HTML
-    return HTML(string=html_for_pdf).write_pdf()
-
-# Mặc định mở sidebar khi truy cập ứng dụng; người dùng vẫn có thể thu gọn bằng nút <<.
-st.set_page_config(initial_sidebar_state="expanded")
 
 
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
+
+# Sát lề trái
+config = {
+    "apiKey": st.secrets["FIREBASE_API_KEY"],
+    "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
+    "projectId": st.secrets["FIREBASE_PROJECT_ID"],
+    "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
+    "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
+    "appId": st.secrets["FIREBASE_APP_ID"],
+    "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
+}
+
+@st.cache_resource
+def get_firebase():
+    return pyrebase.initialize_app(config)
+
+# Khởi tạo Auth
+firebase = pyrebase.initialize_app(config)
+auth = firebase.auth()
+
+# 2. Quản lý trạng thái đăng nhập
+if 'user' not in st.session_state:
+    st.session_state.user = None
+
+# Giao diện đăng nhập
+def login_form():
+    st.title("Đăng nhập")
+    email = st.text_input("Email", key="email_input")
+    password = st.text_input("Mật khẩu", type="password", key="pass_input")
+    
+    if st.button("Đăng nhập"):
+        try:
+            # 1. Gọi Firebase
+            user = auth.sign_in_with_email_and_password(email, password)
+            
+            # 2. Cập nhật Session State ngay lập tức
+            st.session_state.user = user
+            st.session_state.user_name = email.split('@')[0]
+            
+            # 3. QUAN TRỌNG: Rerun ngay sau khi cập nhật để ứng dụng vẽ lại giao diện mới
+            st.rerun() 
+            
+        except Exception as e:
+            st.error("Email hoặc mật khẩu không chính xác.")
+
+# Luồng kiểm tra đăng nhập
+if st.session_state.user is None:
+    login_form()
+    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
+else:
+    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
+    if 'is_loaded' not in st.session_state:
+        st.session_state.is_loaded = False
+    
+    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
+    if not st.session_state.is_loaded:
+        with st.spinner('Đang tải dữ liệu...'):
+            time.sleep(2) # Giả lập thời gian tải
+        st.session_state.is_loaded = True
+        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
+    
+    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
+    st.success(f"hello, {st.session_state.user_name}!")
+    st.caption("mở **sidebar** để bắt đầu")
+    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
+
+# Kiểm tra nếu người dùng đã đăng nhập thành công
+if st.session_state.user is not None:
+    with st.sidebar:
+        st.markdown("---")
+        st.write(f"**Người dùng:** {st.session_state.user_name}")
+        
+        # Nút đổi mật khẩu
+        if st.button("Đổi mật khẩu"):
+            st.session_state.show_change_password = True
+            
+        # Logic đổi mật khẩu
+        if st.session_state.get("show_change_password", False):
+            new_password = st.text_input("Nhập mật khẩu mới", type="password")
+            if st.button("Xác nhận đổi"):
+                try:
+                    id_token = st.session_state.user['idToken']
+                    api_key = st.secrets["FIREBASE_API_KEY"]
+                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
+                    
+                    response = requests.post(api_url, json=payload)
+                    
+                    if response.status_code == 200:
+                        st.success("Đổi mật khẩu thành công!")
+                        st.session_state.show_change_password = False
+                        st.rerun()
+                    else:
+                        error_data = response.json()
+                        st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                        
+                except Exception as e:
+                    st.error(f"Lỗi hệ thống: {e}")
+                    
+        if st.button("Đăng xuất"):
+            st.session_state.user = None
+            st.rerun()
             
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
@@ -34,7 +123,7 @@ def get_number_from_key(note_data):
 
 #Hiển thị
 def get_symbol(value, mode):
-    if mode == "111":
+    if mode == "1. 1.. 1...":
         mapping = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
             6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
@@ -111,53 +200,24 @@ with st.sidebar:
     if "current_song" not in st.session_state:
         st.session_state.current_song = None
 
-    # --- Nút + mở cửa sổ riêng để tải file, tránh tên file hiện ngoài sidebar ---
-    if "show_upload_window" not in st.session_state:
-        st.session_state.show_upload_window = False
-
-    if st.button("＋", key="open_upload_window", help="Thêm file JSON hoặc TXT"):
-        st.session_state.show_upload_window = True
-
-    @st.dialog("Thêm bài hát")
-    def upload_window():
-        st.write("Chọn file **JSON** hoặc **TXT** để tải lên!")
-        st.file_uploader(
-            "Chọn file JSON hoặc TXT để tải lên!",
-            type=["json", "txt"],
-            accept_multiple_files=True,
-            label_visibility="collapsed",
-            key="song_files_uploader"
-        )
-        if st.button("Nhập", key="close_upload_window"):
-            st.session_state.show_upload_window = False
-            st.rerun()
-
-    if st.session_state.show_upload_window:
-        upload_window()
-
-    # Gộp file mới vào playlist đã lưu trong session, không thay thế các bài cũ.
-    # Dùng nội dung file để nhận diện trùng lặp khi Streamlit rerun.
-    newly_uploaded_files = st.session_state.get("song_files_uploader") or []
-    if "playlist_files" not in st.session_state:
-        st.session_state.playlist_files = {}
-
-    for uploaded_file in newly_uploaded_files:
-        file_bytes = uploaded_file.getvalue()
-        file_id = (uploaded_file.name, file_bytes)
-        if file_id not in st.session_state.playlist_files:
-            st.session_state.playlist_files[file_id] = {
-                "name": uploaded_file.name,
-                "data": file_bytes,
-            }
-
-    uploaded_files = list(st.session_state.playlist_files.values())
+    # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
+    
+    st.write("Chọn file **JSON** hoặc **TXT** để tải lên! (nhấp khoảng trắng để nhập bài hát)")
+    
+    # 1. Nút upload file
+    uploaded_files = st.file_uploader(
+        "Chọn file JSON hoặc TXT để tải lên!",
+        type=["json", "txt"],
+        accept_multiple_files=True,
+        label_visibility="collapsed"
+    )
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
     st.write("**Chế độ hiển thị:**")
     display_mode = st.radio(
         "Chọn chế độ hiển thị",
-        options=["115", "111", "abc"],
+        options=["1-15", "1. 1.. 1...", "abc"],
         label_visibility="collapsed"
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -182,7 +242,34 @@ with st.sidebar:
             width: 90% !important;
         }
         
-        /* File uploader đã được chuyển vào cửa sổ riêng, không cần CSS ẩn tên file ở sidebar nữa. */
+        /* ========================================================================= */
+        /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
+        /* ========================================================================= */
+        
+        /* 1. Thu nhỏ vùng Dropzone nhập file */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            padding: 10px !important;
+            min-height: 60px !important;
+            height: 60px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
+            transform: scale(0.7) !important;
+            margin-bottom: 0px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small {
+            font-size: 11px !important;
+        }
+
+        /* 2. Ép toàn bộ các element đi kèm/nằm dưới stFileUploader (trừ vùng section kéo thả) có chiều cao bằng 0 và ẩn đi */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] div,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
+            display: none !important;
+            height: 0px !important;
+            padding: 0px !important;
+            margin: 0px !important;
+            overflow: hidden !important;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -197,7 +284,7 @@ with st.sidebar:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
         for idx, current_file in enumerate(uploaded_files):
-            display_name = current_file["name"].replace(".json", "").replace(".txt", "").replace("_", " ")
+            display_name = current_file.name.replace(".json", "").replace("_", " ")
             is_current = (st.session_state.selected_song_index == idx)
             button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
             
@@ -213,45 +300,10 @@ if uploaded_files:
         
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
-    # Thử nhiều encoding phổ biến; chỉ chấp nhận cách đọc nào tạo được JSON hợp lệ.
-    file_bytes = current_selected_file["data"]
-    data = None
-    read_errors = []
-
-    # Ưu tiên encoding có BOM, sau đó thử UTF-16 LE/BE và UTF-8.
-    encodings = ("utf-8-sig", "utf-16", "utf-16-le", "utf-16-be", "utf-8", "cp1252")
-    for encoding in encodings:
-        try:
-            decoded_text = file_bytes.decode(encoding)
-            data = json.loads(decoded_text)
-            break
-        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            read_errors.append(f"{encoding}: {exc}")
-
-    # Nếu file UTF-16LE/BE bị thiếu đúng 1 byte cuối, bỏ byte lẻ rồi thử lại.
-    if data is None:
-        for encoding in ("utf-16-le", "utf-16-be"):
-            try:
-                even_bytes = file_bytes[:-1] if len(file_bytes) % 2 else file_bytes
-                decoded_text = even_bytes.decode(encoding, errors="ignore")
-                if decoded_text.startswith("\ufeff"):
-                    decoded_text = decoded_text[1:]
-                data = json.loads(decoded_text)
-                break
-            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-                read_errors.append(f"{encoding} (bỏ byte cuối): {exc}")
-
-    if data is None:
-        st.error(
-            f"Không đọc được file {current_selected_file['name']}. "
-            "Cua đã thử UTF-8, UTF-16, UTF-16LE, UTF-16BE và CP1252 nhưng nội dung vẫn không phải JSON hợp lệ. "
-            "File có thể bị thiếu dữ liệu hoặc hỏng cấu trúc JSON."
-        )
-        with st.expander("Chi tiết lỗi đọc file"):
-            st.code("\n".join(read_errors[-6:]))
-        st.stop()
+    # Đọc dữ liệu JSON
+    data = json.load(current_selected_file)
     song_data = data[0] if isinstance(data, list) else data
-    song_name = current_selected_file["name"].rsplit(".", 1)[0]
+    song_name = current_selected_file.name.replace(".json", "")
     
  
     raw_columns = song_data.get("columns", [])
@@ -407,7 +459,7 @@ if uploaded_files:
             notes_in_col = col[1] if len(col) > 1 else []
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-            if display_mode == "111" or display_mode == "abc":
+            if display_mode == "1. 1.. 1..." or display_mode == "abc":
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
@@ -421,90 +473,39 @@ if uploaded_files:
             
             if vals:
                 note_html = []
-
                 for val in vals:
-                    symbol = str(val)
+                    if display_mode == "1. 1.. 1...":
+                        parts = str(val).split(".")
+                        dots = len(parts) - 1
+                        number = parts[0] if parts[0] else "1"
 
-                    # Chỉ xử lý dấu chấm trong chế độ hiển thị nốt số
-                    if display_mode == "111":
-                        dot_count = len(symbol) - len(symbol.rstrip("."))
-                        number = symbol.rstrip(".")
-
-                        # Hai vị trí chấm cố định:
-                        # Chấm sát số đen nếu nốt có ít nhất 1 chấm.
-                        # Chấm phía trên đen nếu nốt có ít nhất 2 chấm.
-                        top_dot_color = "black" if dot_count >= 2 else "transparent"
-                        bottom_dot_color = "black" if dot_count >= 1 else "transparent"
-
-                        note_html.append(f"""
-                        <div style="
-                            position: relative;
-                            height: 30px;
-                            width: 100%;
-                            text-align: center;
-                            line-height: normal;
-                        ">
-                            <span style="
-                                position: absolute;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                height: 7px;
-                                line-height: 7px;
-                                font-size: 8px;
-                                color: {top_dot_color};
-                            ">●</span>
-
-                            <span style="
-                                position: absolute;
-                                top: 6px;
-                                left: 0;
-                                right: 0;
-                                height: 7px;
-                                line-height: 7px;
-                                font-size: 8px;
-                                color: {bottom_dot_color};
-                            ">●</span>
-
-                            <span style="
-                                position: absolute;
-                                top: 12px;
-                                left: 0;
-                                right: 0;
-                                font-size: 15px;
-                                line-height: 19.5px;
-                                font-weight: bold;
-                                font-family: monospace, sans-serif;
-                            ">{number}</span>
-                        </div>
-                        """)
+                        if dots > 0:
+                            note_html.append(
+                                f"<div style='display:flex; flex-direction:column;"
+                                f"align-items:center; line-height:0.8;'>"
+                                f"<span style='font-size:14px; height:auto;"
+                                f"line-height:7px; white-space:normal;'>"
+                                f"{'<br>'.join(['·'] * dots)}</span>"
+                                f"<span>{number}</span></div>"
+                            )
+                        else:
+                            note_html.append(f"<div>{val}</div>")
                     else:
-                        note_html.append(f"""
-                        <div style="
-                            min-height: 19.5px;
-                            line-height: 19.5px;
-                            font-size: 15px;
-                            font-weight: bold;
-                            text-align: center;
-                            font-family: monospace, sans-serif;
-                        ">{symbol}</div>
-                        """)
+                        note_html.append(f"<div>{val}</div>")
 
                 all_nums = "".join(note_html)
-
                 cell_content = f"""
-                <div style="
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: flex-start;
-                    min-height: 60px;
-                ">
+                <div style='display:flex; flex-direction:column;
+                align-items:center; justify-content:flex-start;
+                min-height:75px; font-size:15px; font-weight:bold;
+                line-height:1.3; text-align:center;
+                font-family:monospace,sans-serif;'>
                     {all_nums}
                 </div>
                 """
+
             else:
-                # Đồng bộ chiều cao ô trống
+                # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
                 cell_content = "<div style='min-height: 60px;'></div>"
 
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
@@ -549,157 +550,66 @@ if uploaded_files:
         pages_list.append(page_content)
         
     # Chuỗi HTML đầy đủ để hiển thị trên Web xem trước
-    # Đã bỏ nút "In bản nhạc"; giữ nguyên phần xem trước bản nhạc.
     html_to_render = page_style + "".join(pages_list)
     
     # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
+    
+    # Render nội dung chính lên màn hình Web hiển thị
+    components.html(html_to_render, height=calculated_height, scrolling=False)
+    
+    # =========================================================================
+    # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
+    # =========================================================================
+    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
+    
+    # 1. Khởi tạo trạng thái kích hoạt in nếu chưa tồn tại
+    if "trigger_print" not in st.session_state:
+        st.session_state.trigger_print = False
 
+    # 2. Khi bấm nút, bật cờ trigger
+    if st.button("Xuất PDF", key="btn_to_pdf_layout"):
+        if not pages_list:
+            st.error("Không có dữ liệu trang để in!")
+        else:
+            st.session_state.trigger_print = True
 
-    # Tên bài hát ở đầu khu vực chính, căn giữa ngay phía trên nút xuất PDF
-    display_song_name = song_name.rsplit(".", 1)[0].replace("_", " ").strip()
-    st.markdown(
-        f"<div style='width:100%; text-align:center; color:inherit; font-size:28px; "
-        f"font-weight:700; line-height:1.3; margin:0 0 18px 0;'>{display_song_name}</div>",
-        unsafe_allow_html=True,
-    )
-
-    # Khoảng cách trước nút xuất PDF
-    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
-
-    # Chuẩn bị PDF ngay khi bài hát hoặc chế độ hiển thị thay đổi.
-    # Nhờ vậy khi bấm Tải PDF xuống, file đã được tạo sẵn.
-    if "prepared_pdf_bytes" not in st.session_state:
-        st.session_state.prepared_pdf_bytes = None
-    if "prepared_pdf_name" not in st.session_state:
-        st.session_state.prepared_pdf_name = None
-    if "prepared_pdf_key" not in st.session_state:
-        st.session_state.prepared_pdf_key = None
-
-    # CSS riêng cho PDF: không đưa toàn bộ CSS xem trước vào WeasyPrint,
-    # giúp giảm khối lượng CSS cần phân tích mà vẫn giữ bố cục bản nhạc.
-    # CSS riêng cho PDF: giảm khối lượng CSS cần phân tích.
-    pdf_style = """
-    <style>
-        @page { size: A4 portrait; margin: 0; }
-        html, body {
-            width: 210mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: #ffffff !important;
-            font-family: sans-serif;
-        }
-        body { display: block !important; }
-        .sheet-page {
-            background: #ffffff !important;
-            width: 210mm !important;
-            height: 297mm !important;
-            min-height: 297mm !important;
-            max-width: none !important;
-            box-sizing: border-box !important;
-            margin: 0 !important;
-            padding: 50px 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-            border-radius: 0 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            page-break-after: always !important;
-            break-after: page !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            /* Không cắt khuông nếu WeasyPrint tính chiều cao hơi khác trình duyệt. */
-            overflow: visible !important;
-        }
-        table {
-            border-collapse: collapse !important;
-            text-align: center;
-            table-layout: fixed !important;
-            width: 94% !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
-        }
-        td {
-            padding: 2px 0 !important;
-            vertical-align: top !important;
-            overflow: visible !important;
-            box-sizing: border-box !important;
-        }
+    # 3. Khi cờ trigger được bật, tiến hành sinh JS
+    if st.session_state.get("trigger_print", False):
+        html_for_print = page_style + "".join(pages_list)
         
-        .khuong-wrapper {
-            width: 100% !important;
-            padding: 0 !important;
-            margin-bottom: 45px !important;
-            box-sizing: border-box !important;
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-    </style>
-    """
-    # PDF chỉ cần các trang sheet; bỏ CSS xem trước và phần giao diện web.
-    html_for_pdf = (
-        '<!DOCTYPE html><html><head><meta charset="utf-8">'
-        + pdf_style + "</head><body>"
-        + "".join(pages_list) + "</body></html>"
-    )
-    pdf_key = str(hash(html_for_pdf))
-    safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
-    if not safe_name:
-        safe_name = "Sheet nhac"
+        import json
+        safe_html_json = json.dumps(html_for_print)
+        
+        # Tạo mã số duy nhất dựa trên thời gian
+        print_id = int(time.time())
+        
+        # Chèn thẳng print_id vào comment của JS để thay đổi nội dung chuỗi, ép Streamlit reload lại component này
+        js_code_print = f"""
+        <script>
+        (function() {{
+            // ID lượt in: {print_id}
+            var htmlContent = {safe_html_json};
+            
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) {{
+                alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
+                return;
+            }}
+            
+            printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            
+            setTimeout(function() {{
+                printWindow.print();
+                printWindow.close();
+            }}, 500);
+        }})();
+        </script>
+        """
+        # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
+        components.html(js_code_print, height=0)
 
-    # Khởi chạy tạo PDF ở luồng nền; giao diện xem bản nhạc không phải chờ PDF.
-    if "prepared_pdf_future" not in st.session_state:
-        st.session_state.prepared_pdf_future = None
-
-    if st.session_state.prepared_pdf_key != pdf_key:
-        st.session_state.prepared_pdf_bytes = None
-        st.session_state.prepared_pdf_name = None
-        st.session_state.prepared_pdf_key = pdf_key
-        st.session_state.prepared_pdf_future = None
-        if pages_list:
-            st.session_state.prepared_pdf_future = _pdf_executor.submit(tao_pdf_tu_html, html_for_pdf)
-            st.session_state.prepared_pdf_pending_key = pdf_key
-            st.session_state.prepared_pdf_pending_name = f"{safe_name}.pdf"
-
-    @st.fragment(run_every=1)
-    def hien_thi_nut_pdf():
-        future = st.session_state.get("prepared_pdf_future")
-        if future is not None:
-            if future.done():
-                try:
-                    # Chỉ nhận kết quả nếu vẫn thuộc bài/chế độ hiện tại.
-                    if st.session_state.get("prepared_pdf_pending_key") == st.session_state.get("prepared_pdf_key"):
-                        st.session_state.prepared_pdf_bytes = future.result()
-                        st.session_state.prepared_pdf_name = st.session_state.get("prepared_pdf_pending_name", f"{safe_name}.pdf")
-                except ImportError:
-                    st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
-                except Exception as e:
-                    st.error(f"Không thể tạo PDF: {e}")
-                finally:
-                    st.session_state.prepared_pdf_future = None
-            else:
-                st.caption("Đang chuẩn bị PDF ở nền… Bạn vẫn có thể xem bản nhạc.")
-
-        if st.session_state.get("prepared_pdf_bytes") is not None:
-            st.download_button(
-                label="Xuất file PDF",
-                data=st.session_state.prepared_pdf_bytes,
-                file_name=st.session_state.prepared_pdf_name or f"{safe_name}.pdf",
-                mime="application/pdf",
-                key="download_prepared_pdf",
-                use_container_width=False,
-            )
-        elif st.session_state.get("prepared_pdf_future") is None:
-            st.info("PDF sẽ được chuẩn bị tự động khi bài hát hoặc chế độ hiển thị thay đổi.")
-
-    hien_thi_nut_pdf()
-
-    # Hiển thị bản nhạc  
-    st.write("Chế độ:", display_mode, "| Số khuông:", len(all_khuong_html))
-    components.html(
-        html_to_render,
-        height=calculated_height,
-        scrolling=False
-    )
+    
