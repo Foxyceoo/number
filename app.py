@@ -559,7 +559,15 @@ if uploaded_files:
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
 
-    if st.button("Xuất PDF", key="btn_to_pdf_layout"):
+    col1, col2 = st.columns([1, 4])
+
+    with col1:
+        export_clicked = st.button("Xuất PDF", key="btn_to_pdf_layout")
+
+    with col2:
+        st.write(f"🎵 {song_name}")
+
+    if export_clicked:
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
         else:
