@@ -313,17 +313,30 @@ if uploaded_files:
 
         /* 3. Ép các trang giấy A4 hiển thị chuẩn xác khi xuất file */
         .sheet-page {
-            width: 100% !important;
-            max-width: 794px !important;
-            box-shadow: none !important;
-            border: none !important;
-            margin: 0 auto !important;
-            padding: 0px !important; /* Giữ nguyên lề trên dưới bạn vừa chỉnh */
-            
-            /* Ép trình duyệt BẮT BUỘC phải ngắt trang sau khi hết 1 khối .sheet-page */
-            page-break-after: always !important;
-            break-after: page !important;
-        }
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 297mm !important;
+        max-width: none !important;
+        box-sizing: border-box !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+
+        page-break-after: always !important;
+        break-after: page !important;
+    }
+
+    .khuong-wrapper {
+        margin-bottom: 10px !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
 
         /* 4. Cấu hình cài đặt trang in của trình duyệt */
         @page {
