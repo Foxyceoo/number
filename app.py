@@ -485,7 +485,7 @@ if uploaded_files:
                                 f"align-items:center; line-height:0.8;'>"
                                 f"<span style='font-size:14px; height:auto;"
                                 f"line-height:7px; white-space:normal;'>"
-                                f"{'<br>'.join(['·'] * dots)}</span>"
+                                f"{''.join(['·<br>' for _ in range(dots)]).rstrip('<br>')}</span>"
                                 f"<span>{number}</span></div>"
                             )
                         else:
