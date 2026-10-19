@@ -3,116 +3,12 @@ import pandas as pd
 import json
 import math
 import time
-import pyrebase
-import requests
 import os
 import streamlit.components.v1 as components
 
 
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
-
-# Sát lề trái
-config = {
-    "apiKey": st.secrets["FIREBASE_API_KEY"],
-    "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
-    "projectId": st.secrets["FIREBASE_PROJECT_ID"],
-    "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
-    "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
-    "appId": st.secrets["FIREBASE_APP_ID"],
-    "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
-}
-
-@st.cache_resource
-def get_firebase():
-    return pyrebase.initialize_app(config)
-
-# Khởi tạo Auth
-firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
-
-# 2. Quản lý trạng thái đăng nhập
-if 'user' not in st.session_state:
-    st.session_state.user = None
-
-# Giao diện đăng nhập
-def login_form():
-    st.title("Đăng nhập")
-    email = st.text_input("Email", key="email_input")
-    password = st.text_input("Mật khẩu", type="password", key="pass_input")
-    
-    if st.button("Đăng nhập"):
-        try:
-            # 1. Gọi Firebase
-            user = auth.sign_in_with_email_and_password(email, password)
-            
-            # 2. Cập nhật Session State ngay lập tức
-            st.session_state.user = user
-            st.session_state.user_name = email.split('@')[0]
-            
-            # 3. QUAN TRỌNG: Rerun ngay sau khi cập nhật để ứng dụng vẽ lại giao diện mới
-            st.rerun() 
-            
-        except Exception as e:
-            st.error("Email hoặc mật khẩu không chính xác.")
-
-# Luồng kiểm tra đăng nhập
-if st.session_state.user is None:
-    login_form()
-    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
-else:
-    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
-    if 'is_loaded' not in st.session_state:
-        st.session_state.is_loaded = False
-    
-    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
-    if not st.session_state.is_loaded:
-        with st.spinner('Đang tải dữ liệu...'):
-            time.sleep(2) # Giả lập thời gian tải
-        st.session_state.is_loaded = True
-        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
-    
-    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
-    st.success(f"hello, {st.session_state.user_name}!")
-    st.caption("mở **sidebar** để bắt đầu")
-    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
-
-# Kiểm tra nếu người dùng đã đăng nhập thành công
-if st.session_state.user is not None:
-    with st.sidebar:
-        st.markdown("---")
-        st.write(f"**Người dùng:** {st.session_state.user_name}")
-        
-        # Nút đổi mật khẩu
-        if st.button("Đổi mật khẩu"):
-            st.session_state.show_change_password = True
-            
-        # Logic đổi mật khẩu
-        if st.session_state.get("show_change_password", False):
-            new_password = st.text_input("Nhập mật khẩu mới", type="password")
-            if st.button("Xác nhận đổi"):
-                try:
-                    id_token = st.session_state.user['idToken']
-                    api_key = st.secrets["FIREBASE_API_KEY"]
-                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
-                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
-                    
-                    response = requests.post(api_url, json=payload)
-                    
-                    if response.status_code == 200:
-                        st.success("Đổi mật khẩu thành công!")
-                        st.session_state.show_change_password = False
-                        st.rerun()
-                    else:
-                        error_data = response.json()
-                        st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
-                        
-                except Exception as e:
-                    st.error(f"Lỗi hệ thống: {e}")
-                    
-        if st.button("Đăng xuất"):
-            st.session_state.user = None
-            st.rerun()
             
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
@@ -123,7 +19,7 @@ def get_number_from_key(note_data):
 
 #Hiển thị
 def get_symbol(value, mode):
-    if mode == "1. 1.. 1...":
+    if mode == "111":
         mapping = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
             6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
@@ -217,7 +113,7 @@ with st.sidebar:
     st.write("**Chế độ hiển thị:**")
     display_mode = st.radio(
         "Chọn chế độ hiển thị",
-        options=["1-15", "1. 1.. 1...", "abc"],
+        options=["115", "111", "abc"],
         label_visibility="collapsed"
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -459,7 +355,7 @@ if uploaded_files:
             notes_in_col = col[1] if len(col) > 1 else []
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-            if display_mode == "1. 1.. 1..." or display_mode == "abc":
+            if display_mode == "111" or display_mode == "abc":
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
@@ -474,7 +370,7 @@ if uploaded_files:
             if vals:
                 note_html = []
                 for val in vals:
-                    if display_mode == "1. 1.. 1...":
+                    if display_mode == "111":
                         parts = str(val).split(".")
                         dots = len(parts) - 1
                         number = parts[0] if parts[0] else "1"
