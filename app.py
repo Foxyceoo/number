@@ -34,7 +34,7 @@ def get_number_from_key(note_data):
 
 #Hiển thị
 def get_symbol(value, mode):
-    if mode == "1. 1.. 1...":
+    if mode == "111":
         mapping = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
             6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
@@ -376,7 +376,7 @@ if uploaded_files:
             notes_in_col = col[1] if len(col) > 1 else []
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-            if display_mode == "1. 1.. 1..." or display_mode == "abc":
+            if display_mode == "111" or display_mode == "abc":
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
@@ -395,7 +395,7 @@ if uploaded_files:
                     symbol = str(val)
 
                     # Chỉ xử lý dấu chấm trong chế độ hiển thị nốt số
-                    if display_mode == "1. 1.. 1...":
+                    if display_mode == "111":
                         dot_count = len(symbol) - len(symbol.rstrip("."))
                         number = symbol.rstrip(".")
 
