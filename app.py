@@ -422,7 +422,7 @@ if uploaded_files:
                                 line-height: 7px;
                                 font-size: 8px;
                                 color: {top_dot_color};
-                            ">●</span>
+                            ">.</span>
 
                             <span style="
                                 position: absolute;
