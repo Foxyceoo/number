@@ -532,8 +532,14 @@ if uploaded_files:
     # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
-    # Tạo PDF và tải xuống với tên bài hát được điền sẵn
-    if st.button("Xuất PDF", key="btn_to_pdf_layout"):
+    # Chỉ hiện nút Xuất PDF khi chưa có PDF cho bài đang chọn.
+    # Khi PDF đã tạo xong, ẩn nút Xuất PDF và chỉ hiện nút Tải PDF xuống.
+    pdf_ready_for_current_song = (
+        bool(st.session_state.get("generated_pdf_bytes"))
+        and st.session_state.get("generated_pdf_song_name") == display_song_name
+    )
+
+    if not pdf_ready_for_current_song and st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
             st.error("Không có dữ liệu trang để xuất PDF!")
         else:
@@ -580,26 +586,31 @@ if uploaded_files:
                     + pdf_style + "</head><body>"
                     + html_to_render + "</body></html>"
                 )
-                # Báo trạng thái khi tạo lần đầu; những lần xuất lại cùng sheet sẽ dùng cache.
                 with st.spinner("Đang tạo PDF, Cáo chờ một chút nhé..."):
                     pdf_bytes = tao_pdf_tu_html(html_for_pdf)
 
-                # Làm sạch ký tự không phù hợp trong tên file
                 safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
                 if not safe_name:
                     safe_name = "Sheet nhac"
 
-                st.download_button(
-                    label="⬇️ Tải PDF xuống",
-                    data=pdf_bytes,
-                    file_name=f"{safe_name}.pdf",
-                    mime="application/pdf",
-                    key="download_generated_pdf",
-                )
+                # Lưu PDF đã tạo để nút tải xuống và nút Xuất PDF cùng tồn tại qua các lần rerun.
+                st.session_state["generated_pdf_bytes"] = pdf_bytes
+                st.session_state["generated_pdf_name"] = f"{safe_name}.pdf"
+                st.session_state["generated_pdf_song_name"] = display_song_name
             except ImportError:
                 st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
             except Exception as e:
                 st.error(f"Không thể tạo PDF: {e}")
+
+    # Chỉ hiện nút tải xuống khi PDF thuộc bài hát đang chọn.
+    if pdf_ready_for_current_song:
+        st.download_button(
+            label="⬇️ Tải PDF xuống",
+            data=st.session_state["generated_pdf_bytes"],
+            file_name=st.session_state.get("generated_pdf_name", "Sheet nhac.pdf"),
+            mime="application/pdf",
+            key="download_generated_pdf",
+        )
 
     # Hiển thị bản nhạc      
     components.html(html_to_render, height=calculated_height, scrolling=False)
