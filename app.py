@@ -244,19 +244,19 @@ with st.sidebar:
 
     uploaded_files = list(st.session_state.playlist_files.values())
 
-        # --- Cấu hình chế độ hiển thị ---
-        st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
-        st.write("**Chế độ hiển thị:**")
+    # --- Cấu hình chế độ hiển thị ---
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+    st.write("**Chế độ hiển thị:**")
 
-                display_mode = st.radio(
-                    "Chọn chế độ hiển thị",
-                    options=["115", "111", "abc"],
-                    label_visibility="collapsed",
-                    key="display_mode",
-                    on_change=kiem_tra_che_do
-                )
+            display_mode = st.radio(
+                "Chọn chế độ hiển thị",
+                options=["115", "111", "abc"],
+                label_visibility="collapsed",
+                key="display_mode",
+                on_change=kiem_tra_che_do
+            )
 
-        st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
     st.write("**Danh sách bài hát**")
     st.markdown("<em>*tải lại trang sẽ làm mới danh sách</em>",unsafe_allow_html=True)
