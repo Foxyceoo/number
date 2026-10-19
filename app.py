@@ -171,7 +171,8 @@ with st.sidebar:
             pointer-events: none;
         }
 
-        /* Ẩn danh sách file phụ */
+        /* Ẩn tên file đã tải lên, giữ nguyên vùng nhập bài */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] [data-testid="stFileUploaderFile"],
         [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
         [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
             display: none !important;
