@@ -369,41 +369,91 @@ if uploaded_files:
             
             if vals:
                 note_html = []
-                for val in vals:
-                    if display_mode == "111":
-                        parts = str(val).split(".")
-                        dots = len(parts) - 1
-                        number = parts[0] if parts[0] else "1"
 
-                        if dots > 0:
-                            note_html.append(
-                                f"<div style='display:flex; flex-direction:column;"
-                                f"align-items:center; line-height:0.8;'>"
-                                f"<span style='font-size:14px; height:auto;"
-                                f"line-height:7px; white-space:normal;'>"
-                                f"{'<br>'.join(['·'] * dots)}</span>"
-                                f"<span>{number}</span></div>"
-                            )
-                        else:
-                            note_html.append(f"<div>{val}</div>")
+                for val in vals:
+                    symbol = str(val)
+
+                    # Chỉ xử lý dấu chấm trong chế độ hiển thị nốt số
+                    if display_mode == "1. 1.. 1...":
+                        dot_count = len(symbol) - len(symbol.rstrip("."))
+                        number = symbol.rstrip(".")
+
+                        # Hai vị trí chấm cố định:
+                        # Chấm sát số đen nếu nốt có ít nhất 1 chấm.
+                        # Chấm phía trên đen nếu nốt có ít nhất 2 chấm.
+                        top_dot_color = "black" if dot_count >= 2 else "white"
+                        bottom_dot_color = "black" if dot_count >= 1 else "white"
+
+                        note_html.append(f"""
+                        <div style="
+                            position: relative;
+                            height: 30px;
+                            width: 100%;
+                            text-align: center;
+                            line-height: normal;
+                        ">
+                            <span style="
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                height: 7px;
+                                line-height: 7px;
+                                font-size: 14px;
+                                color: {top_dot_color};
+                            ">●</span>
+
+                            <span style="
+                                position: absolute;
+                                top: 6px;
+                                left: 0;
+                                right: 0;
+                                height: 7px;
+                                line-height: 7px;
+                                font-size: 14px;
+                                color: {bottom_dot_color};
+                            ">●</span>
+
+                            <span style="
+                                position: absolute;
+                                top: 12px;
+                                left: 0;
+                                right: 0;
+                                font-size: 15px;
+                                line-height: 19.5px;
+                                font-weight: bold;
+                                font-family: monospace, sans-serif;
+                            ">{number}</span>
+                        </div>
+                        """)
                     else:
-                        note_html.append(f"<div>{val}</div>")
+                        note_html.append(f"""
+                        <div style="
+                            min-height: 19.5px;
+                            line-height: 19.5px;
+                            font-size: 15px;
+                            font-weight: bold;
+                            text-align: center;
+                            font-family: monospace, sans-serif;
+                        ">{symbol}</div>
+                        """)
 
                 all_nums = "".join(note_html)
+
                 cell_content = f"""
-                <div style='display:flex; flex-direction:column;
-                align-items:center; justify-content:flex-start;
-                min-height:75px; font-size:15px; font-weight:bold;
-                line-height:1.3; text-align:center;
-                font-family:monospace,sans-serif;'>
+                <div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-start;
+                    min-height: 60px;
+                ">
                     {all_nums}
                 </div>
                 """
-
             else:
-                # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
+                # Đồng bộ chiều cao ô trống
                 cell_content = "<div style='min-height: 60px;'></div>"
-
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
         html_content += "</tr></table>"
