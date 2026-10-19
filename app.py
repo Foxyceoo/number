@@ -549,24 +549,7 @@ if uploaded_files:
         pages_list.append(page_content)
         
     # Chuỗi HTML đầy đủ để hiển thị trên Web xem trước
-    print_button = """
-    <div class="print-controls" style="text-align:center; margin: 0 auto 18px; padding: 10px;">
-        <button onclick="window.print()" style="
-            padding: 10px 20px; border: 0; border-radius: 8px;
-            background: #00008c; color: white; font-size: 16px;
-            cursor: pointer;">
-            🖨️ In bản nhạc
-        </button>
-    </div>
-    <style>
-        @media print {
-            .print-controls { display: none !important; }
-            body { background: #ffffff !important; padding: 0 !important; }
-            .sheet-page { box-shadow: none !important; border-radius: 0 !important; }
-        }
-    </style>
-    """
-    html_to_render = page_style + print_button + "".join(pages_list)
+    html_to_render = page_style + "".join(pages_list)
     
     # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
@@ -699,14 +682,9 @@ if uploaded_files:
                 st.caption("Đang chuẩn bị PDF ở nền… Bạn vẫn có thể xem bản nhạc.")
 
         if st.session_state.get("prepared_pdf_bytes") is not None:
-            st.download_button(
-                label="Xuất file PDF",
-                data=st.session_state.prepared_pdf_bytes,
-                file_name=st.session_state.prepared_pdf_name or f"{safe_name}.pdf",
-                mime="application/pdf",
-                key="download_prepared_pdf",
-                use_container_width=False,
-            )
+            if st.button("Xuất file PDF", key="print_sheet_button", help="Mở hộp thoại in để in hoặc lưu bản nhạc thành PDF"):
+                st.session_state["print_sheet_now"] = True
+                st.rerun()
         elif st.session_state.get("prepared_pdf_future") is None:
             st.info("PDF sẽ được chuẩn bị tự động khi bài hát hoặc chế độ hiển thị thay đổi.")
 
@@ -714,8 +692,24 @@ if uploaded_files:
 
     # Hiển thị bản nhạc  
     st.write("Chế độ:", display_mode, "| Số khuông:", len(all_khuong_html))
+    # Khi bấm "Xuất file PDF", mở hộp thoại in của trình duyệt ngay trên khung bản nhạc.
+    if st.session_state.get("print_sheet_now", False):
+        html_to_render += """
+        <style>
+            @media print {
+                @page { size: A4 portrait; margin: 0; }
+                body { background: #ffffff !important; padding: 0 !important; }
+                .sheet-page { box-shadow: none !important; border-radius: 0 !important; }
+            }
+        </style>
+        <script>
+            setTimeout(function() { window.print(); }, 300);
+        </script>
+        """
     components.html(
         html_to_render,
         height=calculated_height,
         scrolling=False
     )
+    # Xóa cờ sau khi đã gửi lệnh in vào khung xem trước.
+    st.session_state["print_sheet_now"] = False
