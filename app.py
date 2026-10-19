@@ -608,7 +608,7 @@ if uploaded_files:
 
     st.markdown(
         f"<h2 style='text-align: center; margin-bottom: 15px;'>"
-        f"🎵 {os.path.splitext(song_name)[0].replace('_', ' ')}"
+        f"{os.path.splitext(song_name)[0].replace('_', ' ')}"
         f"</h2>",
         unsafe_allow_html=True
     )
