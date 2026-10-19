@@ -212,9 +212,13 @@ if uploaded_files:
         return pitch + 1
     
 
-    # Lấy danh sách các cột và số bit mỗi trang từ file
+        # Lấy danh sách các cột và số bit mỗi trang từ file
     columns = xu_ly_nhat_ky(song_data)
-    bits_per_page = 32
+
+    if display_mode == "1. 1.. 1...":
+        bits_per_page = 6
+    else:
+        bits_per_page = 32
     
 
     def get_number_from_data(note_data):
