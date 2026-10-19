@@ -7,9 +7,12 @@ import os
 import re
 import base64
 import streamlit.components.v1 as components
+from concurrent.futures import ThreadPoolExecutor
 
 
-# Tạo PDF một lần và lưu cache để xuất lại cùng một sheet nhanh hơn.
+# Tạo PDF trong luồng nền để không chặn giao diện khi đổi chế độ.
+_pdf_executor = ThreadPoolExecutor(max_workers=1)
+
 @st.cache_data(show_spinner=False)
 def tao_pdf_tu_html(html_for_pdf):
     from weasyprint import HTML
@@ -610,32 +613,52 @@ if uploaded_files:
     if not safe_name:
         safe_name = "Sheet nhac"
 
-    # Tự tạo lại PDF khi đổi bài hoặc đổi chế độ hiển thị.
+    # Khởi chạy tạo PDF ở luồng nền; giao diện xem bản nhạc không phải chờ PDF.
+    if "prepared_pdf_future" not in st.session_state:
+        st.session_state.prepared_pdf_future = None
+
     if st.session_state.prepared_pdf_key != pdf_key:
         st.session_state.prepared_pdf_bytes = None
         st.session_state.prepared_pdf_name = None
         st.session_state.prepared_pdf_key = pdf_key
+        st.session_state.prepared_pdf_future = None
         if pages_list:
-            try:
-                with st.spinner("Loading..."):
-                    st.session_state.prepared_pdf_bytes = tao_pdf_tu_html(html_for_pdf)
-                st.session_state.prepared_pdf_name = f"{safe_name}.pdf"
-            except ImportError:
-                st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
-            except Exception as e:
-                st.error(f"Không thể tạo PDF: {e}")
+            st.session_state.prepared_pdf_future = _pdf_executor.submit(tao_pdf_tu_html, html_for_pdf)
+            st.session_state.prepared_pdf_pending_key = pdf_key
+            st.session_state.prepared_pdf_pending_name = f"{safe_name}.pdf"
 
-    if st.session_state.prepared_pdf_bytes is not None:
-        st.download_button(
-            label="Xuất file PDF",
-            data=st.session_state.prepared_pdf_bytes,
-            file_name=st.session_state.prepared_pdf_name,
-            mime="application/pdf",
-            key="download_prepared_pdf",
-            use_container_width=False,
-        )
-    else:
-        st.info("PDF sẽ được chuẩn bị tự động khi bài hát hoặc chế độ hiển thị thay đổi.")
+    @st.fragment(run_every=1)
+    def hien_thi_nut_pdf():
+        future = st.session_state.get("prepared_pdf_future")
+        if future is not None:
+            if future.done():
+                try:
+                    # Chỉ nhận kết quả nếu vẫn thuộc bài/chế độ hiện tại.
+                    if st.session_state.get("prepared_pdf_pending_key") == st.session_state.get("prepared_pdf_key"):
+                        st.session_state.prepared_pdf_bytes = future.result()
+                        st.session_state.prepared_pdf_name = st.session_state.get("prepared_pdf_pending_name", f"{safe_name}.pdf")
+                except ImportError:
+                    st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
+                except Exception as e:
+                    st.error(f"Không thể tạo PDF: {e}")
+                finally:
+                    st.session_state.prepared_pdf_future = None
+            else:
+                st.caption("Đang chuẩn bị PDF ở nền… Bạn vẫn có thể xem bản nhạc.")
+
+        if st.session_state.get("prepared_pdf_bytes") is not None:
+            st.download_button(
+                label="Xuất file PDF",
+                data=st.session_state.prepared_pdf_bytes,
+                file_name=st.session_state.prepared_pdf_name or f"{safe_name}.pdf",
+                mime="application/pdf",
+                key="download_prepared_pdf",
+                use_container_width=False,
+            )
+        elif st.session_state.get("prepared_pdf_future") is None:
+            st.info("PDF sẽ được chuẩn bị tự động khi bài hát hoặc chế độ hiển thị thay đổi.")
+
+    hien_thi_nut_pdf()
 
     # Hiển thị bản nhạc      
     components.html(html_to_render, height=calculated_height, scrolling=False)
