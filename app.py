@@ -229,16 +229,18 @@ if uploaded_files:
     <style>
     ::-webkit-scrollbar { display: none !important; }
     
-    body { 
-        background-color: #f0f2f6; 
-        margin: 0; 
-        padding: 20px 0;
+    body {
+        background-color: #f0f2f6;
+        margin: 0;
+        padding: 20px;
         font-family: sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        width: 100%;
+        justify-content: flex-start;
+        width: max-content;
+        min-width: 100%;
+        box-sizing: border-box;
     }
 
     .text-label {
@@ -259,19 +261,16 @@ if uploaded_files:
         height: 297mm !important;
         min-height: 297mm !important;
         max-width: none !important;
-
+        flex: 0 0 297mm !important;
         box-sizing: border-box !important;
         background: white !important;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15) !important;
         border: 1px solid #d0d0d0 !important;
-
-        margin: 20px auto !important;
+        margin: 0 auto 20px auto !important;
         padding: 0 !important;
-
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
-
         page-break-after: always !important;
         break-after: page !important;
     }
