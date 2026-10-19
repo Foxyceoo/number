@@ -156,15 +156,35 @@ with st.sidebar:
             font-size: 11px !important;
         }
 
-        /* 2. Ép toàn bộ các element đi kèm/nằm dưới stFileUploader (trừ vùng section kéo thả) có chiều cao bằng 0 và ẩn đi */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] div,
+        /* Ẩn danh sách file phụ, không ẩn toàn bộ div của nút tải */
         [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
         [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
             display: none !important;
-            height: 0px !important;
-            padding: 0px !important;
-            margin: 0px !important;
-            overflow: hidden !important;
+        }
+
+        /* Chỉ hiển thị dấu cộng ở vùng tải file */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            position: relative;
+            height: 60px !important;
+            min-height: 60px !important;
+            padding: 0 !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
+            display: none !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section::after {
+            content: "+";
+            font-size: 30px;
+            font-weight: bold;
+            color: #00008C;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
         }
         </style>
         """,
