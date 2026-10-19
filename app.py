@@ -273,6 +273,7 @@ if uploaded_files:
 
         page-break-after: always !important;
         break-after: page !important;
+        flex-shrink: 0 !important;
     }
     /* Bảng nhạc co giãn ăn trọn 100% không gian còn lại sau khi đã trừ lề */
     table { 
