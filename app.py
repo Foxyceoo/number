@@ -477,7 +477,7 @@ if uploaded_files:
     # 5. XẾP DÒNG NHẠC VÀO TRANG GIẤY CHUẨN & TỰ ĐỘNG BÙ KHUÔNG ẨN (8 DÒNG/TRANG)
     # =========================================================================
     display_html = ""
-    lines_per_page = 5 if display_mode == "1. 1.. 1..." else 12  # Đã đổi thành 8 dòng theo ý bạn nè!
+    lines_per_page = 5 if display_mode == "1. 1.. 1..." else 10  # Đã đổi thành 8 dòng theo ý bạn nè!
     
     # Danh sách chứa HTML của từng trang sau khi gom đủ 8 dòng
     pages_list = []
