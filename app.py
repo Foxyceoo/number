@@ -86,6 +86,30 @@ st.markdown(
 # =========================================================================
 # 2. QUẢN LÝ SIDEBAR (Giao diện mới: Siêu gọn - Không lặp - Có nút xóa)
 # =========================================================================
+st.markdown(
+    """
+    <style>
+    /* Mở rộng tối đa container chính của Streamlit */
+    .block-container {
+        max-width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 5rem !important;
+    }
+    /* Căn giữa thành phần iframe hiển thị sheet nhạc */
+    iframe {
+        display: block;
+        margin: 0 auto !important;
+        width: 90% !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# =========================================================================
+# 2. QUẢN LÝ SIDEBAR (Giao diện mới: Siêu gọn - Không lặp - Có nút xóa)
+# =========================================================================
 with st.sidebar:
     st.title("Bộ chuyển đổi sheet số")
     
@@ -96,17 +120,46 @@ with st.sidebar:
     if "current_song" not in st.session_state:
         st.session_state.current_song = None
 
-    # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
-    
-    st.write("Chọn file **JSON** hoặc **TXT** để tải lên! (nhấp khoảng trắng để nhập bài hát)")
-    
-    # 1. Nút upload file
-    uploaded_files = st.file_uploader(
-        "Chọn file JSON hoặc TXT để tải lên!",
-        type=["json", "txt"],
-        accept_multiple_files=True,
-        label_visibility="collapsed"
-    )
+    # --- Nút + mở cửa sổ riêng để tải file, tránh tên file hiện ngoài sidebar ---
+    if "show_upload_window" not in st.session_state:
+        st.session_state.show_upload_window = False
+
+    if st.button("＋", key="open_upload_window", help="Thêm file JSON hoặc TXT"):
+        st.session_state.show_upload_window = True
+
+    @st.dialog("Thêm bài hát")
+    def upload_window():
+        st.write("Chọn file **JSON** hoặc **TXT** để tải lên!")
+        st.file_uploader(
+            "Chọn file JSON hoặc TXT để tải lên!",
+            type=["json", "txt"],
+            accept_multiple_files=True,
+            label_visibility="collapsed",
+            key="song_files_uploader"
+        )
+        if st.button("Đóng", key="close_upload_window"):
+            st.session_state.show_upload_window = False
+            st.rerun()
+
+    if st.session_state.show_upload_window:
+        upload_window()
+
+    # Gộp file mới vào playlist đã lưu trong session, không thay thế các bài cũ.
+    # Dùng nội dung file để nhận diện trùng lặp khi Streamlit rerun.
+    newly_uploaded_files = st.session_state.get("song_files_uploader") or []
+    if "playlist_files" not in st.session_state:
+        st.session_state.playlist_files = {}
+
+    for uploaded_file in newly_uploaded_files:
+        file_bytes = uploaded_file.getvalue()
+        file_id = (uploaded_file.name, file_bytes)
+        if file_id not in st.session_state.playlist_files:
+            st.session_state.playlist_files[file_id] = {
+                "name": uploaded_file.name,
+                "data": file_bytes,
+            }
+
+    uploaded_files = list(st.session_state.playlist_files.values())
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -138,55 +191,7 @@ with st.sidebar:
             width: 90% !important;
         }
         
-        /* ========================================================================= */
-        /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
-        /* ========================================================================= */
-        
-        /* 1. Thu nhỏ vùng Dropzone nhập file */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
-            padding: 10px !important;
-            min-height: 60px !important;
-            height: 60px !important;
-        }
-        /* Chỉ giữ lại dấu cộng ở khu vực tải file */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section > div {
-            display: none !important;
-        }
-
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            transform: scale(1.2) !important;
-            margin: 0 auto !important;
-        }
-
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 0 !important;
-            min-height: 60px !important;
-            height: 60px !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
-            transform: scale(0.7) !important;
-            margin-bottom: 0px !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small {
-            font-size: 11px !important;
-        }
-
-        /* 2. Ép toàn bộ các element đi kèm/nằm dưới stFileUploader (trừ vùng section kéo thả) có chiều cao bằng 0 và ẩn đi */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] div,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
-            display: none !important;
-            height: 0px !important;
-            padding: 0px !important;
-            margin: 0px !important;
-            overflow: hidden !important;
-        }
+        /* File uploader đã được chuyển vào cửa sổ riêng, không cần CSS ẩn tên file ở sidebar nữa. */
         </style>
         """,
         unsafe_allow_html=True
@@ -201,7 +206,7 @@ with st.sidebar:
         st.info("Chưa có bài hát nào được tải lên.")
     else:
         for idx, current_file in enumerate(uploaded_files):
-            display_name = current_file.name.replace(".json", "").replace("_", " ")
+            display_name = current_file["name"].replace(".json", "").replace(".txt", "").replace("_", " ")
             is_current = (st.session_state.selected_song_index == idx)
             button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
             
@@ -217,10 +222,14 @@ if uploaded_files:
         
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
-    # Đọc dữ liệu JSON
-    data = json.load(current_selected_file)
+    # Đọc dữ liệu từ nội dung đã lưu trong session để các bài cũ vẫn còn khi thêm bài mới.
+    try:
+        data = json.loads(current_selected_file["data"].decode("utf-8-sig"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        st.error(f"Không đọc được file {current_selected_file['name']}: {exc}")
+        st.stop()
     song_data = data[0] if isinstance(data, list) else data
-    song_name = current_selected_file.name.replace(".json", "")
+    song_name = current_selected_file["name"].rsplit(".", 1)[0]
     
  
     raw_columns = song_data.get("columns", [])
