@@ -473,27 +473,42 @@ if uploaded_files:
             
             if vals:
                 note_html = []
+
                 for val in vals:
                     if display_mode == "1. 1.. 1...":
                         parts = str(val).split(".")
                         dots = len(parts) - 1
-                        number = parts[0] if parts[0] else "1"
+                        number = parts[0]
 
                         if dots > 0:
+                            dots_html = "".join(
+                                "<span style='display:block; height:6px;"
+                                "line-height:6px;'>·</span>"
+                                for _ in range(dots)
+                            )
+
                             note_html.append(
-                                f"<div style='display:flex; flex-direction:column;"
-                                f"align-items:center; line-height:0.8;'>"
-                                f"<span style='font-size:14px; height:auto;"
-                                f"line-height:7px; white-space:normal;'>"
-                                f"{'<br>'.join(['·'] * dots)}</span>"
-                                f"<span>{number}</span></div>"
+                                f"<div style='display:inline-flex;"
+                                f"flex-direction:column; align-items:center;"
+                                f"justify-content:flex-end; vertical-align:bottom;'>"
+                                f"<span style='display:flex; flex-direction:column;"
+                                f"align-items:center; font-size:14px;"
+                                f"line-height:6px; height:{dots * 6}px;'>"
+                                f"{dots_html}</span>"
+                                f"<span style='line-height:19.5px;'>{number}</span>"
+                                f"</div>"
                             )
                         else:
-                            note_html.append(f"<div>{val}</div>")
+                            note_html.append(
+                                f"<div style='display:inline-flex;"
+                                f"align-items:flex-end; height:19.5px;'>"
+                                f"{number}</div>"
+                            )
                     else:
                         note_html.append(f"<div>{val}</div>")
 
                 all_nums = "".join(note_html)
+
                 cell_content = f"""
                 <div style='display:flex; flex-direction:column;
                 align-items:center; justify-content:flex-start;
