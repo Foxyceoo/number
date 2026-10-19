@@ -374,7 +374,7 @@ if uploaded_files:
                     symbol = str(val)
 
                     # Chỉ xử lý dấu chấm trong chế độ hiển thị nốt số
-                    if display_mode == "1. 1.. 1...":
+                    if display_mode == "111":
                         dot_count = len(symbol) - len(symbol.rstrip("."))
                         number = symbol.rstrip(".")
 
