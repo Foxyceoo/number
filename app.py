@@ -470,14 +470,39 @@ if uploaded_files:
             border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
             border_left = "1.5px solid #00008c" if is_new_line else "none"
 
+            
             if vals:
-                all_nums = "<br>".join(map(str, vals))
+                note_html = []
+                for val in vals:
+                    if display_mode == "1. 1.. 1...":
+                        parts = str(val).split(".")
+                        dots = len(parts) - 1
+                        number = parts[0] if parts[0] else "1"
+
+                        if dots > 0:
+                            note_html.append(
+                                f"<div style='display:flex; flex-direction:column;"
+                                f"align-items:center; line-height:0.8;'>"
+                                f"<span style='font-size:10px; height:7px;"
+                                f"line-height:7px;'>{'·' * dots}</span>"
+                                f"<span>{number}</span></div>"
+                            )
+                        else:
+                            note_html.append(f"<div>{val}</div>")
+                    else:
+                        note_html.append(f"<div>{val}</div>")
+
+                all_nums = "".join(note_html)
                 cell_content = f"""
-                <div style='display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 60px;'>
-                    <!-- Yaoyao đã tăng font-size từ 10px lên 15px và chỉnh lại line-height cho thoáng -->
-                    <div style='font-size: 15px; font-weight: bold; line-height: 1.3; text-align: center; font-family: monospace, sans-serif;'>{all_nums}</div>
+                <div style='display:flex; flex-direction:column;
+                align-items:center; justify-content:flex-start;
+                min-height:60px; font-size:15px; font-weight:bold;
+                line-height:1.3; text-align:center;
+                font-family:monospace,sans-serif;'>
+                    {all_nums}
                 </div>
                 """
+
             else:
                 # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
                 cell_content = "<div style='min-height: 60px;'></div>"
