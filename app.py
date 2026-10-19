@@ -15,16 +15,16 @@ st.set_page_config(
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
 
-# Hàm chuyển đổi Key thành số 1-15
+# Hàm chuyển đổi Key thành số 115
 def get_number_from_key(note_data):
     # note_data là list [pitch, layer], ví dụ: [7, "2"]
     # Pitch (note_data[0]) chính là vị trí phím 0-14
     pitch = int(note_data[0])
-    return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 1-15
+    return pitch + 1  # Vì index bắt đầu từ 0 nên cộng 1 để ra số 115
 
 #Hiển thị
 def get_symbol(value, mode):
-    if mode == "1. 1.. 1...":
+    if mode == "111":
         mapping = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
             6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
@@ -154,7 +154,7 @@ with st.sidebar:
             label_visibility="collapsed",
             key="song_files_uploader"
         )
-        if st.button("Đóng", key="close_upload_window"):
+        if st.button("Nhập", key="close_upload_window"):
             st.session_state.show_upload_window = False
             st.rerun()
 
@@ -183,7 +183,7 @@ with st.sidebar:
     st.write("**Chế độ hiển thị:**")
     display_mode = st.radio(
         "Chọn chế độ hiển thị",
-        options=["1-15", "1. 1.. 1...", "abc"],
+        options=["115", "111", "abc"],
         label_visibility="collapsed"
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -403,7 +403,7 @@ if uploaded_files:
     all_khuong_html = []
 
     # Chiều cao mỗi nốt tùy theo chế độ hiển thị
-    note_item_height = 32 if display_mode == "1. 1.. 1..." else 20
+    note_item_height = 32 if display_mode == "111" else 20
 
     # Chiều cao thống nhất cho các cột trong toàn bài
     max_notes_in_song = max(
@@ -429,7 +429,7 @@ if uploaded_files:
             notes_in_col = col[1] if len(col) > 1 else []
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-            if display_mode == "1. 1.. 1..." or display_mode == "abc":
+            if display_mode == "111" or display_mode == "abc":
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
@@ -444,7 +444,7 @@ if uploaded_files:
                 note_html = []
 
                 for val in vals:
-                    if display_mode == "1. 1.. 1...":
+                    if display_mode == "111":
                         symbol = str(val)
                         number = symbol.rstrip(".")
                         dot_count = len(symbol) - len(number)
@@ -529,7 +529,7 @@ if uploaded_files:
     display_html = ""
 
     # Số dòng mỗi trang theo chế độ hiển thị
-    if display_mode == "1. 1.. 1...":
+    if display_mode == "111":
         lines_per_page = 5
     else:
         max_notes_in_song = max(
