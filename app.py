@@ -533,74 +533,70 @@ if uploaded_files:
     # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
-    # Tạo PDF rồi dùng nút tải xuống gốc của Streamlit để trình duyệt tải ổn định.
-    # Không dùng JavaScript trong iframe vì trình duyệt có thể chặn tải xuống tự động.
+    # Chuẩn bị PDF ngay khi bài hát hoặc chế độ hiển thị thay đổi.
+    # Nhờ vậy khi bấm Tải PDF xuống, file đã được tạo sẵn.
     if "prepared_pdf_bytes" not in st.session_state:
         st.session_state.prepared_pdf_bytes = None
     if "prepared_pdf_name" not in st.session_state:
         st.session_state.prepared_pdf_name = None
-    if "prepared_pdf_song" not in st.session_state:
-        st.session_state.prepared_pdf_song = None
+    if "prepared_pdf_key" not in st.session_state:
+        st.session_state.prepared_pdf_key = None
 
-    # Nếu đổi bài, bỏ bản PDF đã chuẩn bị của bài trước.
-    if st.session_state.prepared_pdf_song != display_song_name:
+    pdf_style = """
+    <style>
+        @page { size: A4 portrait; margin: 0; }
+        html, body {
+            width: 210mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            font-family: sans-serif;
+        }
+        body { display: block !important; align-items: initial !important; justify-content: initial !important; }
+        .sheet-page {
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-width: none !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            padding: 50px 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            overflow: hidden !important;
+        }
+        .khuong-wrapper { width: 100% !important; box-sizing: border-box !important; }
+    </style>
+    """
+    html_for_pdf = (
+        "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
+        + pdf_style + "</head><body>"
+        + html_to_render + "</body></html>"
+    )
+    pdf_key = str(hash(html_for_pdf))
+    safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
+    if not safe_name:
+        safe_name = "Sheet nhac"
+
+    # Tự tạo lại PDF khi đổi bài hoặc đổi chế độ hiển thị.
+    if st.session_state.prepared_pdf_key != pdf_key:
         st.session_state.prepared_pdf_bytes = None
         st.session_state.prepared_pdf_name = None
-        st.session_state.prepared_pdf_song = display_song_name
+        st.session_state.prepared_pdf_key = pdf_key
+        if pages_list:
+            try:
+                with st.spinner("Đang chuẩn bị PDF cho bài này..."):
+                    st.session_state.prepared_pdf_bytes = tao_pdf_tu_html(html_for_pdf)
+                st.session_state.prepared_pdf_name = f"{safe_name}.pdf"
+            except ImportError:
+                st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
+            except Exception as e:
+                st.error(f"Không thể tạo PDF: {e}")
 
-    if st.session_state.prepared_pdf_bytes is None:
-        if st.button("⬇️ Tải PDF xuống", key="btn_download_pdf_direct"):
-            if not pages_list:
-                st.error("Không có dữ liệu trang để xuất PDF!")
-            else:
-                try:
-                    pdf_style = """
-                    <style>
-                        @page { size: A4 portrait; margin: 0; }
-                        html, body {
-                            width: 210mm !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                            background: #ffffff !important;
-                            font-family: sans-serif;
-                        }
-                        body { display: block !important; align-items: initial !important; justify-content: initial !important; }
-                        .sheet-page {
-                            width: 210mm !important;
-                            height: 297mm !important;
-                            min-height: 297mm !important;
-                            max-width: none !important;
-                            box-sizing: border-box !important;
-                            margin: 0 !important;
-                            padding: 50px 0 !important;
-                            box-shadow: none !important;
-                            border: none !important;
-                            border-radius: 0 !important;
-                            page-break-after: always !important;
-                            break-after: page !important;
-                            overflow: hidden !important;
-                        }
-                        .khuong-wrapper { width: 100% !important; box-sizing: border-box !important; }
-                    </style>
-                    """
-                    html_for_pdf = (
-                        "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
-                        + pdf_style + "</head><body>"
-                        + html_to_render + "</body></html>"
-                    )
-                    with st.spinner("Đang tạo PDF, Cáo chờ một chút nhé..."):
-                        pdf_bytes = tao_pdf_tu_html(html_for_pdf)
-                    safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
-                    if not safe_name:
-                        safe_name = "Sheet nhac"
-                    st.session_state.prepared_pdf_bytes = pdf_bytes
-                    st.session_state.prepared_pdf_name = f"{safe_name}.pdf"
-                    st.rerun()
-                except ImportError:
-                    st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
-                except Exception as e:
-                    st.error(f"Không thể tạo PDF: {e}")
-    else:
+    if st.session_state.prepared_pdf_bytes is not None:
         st.download_button(
             label="⬇️ Tải PDF xuống",
             data=st.session_state.prepared_pdf_bytes,
@@ -609,10 +605,8 @@ if uploaded_files:
             key="download_prepared_pdf",
             use_container_width=False,
         )
-        if st.button("↻ Tạo lại PDF", key="regenerate_pdf"):
-            st.session_state.prepared_pdf_bytes = None
-            st.session_state.prepared_pdf_name = None
-            st.rerun()
+    else:
+        st.info("PDF sẽ được chuẩn bị tự động khi bài hát hoặc chế độ hiển thị thay đổi.")
 
     # Hiển thị bản nhạc      
     components.html(html_to_render, height=calculated_height, scrolling=False)
