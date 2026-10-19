@@ -549,24 +549,8 @@ if uploaded_files:
         pages_list.append(page_content)
         
     # Chuỗi HTML đầy đủ để hiển thị trên Web xem trước
-    print_button = """
-    <div class="print-controls" style="text-align:center; margin: 0 auto 18px; padding: 10px;">
-        <button onclick="window.print()" style="
-            padding: 10px 20px; border: 0; border-radius: 8px;
-            background: #00008c; color: white; font-size: 16px;
-            cursor: pointer;">
-            🖨️ In bản nhạc
-        </button>
-    </div>
-    <style>
-        @media print {
-            .print-controls { display: none !important; }
-            body { background: #ffffff !important; padding: 0 !important; }
-            .sheet-page { box-shadow: none !important; border-radius: 0 !important; }
-        }
-    </style>
-    """
-    html_to_render = page_style + print_button + "".join(pages_list)
+    # Đã bỏ nút "In bản nhạc"; giữ nguyên phần xem trước bản nhạc.
+    html_to_render = page_style + "".join(pages_list)
     
     # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
