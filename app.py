@@ -557,4 +557,4 @@ if uploaded_files:
 
         components.html(js_code_print, height=0)
             
-        components.html(html_to_render, height=calculated_height, scrolling=False)
+    components.html(html_to_render, height=calculated_height, scrolling=False)
