@@ -704,13 +704,15 @@ if uploaded_files:
                 printWindow.document.close();
                 printWindow.focus();
 
-                printWindow.onload = function() {{
-                    printWindow.onafterprint = function() {{
-                        printWindow.close();
-                    }};
-
-                    printWindow.print();
+                // Tự đóng tab sau khi in xong hoặc người dùng bấm Hủy.
+                printWindow.onafterprint = function() {{
+                    printWindow.close();
                 }};
+
+                // Chờ trình duyệt chuẩn bị nội dung rồi mở hộp thoại in.
+                setTimeout(function() {{
+                    printWindow.print();
+                }}, 500);
             }})();
             </script>
             """
