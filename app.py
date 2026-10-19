@@ -128,7 +128,7 @@ with st.sidebar:
             label_visibility="collapsed",
             key="song_files_uploader"
         )
-        if st.button("Đóng", key="close_upload_window"):
+        if st.button("Nhập", key="close_upload_window"):
             st.session_state.show_upload_window = False
             st.rerun()
 
@@ -157,7 +157,7 @@ with st.sidebar:
     st.write("**Chế độ hiển thị:**")
     display_mode = st.radio(
         "Chọn chế độ hiển thị",
-        options=["1-15", "1. 1.. 1...", "abc"],
+        options=["115", "111", "abc"],
         label_visibility="collapsed"
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
