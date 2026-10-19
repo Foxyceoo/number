@@ -662,4 +662,9 @@ if uploaded_files:
     hien_thi_nut_pdf()
 
     # Hiển thị bản nhạc      
-    components.html(html_to_render, height=calculated_height, scrolling=False)
+    components.html(
+        html_to_render,
+        height=calculated_height,
+        scrolling=False,
+        key=f"sheet_{st.session_state.selected_song_index}_{display_mode}"
+    )
