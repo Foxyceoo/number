@@ -425,6 +425,21 @@ if uploaded_files:
                         """)
                     else:
                         note_html.append(f"<div>{val}</div>")
+                        all_nums = "".join(note_html)
+
+                        cell_content = f"""
+                        <div style='display:flex; flex-direction:column;
+                        align-items:center; justify-content:flex-start;
+                        min-height:75px; font-size:15px; font-weight:bold;
+                        line-height:1.3; text-align:center;
+                        font-family:monospace,sans-serif;'>
+                            {all_nums}
+                        </div>
+                        """
+                    else:
+                        cell_content = """
+                        <div style='min-height:60px;'></div>
+                        """
 
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
