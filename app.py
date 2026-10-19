@@ -559,13 +559,20 @@ if uploaded_files:
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
 
+    st.markdown(
+        f"<h2 style='text-align: center; margin-bottom: 15px;'>"
+        f"🎵 {os.path.splitext(song_name)[0].replace('_', ' ')}"
+        f"</h2>",
+        unsafe_allow_html=True
+    )
+
     col1, col2 = st.columns([1, 4])
 
     with col1:
         export_clicked = st.button("Xuất PDF", key="btn_to_pdf_layout")
 
     with col2:
-        st.write(f"🎵 {song_name}")
+        st.write("")
 
     if export_clicked:
         if not pages_list:
