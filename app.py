@@ -558,16 +558,7 @@ if uploaded_files:
     # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
-    
-    # Render nội dung chính lên màn hình Web hiển thị
-    components.html(html_to_render, height=calculated_height, scrolling=True)
-    
-    # =========================================================================
-    # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
-    # =========================================================================
-    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
-    
-        # 1. Chỉ mở cửa sổ in khi người dùng vừa bấm nút
+
     if st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
@@ -609,3 +600,5 @@ if uploaded_files:
 
             components.html(js_code_print, height=0)
     
+    # Render nội dung chính lên màn hình Web hiển thị
+    components.html(html_to_render, height=calculated_height, scrolling=True)
