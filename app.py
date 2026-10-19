@@ -585,7 +585,7 @@ if uploaded_files:
 
     # Số dòng mỗi trang theo chế độ hiển thị
     if display_mode == "111":
-        lines_per_page = 12
+        lines_per_page = 11
     else:
         max_notes_in_song = max(
             (len(col[1]) for col in columns if len(col) > 1),
