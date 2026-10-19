@@ -559,7 +559,7 @@ if uploaded_files:
     calculated_height = total_pages * 1200 + 100
     
     # Render nội dung chính lên màn hình Web hiển thị
-    components.html(html_to_render, height=calculated_height, scrolling=False)
+    components.html(html_to_render, height=calculated_height, scrolling=True)
     
     # =========================================================================
     # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
