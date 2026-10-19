@@ -96,17 +96,32 @@ with st.sidebar:
     if "current_song" not in st.session_state:
         st.session_state.current_song = None
 
-    # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
-    
-    st.write("Chọn file **JSON** hoặc **TXT** để tải lên!")
-    
-    # 1. Nút upload file
-    uploaded_files = st.file_uploader(
-        "Chọn file JSON hoặc TXT để tải lên!",
-        type=["json", "txt"],
-        accept_multiple_files=True,
-        label_visibility="collapsed"
-    )
+    # --- Nút + mở cửa sổ riêng để tải file, tránh tên file hiện ngoài sidebar ---
+    if "show_upload_window" not in st.session_state:
+        st.session_state.show_upload_window = False
+
+    if st.button("＋", key="open_upload_window", help="Thêm file JSON hoặc TXT"):
+        st.session_state.show_upload_window = True
+
+    @st.dialog("Thêm bài hát")
+    def upload_window():
+        st.write("Chọn file **JSON** hoặc **TXT** để tải lên!")
+        st.file_uploader(
+            "Chọn file JSON hoặc TXT để tải lên!",
+            type=["json", "txt"],
+            accept_multiple_files=True,
+            label_visibility="collapsed",
+            key="song_files_uploader"
+        )
+        if st.button("Đóng", key="close_upload_window"):
+            st.session_state.show_upload_window = False
+            st.rerun()
+
+    if st.session_state.show_upload_window:
+        upload_window()
+
+    # Lấy file từ widget trong cửa sổ; danh sách bài hát bên dưới vẫn dùng như cũ
+    uploaded_files = st.session_state.get("song_files_uploader")
 
     # --- Cấu hình chế độ hiển thị ---
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -138,52 +153,7 @@ with st.sidebar:
             width: 90% !important;
         }
         
-        /* ========================================================================= */
-        /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
-        /* ========================================================================= */
-        
-        /* Vùng nhập bài: chỉ hiển thị một dấu cộng */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
-            position: relative;
-            height: 60px !important;
-            min-height: 60px !important;
-            padding: 0 !important;
-        }
-
-        /* Ẩn biểu tượng và chữ gốc để không bị trùng */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section span {
-            visibility: hidden !important;
-        }
-
-        /* Chỉ hiện một dấu cộng */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section::after {
-            content: "+";
-            font-size: 30px;
-            font-weight: bold;
-            color: #00008C;
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        /* Ẩn phần hiển thị file đã tải lên, nhưng giữ nguyên vùng bấm dấu cộng */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] [data-testid*="FileUploaderFile"],
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] [data-testid*="FileName"],
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] li,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section ~ div {
-            display: none !important;
-        }
-
-        /* Một số phiên bản Streamlit bọc tên file trong container riêng */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] div:has(> [data-testid="stFileUploaderFile"]) {
-            display: none !important;
-        }
+        /* File uploader đã được chuyển vào cửa sổ riêng, không cần CSS ẩn tên file ở sidebar nữa. */
         </style>
         """,
         unsafe_allow_html=True
