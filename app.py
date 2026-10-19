@@ -502,4 +502,5 @@ if uploaded_files:
     # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
-
+            
+    components.html(html_to_render, height=calculated_height, scrolling=False)
