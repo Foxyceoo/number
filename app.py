@@ -503,7 +503,7 @@ if uploaded_files:
                                 right: 0;
                                 height: 7px;
                                 line-height: 7px;
-                                font-size: 14px;
+                                font-size: 8px;
                                 color: {top_dot_color};
                             ">●</span>
 
@@ -514,7 +514,7 @@ if uploaded_files:
                                 right: 0;
                                 height: 7px;
                                 line-height: 7px;
-                                font-size: 14px;
+                                font-size: 8px;
                                 color: {bottom_dot_color};
                             ">●</span>
 
