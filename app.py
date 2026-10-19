@@ -396,7 +396,7 @@ if uploaded_files:
     .khuong-wrapper {
         width: 100% !important;
         padding: 0 !important;
-        margin-bottom: 35px !important;
+        margin-bottom: 45px !important;
         break-inside: avoid;
         page-break-inside: avoid;
     }
@@ -497,7 +497,7 @@ if uploaded_files:
                 cell_content = f"""
                 <div style='display:flex; flex-direction:column;
                 align-items:center; justify-content:flex-start;
-                min-height:60px; font-size:15px; font-weight:bold;
+                min-height:75px; font-size:15px; font-weight:bold;
                 line-height:1.3; text-align:center;
                 font-family:monospace,sans-serif;'>
                     {all_nums}
