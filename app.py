@@ -213,11 +213,42 @@ if uploaded_files:
         
     current_selected_file = uploaded_files[st.session_state.selected_song_index]
     
-    # Đọc dữ liệu từ nội dung đã lưu trong session để các bài cũ vẫn còn khi thêm bài mới.
-    try:
-        data = json.loads(current_selected_file["data"].decode("utf-16"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        st.error(f"Không đọc được file {current_selected_file['name']}: {exc}")
+    # Thử nhiều encoding phổ biến; chỉ chấp nhận cách đọc nào tạo được JSON hợp lệ.
+    file_bytes = current_selected_file["data"]
+    data = None
+    read_errors = []
+
+    # Ưu tiên encoding có BOM, sau đó thử UTF-16 LE/BE và UTF-8.
+    encodings = ("utf-8-sig", "utf-16", "utf-16-le", "utf-16-be", "utf-8", "cp1252")
+    for encoding in encodings:
+        try:
+            decoded_text = file_bytes.decode(encoding)
+            data = json.loads(decoded_text)
+            break
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            read_errors.append(f"{encoding}: {exc}")
+
+    # Nếu file UTF-16LE/BE bị thiếu đúng 1 byte cuối, bỏ byte lẻ rồi thử lại.
+    if data is None:
+        for encoding in ("utf-16-le", "utf-16-be"):
+            try:
+                even_bytes = file_bytes[:-1] if len(file_bytes) % 2 else file_bytes
+                decoded_text = even_bytes.decode(encoding, errors="ignore")
+                if decoded_text.startswith("\ufeff"):
+                    decoded_text = decoded_text[1:]
+                data = json.loads(decoded_text)
+                break
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                read_errors.append(f"{encoding} (bỏ byte cuối): {exc}")
+
+    if data is None:
+        st.error(
+            f"Không đọc được file {current_selected_file['name']}. "
+            "Cua đã thử UTF-8, UTF-16, UTF-16LE, UTF-16BE và CP1252 nhưng nội dung vẫn không phải JSON hợp lệ. "
+            "File có thể bị thiếu dữ liệu hoặc hỏng cấu trúc JSON."
+        )
+        with st.expander("Chi tiết lỗi đọc file"):
+            st.code("\n".join(read_errors[-6:]))
         st.stop()
     song_data = data[0] if isinstance(data, list) else data
     song_name = current_selected_file["name"].rsplit(".", 1)[0]
@@ -545,11 +576,12 @@ if uploaded_files:
     if "prepared_pdf_key" not in st.session_state:
         st.session_state.prepared_pdf_key = None
 
-    # CSS riêng cho PDF: để bộ phân trang của WeasyPrint tự ngắt trang A4.
-    # Mỗi khuông được giữ nguyên khối, không bị cắt giữa hai trang.
+    # CSS riêng cho PDF: không đưa toàn bộ CSS xem trước vào WeasyPrint,
+    # giúp giảm khối lượng CSS cần phân tích mà vẫn giữ bố cục bản nhạc.
+    # CSS riêng cho PDF: giảm khối lượng CSS cần phân tích.
     pdf_style = """
     <style>
-        @page { size: A4 portrait; margin: 15mm 0; }
+        @page { size: A4 portrait; margin: 0; }
         html, body {
             width: 210mm !important;
             margin: 0 !important;
@@ -558,20 +590,30 @@ if uploaded_files:
             font-family: sans-serif;
         }
         body { display: block !important; }
-        .pdf-khuong-wrapper {
-            display: block !important;
-            width: 100% !important;
-            padding: 0 !important;
-            margin: 0 0 18px 0 !important;
+        .sheet-page {
+            background: #ffffff !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-width: none !important;
             box-sizing: border-box !important;
-            break-inside: avoid !important;
-            page-break-inside: avoid !important;
+            margin: 0 !important;
+            padding: 50px 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            overflow: hidden !important;
         }
         table {
             border-collapse: collapse !important;
             text-align: center;
             table-layout: fixed !important;
-            width: 90% !important;
+            width: 94% !important;
             margin: 0 auto !important;
             padding: 0 !important;
         }
@@ -581,19 +623,22 @@ if uploaded_files:
             overflow: hidden;
             box-sizing: border-box !important;
         }
+        
+        .khuong-wrapper {
+            width: 100% !important;
+            padding: 0 !important;
+            margin-bottom: 45px !important;
+            box-sizing: border-box !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
     </style>
     """
-    # Tạo nội dung PDF độc lập với pages_list của cửa sổ xem trước.
-    # WeasyPrint tự chuyển khuông sang trang A4 tiếp theo khi không đủ chỗ;
-    # không thêm khuông ẩn và không cố định chiều cao trang gây cắt nội dung.
-    pdf_khuong_html = "".join(
-        f"<div class='pdf-khuong-wrapper'>{khuong_html}</div>"
-        for khuong_html in all_khuong_html
-    )
+    # PDF chỉ cần các trang sheet; bỏ CSS xem trước và phần giao diện web.
     html_for_pdf = (
         '<!DOCTYPE html><html><head><meta charset="utf-8">'
         + pdf_style + "</head><body>"
-        + pdf_khuong_html + "</body></html>"
+        + "".join(pages_list) + "</body></html>"
     )
     pdf_key = str(hash(html_for_pdf))
     safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
