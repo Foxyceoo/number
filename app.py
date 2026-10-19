@@ -471,38 +471,52 @@ if uploaded_files:
             border_left = "1.5px solid #00008c" if is_new_line else "none"
 
             
+            
             if vals:
                 note_html = []
+
                 for val in vals:
                     if display_mode == "1. 1.. 1...":
                         parts = str(val).split(".")
                         dots = len(parts) - 1
-                        number = parts[0] if parts[0] else "1"
+                        number = parts[0]
 
                         if dots > 0:
+                            dots_html = "".join(
+                                "<span style='display:block; height:6px; "
+                                "line-height:6px;'>·</span>"
+                                for _ in range(dots)
+                            )
+
                             note_html.append(
-                                f"<div style='display:flex; flex-direction:column;"
-                                f"align-items:center; line-height:0.8;'>"
-                                f"<span style='font-size:14px; height:auto;"
-                                f"line-height:7px; white-space:normal;'>"
-                                f"{''.join(['·<br>' for _ in range(dots)]).rstrip('<br>')}</span>"
+                                f"<div style='position:relative; "
+                                f"display:inline-block;'>"
+                                f"<span style='position:absolute; "
+                                f"bottom:100%; left:50%; "
+                                f"transform:translateX(-50%); "
+                                f"display:flex; flex-direction:column; "
+                                f"align-items:center; font-size:14px; "
+                                f"line-height:6px; white-space:nowrap;'>"
+                                f"{dots_html}</span>"
                                 f"<span>{number}</span></div>"
                             )
                         else:
-                            note_html.append(f"<div>{val}</div>")
+                            note_html.append(f"<div>{number}</div>")
                     else:
                         note_html.append(f"<div>{val}</div>")
 
                 all_nums = "".join(note_html)
+
                 cell_content = f"""
                 <div style='display:flex; flex-direction:column;
                 align-items:center; justify-content:flex-start;
-                min-height:60px; font-size:15px; font-weight:bold;
+                min-height:60px; font-size:13px; font-weight:bold;
                 line-height:1.3; text-align:center;
                 font-family:monospace,sans-serif;'>
                     {all_nums}
                 </div>
                 """
+
 
             else:
                 # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
