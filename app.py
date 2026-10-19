@@ -503,8 +503,6 @@ if uploaded_files:
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
 
-    # Hiển thị bản nhạc
-    components.html(html_to_render, height=calculated_height, scrolling=False)
 
     # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
@@ -556,5 +554,6 @@ if uploaded_files:
         """
 
         components.html(js_code_print, height=0)
-            
+
+    # Hiển thị bản nhạc      
     components.html(html_to_render, height=calculated_height, scrolling=False)
