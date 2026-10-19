@@ -3,12 +3,116 @@ import pandas as pd
 import json
 import math
 import time
+import pyrebase
+import requests
 import os
 import streamlit.components.v1 as components
 
 
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
+
+# Sát lề trái
+config = {
+    "apiKey": st.secrets["FIREBASE_API_KEY"],
+    "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
+    "projectId": st.secrets["FIREBASE_PROJECT_ID"],
+    "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
+    "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
+    "appId": st.secrets["FIREBASE_APP_ID"],
+    "databaseURL": "https://email-8c050-default-rtdb.firebaseio.com/"
+}
+
+@st.cache_resource
+def get_firebase():
+    return pyrebase.initialize_app(config)
+
+# Khởi tạo Auth
+firebase = pyrebase.initialize_app(config)
+auth = firebase.auth()
+
+# 2. Quản lý trạng thái đăng nhập
+if 'user' not in st.session_state:
+    st.session_state.user = None
+
+# Giao diện đăng nhập
+def login_form():
+    st.title("Đăng nhập")
+    email = st.text_input("Email", key="email_input")
+    password = st.text_input("Mật khẩu", type="password", key="pass_input")
+    
+    if st.button("Đăng nhập"):
+        try:
+            # 1. Gọi Firebase
+            user = auth.sign_in_with_email_and_password(email, password)
+            
+            # 2. Cập nhật Session State ngay lập tức
+            st.session_state.user = user
+            st.session_state.user_name = email.split('@')[0]
+            
+            # 3. QUAN TRỌNG: Rerun ngay sau khi cập nhật để ứng dụng vẽ lại giao diện mới
+            st.rerun() 
+            
+        except Exception as e:
+            st.error("Email hoặc mật khẩu không chính xác.")
+
+# Luồng kiểm tra đăng nhập
+if st.session_state.user is None:
+    login_form()
+    st.stop() # Dừng ứng dụng nếu chưa đăng nhập
+else:
+    # 1. Kiểm tra trạng thái đã tải xong chưa trong session_state
+    if 'is_loaded' not in st.session_state:
+        st.session_state.is_loaded = False
+    
+    # 2. Nếu chưa tải, hiển thị spinner và đặt lại cờ
+    if not st.session_state.is_loaded:
+        with st.spinner('Đang tải dữ liệu...'):
+            time.sleep(2) # Giả lập thời gian tải
+        st.session_state.is_loaded = True
+        st.rerun() # Chỉ rerun duy nhất 1 lần sau khi đặt flag
+    
+    # 3. Sau khi đã tải xong (is_loaded là True), hiển thị nội dung chính
+    st.success(f"hello, {st.session_state.user_name}!")
+    st.caption("mở **sidebar** để bắt đầu")
+    # ... (code hiển thị sheet nhạc của bạn nằm ở đây)
+
+# Kiểm tra nếu người dùng đã đăng nhập thành công
+if st.session_state.user is not None:
+    with st.sidebar:
+        st.markdown("---")
+        st.write(f"**Người dùng:** {st.session_state.user_name}")
+        
+        # Nút đổi mật khẩu
+        if st.button("Đổi mật khẩu"):
+            st.session_state.show_change_password = True
+            
+        # Logic đổi mật khẩu
+        if st.session_state.get("show_change_password", False):
+            new_password = st.text_input("Nhập mật khẩu mới", type="password")
+            if st.button("Xác nhận đổi"):
+                try:
+                    id_token = st.session_state.user['idToken']
+                    api_key = st.secrets["FIREBASE_API_KEY"]
+                    api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={api_key}"
+                    payload = {"idToken": id_token, "password": new_password, "returnSecureToken": True}
+                    
+                    response = requests.post(api_url, json=payload)
+                    
+                    if response.status_code == 200:
+                        st.success("Đổi mật khẩu thành công!")
+                        st.session_state.show_change_password = False
+                        st.rerun()
+                    else:
+                        error_data = response.json()
+                        st.error(f"Lỗi Firebase: {error_data.get('error', {}).get('message', 'Có lỗi xảy ra')}")
+                        
+                except Exception as e:
+                    st.error(f"Lỗi hệ thống: {e}")
+                    
+        if st.button("Đăng xuất"):
+            st.session_state.user = None
+            st.rerun()
             
 # Hàm chuyển đổi Key thành số 1-15
 def get_number_from_key(note_data):
@@ -19,7 +123,7 @@ def get_number_from_key(note_data):
 
 #Hiển thị
 def get_symbol(value, mode):
-    if mode == "111":
+    if mode == "1. 1.. 1...":
         mapping = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 
             6: "6", 7: "7", 8: "1.", 9: "2.", 10: "3.", 
@@ -113,7 +217,7 @@ with st.sidebar:
     st.write("**Chế độ hiển thị:**")
     display_mode = st.radio(
         "Chọn chế độ hiển thị",
-        options=["115", "111", "abc"],
+        options=["1-15", "1. 1.. 1...", "abc"],
         label_visibility="collapsed"
     )
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
@@ -355,7 +459,7 @@ if uploaded_files:
             notes_in_col = col[1] if len(col) > 1 else []
             raw_vals = sorted([get_number_from_key(n) for n in notes_in_col], reverse=True)
             
-            if display_mode == "111" or display_mode == "abc":
+            if display_mode == "1. 1.. 1..." or display_mode == "abc":
                 vals = [get_symbol(v, display_mode) for v in raw_vals]
             else:
                 vals = raw_vals
@@ -369,91 +473,41 @@ if uploaded_files:
             
             if vals:
                 note_html = []
-
                 for val in vals:
-                    symbol = str(val)
+                    if display_mode == "1. 1.. 1...":
+                        parts = str(val).split(".")
+                        dots = len(parts) - 1
+                        number = parts[0] if parts[0] else "1"
 
-                    # Chỉ xử lý dấu chấm trong chế độ hiển thị nốt số
-                    if display_mode == "111":
-                        dot_count = len(symbol) - len(symbol.rstrip("."))
-                        number = symbol.rstrip(".")
-
-                        # Hai vị trí chấm cố định:
-                        # Chấm sát số đen nếu nốt có ít nhất 1 chấm.
-                        # Chấm phía trên đen nếu nốt có ít nhất 2 chấm.
-                        top_dot_color = "black" if dot_count >= 2 else "transparent"
-                        bottom_dot_color = "black" if dot_count >= 1 else "transparent"
-
-                        note_html.append(f"""
-                        <div style="
-                            position: relative;
-                            height: 30px;
-                            width: 100%;
-                            text-align: center;
-                            line-height: normal;
-                        ">
-                            <span style="
-                                position: absolute;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                height: 7px;
-                                line-height: 7px;
-                                font-size: 8px;
-                                color: {top_dot_color};
-                            ">●</span>
-
-                            <span style="
-                                position: absolute;
-                                top: 6px;
-                                left: 0;
-                                right: 0;
-                                height: 7px;
-                                line-height: 7px;
-                                font-size: 8px;
-                                color: {bottom_dot_color};
-                            ">●</span>
-
-                            <span style="
-                                position: absolute;
-                                top: 12px;
-                                left: 0;
-                                right: 0;
-                                font-size: 15px;
-                                line-height: 19.5px;
-                                font-weight: bold;
-                                font-family: monospace, sans-serif;
-                            ">{number}</span>
-                        </div>
-                        """)
+                        if dots > 0:
+                            note_html.append(
+                                f"<div style='display:flex; flex-direction:column;"
+                                f"align-items:center; line-height:0.8;'>"
+                                f"<span style='font-size:14px; height:auto;"
+                                f"line-height:7px; white-space:normal;'>"
+                                f"{'<br>'.join(['·'] * dots)}</span>"
+                                f"<span>{number}</span></div>"
+                            )
+                        else:
+                            note_html.append(f"<div>{val}</div>")
                     else:
-                        note_html.append(f"""
-                        <div style="
-                            min-height: 19.5px;
-                            line-height: 19.5px;
-                            font-size: 15px;
-                            font-weight: bold;
-                            text-align: center;
-                            font-family: monospace, sans-serif;
-                        ">{symbol}</div>
-                        """)
+                        note_html.append(f"<div>{val}</div>")
 
                 all_nums = "".join(note_html)
-
                 cell_content = f"""
-                <div style="
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: flex-start;
-                    min-height: 60px;
-                ">
+                <div style='display:flex; flex-direction:column;
+                align-items:center; justify-content:flex-start;
+                min-height:75px; font-size:15px; font-weight:bold;
+                line-height:1.3; text-align:center;
+                font-family:monospace,sans-serif;'>
                     {all_nums}
                 </div>
                 """
+
             else:
-                # Đồng bộ chiều cao ô trống
+                # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
                 cell_content = "<div style='min-height: 60px;'></div>"
+
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
         html_content += "</tr></table>"
@@ -501,66 +555,61 @@ if uploaded_files:
     # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
-
-    # =========================================================================
-    # 6. MỞ TOÀN BỘ TRANG NHẠC TRONG CỬA SỔ RIÊNG VÀ DÙNG LỆNH IN CỦA TRÌNH DUYỆT
-    # =========================================================================
-    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
-
-    if st.button("Xuất PDF", key="btn_to_pdf_layout"):
-        if not pages_list:
-            st.error("Không có dữ liệu trang để in!")
-        else:
-            # Mã hóa riêng CSS và nội dung trang để đưa sang cửa sổ mới an toàn.
-            safe_style_json = json.dumps(page_style)
-            safe_pages_json = json.dumps("".join(pages_list))
-            print_id = int(time.time())
-
-            js_code_print = f"""
-            <script>
-            (function() {{
-                // ID lượt xuất: {print_id}
-                var pageStyle = {safe_style_json};
-                var pagesHtml = {safe_pages_json};
-                var printWindow = window.open('', '_blank');
-
-                if (!printWindow) {{
-                    alert('Trình duyệt đang chặn cửa sổ bật lên. Hãy cho phép popup cho trang này rồi bấm Xuất PDF lại nhé!');
-                    return;
-                }}
-
-                printWindow.document.open();
-                printWindow.document.write(
-                    '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-                    '<title>Sheet nhạc - In hoặc lưu PDF</title>' +
-                    pageStyle +
-                    '</head><body>' + pagesHtml + '</body></html>'
-                );
-                printWindow.document.close();
-                printWindow.focus();
-
-                // Mở hộp thoại in/lưu PDF của chính trình duyệt sau khi trang đã dựng xong.
-                // Không tự đóng cửa sổ để người dùng có thể kiểm tra và in lại nếu cần.
-                var openPrintDialog = function() {{
-                    printWindow.setTimeout(function() {{
-                        printWindow.focus();
-                        printWindow.print();
-                    }}, 700);
-                }};
-
-                if (printWindow.document.readyState === 'complete') {{
-                    openPrintDialog();
-                }} else {{
-                    printWindow.onload = openPrintDialog;
-                }}
-            }})();
-            </script>
-            """
-            components.html(js_code_print, height=0)
-
     
     # Render nội dung chính lên màn hình Web hiển thị
     components.html(html_to_render, height=calculated_height, scrolling=False)
     
+    # =========================================================================
+    # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
+    # =========================================================================
+    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
+    
+    # 1. Khởi tạo trạng thái kích hoạt in nếu chưa tồn tại
+    if "trigger_print" not in st.session_state:
+        st.session_state.trigger_print = False
+
+    # 2. Khi bấm nút, bật cờ trigger
+    if st.button("Xuất PDF", key="btn_to_pdf_layout"):
+        if not pages_list:
+            st.error("Không có dữ liệu trang để in!")
+        else:
+            st.session_state.trigger_print = True
+
+    # 3. Khi cờ trigger được bật, tiến hành sinh JS
+    if st.session_state.get("trigger_print", False):
+        html_for_print = page_style + "".join(pages_list)
+        
+        import json
+        safe_html_json = json.dumps(html_for_print)
+        
+        # Tạo mã số duy nhất dựa trên thời gian
+        print_id = int(time.time())
+        
+        # Chèn thẳng print_id vào comment của JS để thay đổi nội dung chuỗi, ép Streamlit reload lại component này
+        js_code_print = f"""
+        <script>
+        (function() {{
+            // ID lượt in: {print_id}
+            var htmlContent = {safe_html_json};
+            
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) {{
+                alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
+                return;
+            }}
+            
+            printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            
+            setTimeout(function() {{
+                printWindow.print();
+                printWindow.close();
+            }}, 500);
+        }})();
+        </script>
+        """
+        # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
+        components.html(js_code_print, height=0)
 
     
