@@ -460,52 +460,41 @@ if uploaded_files:
     # =========================================================================
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
     
-    # 1. Khởi tạo trạng thái kích hoạt in nếu chưa tồn tại
-    if "trigger_print" not in st.session_state:
-        st.session_state.trigger_print = False
-
-    # 2. Khi bấm nút, bật cờ trigger
+        # 1. Chỉ mở cửa sổ in khi người dùng vừa bấm nút
     if st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
         else:
-            st.session_state.trigger_print = True
+            html_for_print = page_style + "".join(pages_list)
+            safe_html_json = json.dumps(html_for_print)
+            print_id = int(time.time() * 1000)
 
-    # 3. Khi cờ trigger được bật, tiến hành sinh JS
-    if st.session_state.get("trigger_print", False):
-        html_for_print = page_style + "".join(pages_list)
-        
-        import json
-        safe_html_json = json.dumps(html_for_print)
-        
-        # Tạo mã số duy nhất dựa trên thời gian
-        print_id = int(time.time())
-        
-        # Chèn thẳng print_id vào comment của JS để thay đổi nội dung chuỗi, ép Streamlit reload lại component này
-        js_code_print = f"""
-        <script>
-        (function() {{
-            // ID lượt in: {print_id}
-            var htmlContent = {safe_html_json};
-            
-            var printWindow = window.open('', '_blank');
-            if (!printWindow) {{
-                alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
-                return;
-            }}
-            
-            printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            
-            setTimeout(function() {{
-                printWindow.print();
-                printWindow.close();
-            }}, 500);
-        }})();
-        </script>
-        """
-        # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
-        components.html(js_code_print, height=0)
+            js_code_print = f"""
+            <script>
+            (function() {{
+                var printId = {print_id};
+                var htmlContent = {safe_html_json};
 
+                var printWindow = window.open('', '_blank');
+
+                if (!printWindow) {{
+                    alert('Trình duyệt đã chặn cửa sổ bật lên. Hãy cho phép popup để in nhé!');
+                    return;
+                }}
+
+                printWindow.document.write(
+                    '<html><head><title>In Toàn Bộ Sheet Nhạc</title></head>' +
+                    '<body>' + htmlContent + '</body></html>'
+                );
+                printWindow.document.close();
+                printWindow.focus();
+
+                printWindow.onload = function() {{
+                    printWindow.print();
+                }};
+            }})();
+            </script>
+            """
+
+            components.html(js_code_print, height=0)
     
