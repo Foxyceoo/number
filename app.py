@@ -665,6 +665,5 @@ if uploaded_files:
     components.html(
         html_to_render,
         height=calculated_height,
-        scrolling=False,
-        key=f"sheet_{st.session_state.selected_song_index}_{display_mode}"
+        scrolling=False
     )
