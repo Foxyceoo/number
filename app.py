@@ -254,25 +254,24 @@ if uploaded_files:
     
     /* Trang A4 chuẩn Web - Đã thêm căn giữa trên/dưới */
     .sheet-page {
-        background-color: #ffffff;
-        box-sizing: border-box;
-        width: 794px;
-        height: 1123px;
-        min-height: 1123px;
-        padding: 0px !important; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        border-radius: 4px;
-        page-break-after: always;
-        margin-bottom: 25px;
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 297mm !important;
+        max-width: none !important;
+        box-sizing: border-box !important;
 
-        /* ========================================================================= */
-        /* MỚI: Biến trang giấy thành Flexbox để căn giữa nội dung theo chiều dọc */
-        /* ========================================================================= */
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important; /* Căn giữa tất cả các dòng nhạc theo chiều dọc */
-    }
+        justify-content: center !important;
 
+        page-break-after: always !important;
+        break-after: page !important;
+    }
     /* Bảng nhạc co giãn ăn trọn 100% không gian còn lại sau khi đã trừ lề */
     table { 
         border-collapse: collapse !important; 
