@@ -511,7 +511,7 @@ if uploaded_files:
 
                 cell_content = f"""
                 <div style='display:flex; flex-direction:column;
-                align-items:center; justify-content:flex-end;
+                align-items:center; justify-content:flex-start;
                 min-height:75px; font-size:15px; font-weight:bold;
                 line-height:1.3; text-align:center;
                 font-family:monospace,sans-serif;'>
