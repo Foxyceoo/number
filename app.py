@@ -5,6 +5,7 @@ import math
 import time
 import os
 import re
+import base64
 import streamlit.components.v1 as components
 
 
@@ -532,19 +533,13 @@ if uploaded_files:
     # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
-    # Chỉ hiện nút Xuất PDF khi chưa có PDF cho bài đang chọn.
-    # Khi PDF đã tạo xong, ẩn nút Xuất PDF và chỉ hiện nút Tải PDF xuống.
-    pdf_ready_for_current_song = (
-        bool(st.session_state.get("generated_pdf_bytes"))
-        and st.session_state.get("generated_pdf_song_name") == display_song_name
-    )
-
-    if not pdf_ready_for_current_song and st.button("Xuất PDF", key="btn_to_pdf_layout"):
+    # Một nút duy nhất: bấm là tạo PDF rồi tự tải xuống.
+    if st.button("⬇️ Tải PDF xuống", key="btn_download_pdf_direct"):
         if not pages_list:
             st.error("Không có dữ liệu trang để xuất PDF!")
         else:
             try:
-                # CSS riêng cho PDF: giữ đúng kích thước A4, tránh flex/padding của bản xem trước làm lệch trang.
+                # CSS riêng cho PDF: giữ đúng kích thước A4 và bố cục đã chỉnh.
                 pdf_style = """
                 <style>
                     @page { size: A4 portrait; margin: 0; }
@@ -592,25 +587,25 @@ if uploaded_files:
                 safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
                 if not safe_name:
                     safe_name = "Sheet nhac"
-
-                # Lưu PDF đã tạo để nút tải xuống và nút Xuất PDF cùng tồn tại qua các lần rerun.
-                st.session_state["generated_pdf_bytes"] = pdf_bytes
-                st.session_state["generated_pdf_name"] = f"{safe_name}.pdf"
-                st.session_state["generated_pdf_song_name"] = display_song_name
+                file_name = f"{safe_name}.pdf"
+                pdf_base64 = base64.b64encode(pdf_bytes).decode("ascii")
+                # Tự kích hoạt tải xuống ngay sau khi tạo xong, không cần bấm nút lần hai.
+                components.html(
+                    f"""<script>
+                    const a = document.createElement('a');
+                    a.href = 'data:application/pdf;base64,{pdf_base64}';
+                    a.download = {json.dumps(file_name, ensure_ascii=False)};
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    </script>""",
+                    height=0,
+                )
+                st.success(f"Đã tạo yêu cầu tải xuống: {file_name}")
             except ImportError:
                 st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
             except Exception as e:
                 st.error(f"Không thể tạo PDF: {e}")
-
-    # Chỉ hiện nút tải xuống khi PDF thuộc bài hát đang chọn.
-    if pdf_ready_for_current_song:
-        st.download_button(
-            label="⬇️ Tải PDF xuống",
-            data=st.session_state["generated_pdf_bytes"],
-            file_name=st.session_state.get("generated_pdf_name", "Sheet nhac.pdf"),
-            mime="application/pdf",
-            key="download_generated_pdf",
-        )
 
     # Hiển thị bản nhạc      
     components.html(html_to_render, height=calculated_height, scrolling=False)
