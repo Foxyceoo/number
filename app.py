@@ -116,7 +116,7 @@ with st.sidebar:
             label_visibility="collapsed",
             key="song_files_uploader"
         )
-        if st.button("Đóng", key="close_upload_window"):
+        if st.button("Nhập", key="close_upload_window"):
             st.session_state.show_upload_window = False
             st.rerun()
 
