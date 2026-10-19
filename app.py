@@ -527,6 +527,10 @@ if uploaded_files:
                 printWindow.focus();
 
                 printWindow.onload = function() {{
+                    printWindow.onafterprint = function() {{
+                        printWindow.close();
+                    }};
+
                     printWindow.print();
                 }};
             }})();
