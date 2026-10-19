@@ -338,6 +338,15 @@ if uploaded_files:
     # 4. VÒNG LẶP DỰNG BẢNG KHUÔNG NHẠC CHIA ĐỀU TỶ LỆ %
     # =========================================================================
     all_khuong_html = []
+
+    # Tìm số nốt lớn nhất trong một cột của toàn bộ bài nhạc
+    max_notes_in_song = max(
+        (len(col[1]) for col in columns if len(col) > 1),
+        default=0
+    )
+
+    # Chiều cao thống nhất cho các cột trong toàn bài
+    note_height = max(75, max_notes_in_song * 32)
     
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
@@ -430,15 +439,16 @@ if uploaded_files:
                 cell_content = f"""
                 <div style='display:flex; flex-direction:column;
                 align-items:center; justify-content:flex-start;
-                min-height:75px; font-size:15px; font-weight:bold;
+                height:{note_height}px; min-height:{note_height}px;
+                font-size:15px; font-weight:bold;
                 line-height:1.3; text-align:center;
                 font-family:monospace,sans-serif;'>
                     {all_nums}
                 </div>
                 """
             else:
-                cell_content = """
-                <div style='min-height:60px;'></div>
+                cell_content = f"""
+                <div style='height:{note_height}px; min-height:{note_height}px;'></div>
                 """
 
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
