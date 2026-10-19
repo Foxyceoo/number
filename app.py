@@ -255,14 +255,17 @@ if uploaded_files:
     /* Trang A4 chuẩn Web - Đã thêm căn giữa trên/dưới */
     .sheet-page {
         width: 210mm !important;
+        min-width: 210mm !important;
         height: 297mm !important;
         min-height: 297mm !important;
         max-width: none !important;
-        box-sizing: border-box !important;
 
-        box-shadow: none !important;
-        border: none !important;
-        margin: 0 !important;
+        box-sizing: border-box !important;
+        background: white !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15) !important;
+        border: 1px solid #d0d0d0 !important;
+
+        margin: 20px auto !important;
         padding: 0 !important;
 
         display: flex !important;
