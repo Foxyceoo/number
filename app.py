@@ -6,9 +6,6 @@ import time
 import os
 import streamlit.components.v1 as components
 
-# Mặc định mở sidebar khi truy cập ứng dụng; người dùng vẫn có thể thu gọn bằng nút <<.
-st.set_page_config(initial_sidebar_state="expanded")
-
 
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
@@ -540,9 +537,6 @@ if uploaded_files:
 
         html_for_print = page_style + "".join(pages_list)
         safe_html_json = json.dumps(html_for_print)
-        # Dùng tên bài hát làm tên gợi ý khi lưu bản in thành PDF
-        pdf_file_name = display_song_name or "Sheet nhac"
-        safe_pdf_title = json.dumps(pdf_file_name)
         print_id = int(time.time())
 
         js_code_print = f"""
@@ -550,7 +544,6 @@ if uploaded_files:
         (function() {{
             // ID lượt in: {print_id}
             var htmlContent = {safe_html_json};
-            var pdfTitle = {safe_pdf_title};
             var printWindow = window.open('', '_blank');
 
             if (!printWindow) {{
@@ -559,7 +552,7 @@ if uploaded_files:
             }}
 
             printWindow.document.write(
-                '<html><head><title>' + pdfTitle + '</title></head><body>'
+                '<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>'
                 + htmlContent +
                 '</body></html>'
             );
