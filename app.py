@@ -124,7 +124,12 @@ with st.sidebar:
     if "show_upload_window" not in st.session_state:
         st.session_state.show_upload_window = False
 
-    if st.button("＋", key="open_upload_window", help="Thêm file JSON hoặc TXT"):
+    if st.button(
+        "＋",
+        key="open_upload_window",
+        help="Thêm file JSON hoặc TXT",
+        use_container_width=True
+    ):
         st.session_state.show_upload_window = True
 
     @st.dialog("Thêm bài hát")
