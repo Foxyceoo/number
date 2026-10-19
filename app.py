@@ -257,6 +257,7 @@ if uploaded_files:
         background-color: #ffffff;
         box-sizing: border-box;
         width: 794px;
+        height: 1123px;
         min-height: 1123px;
         padding: 60px 0px !important; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -472,7 +473,14 @@ if uploaded_files:
     for idx in range(0, len(all_khuong_html), lines_per_page):
         chunk = all_khuong_html[idx : idx + lines_per_page]
         
-        page_content = "<div class='sheet-page'>"
+        page_content = """
+        <div class='sheet-page' style="
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+        ">
+        """
         
         # 1. Chèn các khuông nhạc có dữ liệu thực tế vào trước
         for khuong_html in chunk:
