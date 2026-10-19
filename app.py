@@ -592,11 +592,6 @@ if uploaded_files:
             overflow: hidden;
             box-sizing: border-box !important;
         }
-
-        /* Thu nhỏ dấu chấm khi xuất PDF */
-        td span {
-            font-size: 8px;
-        }
         
         .khuong-wrapper {
             width: 100% !important;
