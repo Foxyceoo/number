@@ -6,6 +6,11 @@ import time
 import os
 import streamlit.components.v1 as components
 
+st.set_page_config(
+    page_title="Bộ chuyển đổi sheet số",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # Sát lề trái, không thụt đầu dòng
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4HTreKOHkHRXq2zdolvnEt2o5HyDN6JAWBy3DSI8kRgftC3_pAHJZKztQCXfBrLzvVbw0ohY6vfNG/pub?gid=0&single=true&output=csv"
