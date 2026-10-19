@@ -510,6 +510,14 @@ if uploaded_files:
     calculated_height = total_pages * 1200 + 100
 
 
+    # Tên bài hát ở đầu khu vực chính, căn giữa ngay phía trên nút xuất PDF
+    display_song_name = song_name.rsplit(".", 1)[0].replace("_", " ").strip()
+    st.markdown(
+        f"<div style='width:100%; text-align:center; color:inherit; font-size:28px; "
+        f"font-weight:700; line-height:1.3; margin:0 0 18px 0;'>{display_song_name}</div>",
+        unsafe_allow_html=True,
+    )
+
     # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
