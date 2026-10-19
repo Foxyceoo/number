@@ -41,6 +41,37 @@ def get_symbol(value, mode):
         
     return mapping.get(value, str(value))
 
+# Đọc nội dung file với nhiều bảng mã, ưu tiên UTF-8
+def decode_file_content(file_bytes):
+    encodings = [
+        "utf-8-sig",
+        "utf-8",
+        "gb18030",
+        "gbk",
+        "big5",
+        "cp932",
+        "shift_jis",
+        "utf-16",
+        "utf-16-le",
+        "utf-16-be",
+        "cp1252",
+        "latin-1",
+    ]
+
+    for encoding in encodings:
+        try:
+            return file_bytes.decode(encoding)
+        except (UnicodeDecodeError, LookupError):
+            continue
+
+    raise UnicodeDecodeError(
+        "unknown",
+        file_bytes,
+        0,
+        min(1, len(file_bytes)),
+        "Không tìm được bảng mã phù hợp."
+    )
+
 # 1. Để hàm ở trên cùng (sau các hàm tiện ích)
 def xu_ly_nhat_ky(song_data):
     bpm = song_data.get("bpm", 240)
