@@ -598,7 +598,7 @@ if uploaded_files:
 
     if st.session_state.prepared_pdf_bytes is not None:
         st.download_button(
-            label="Xuát file PDF",
+            label="Xuất file PDF",
             data=st.session_state.prepared_pdf_bytes,
             file_name=st.session_state.prepared_pdf_name,
             mime="application/pdf",
