@@ -542,6 +542,9 @@ if uploaded_files:
     if "prepared_pdf_key" not in st.session_state:
         st.session_state.prepared_pdf_key = None
 
+    # CSS riêng cho PDF: không đưa toàn bộ CSS xem trước vào WeasyPrint,
+    # giúp giảm khối lượng CSS cần phân tích mà vẫn giữ bố cục bản nhạc.
+    # CSS riêng cho PDF: giảm khối lượng CSS cần phân tích.
     pdf_style = """
     <style>
         @page { size: A4 portrait; margin: 0; }
@@ -552,8 +555,9 @@ if uploaded_files:
             background: #ffffff !important;
             font-family: sans-serif;
         }
-        body { display: block !important; align-items: initial !important; justify-content: initial !important; }
+        body { display: block !important; }
         .sheet-page {
+            background: #ffffff !important;
             width: 210mm !important;
             height: 297mm !important;
             min-height: 297mm !important;
@@ -564,17 +568,42 @@ if uploaded_files:
             box-shadow: none !important;
             border: none !important;
             border-radius: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
             page-break-after: always !important;
             break-after: page !important;
             overflow: hidden !important;
         }
-        .khuong-wrapper { width: 100% !important; box-sizing: border-box !important; }
+        table {
+            border-collapse: collapse !important;
+            text-align: center;
+            table-layout: fixed !important;
+            width: 94% !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+        }
+        td {
+            padding: 2px 0 !important;
+            vertical-align: top !important;
+            overflow: hidden;
+            box-sizing: border-box !important;
+        }
+        .khuong-wrapper {
+            width: 100% !important;
+            padding: 0 !important;
+            margin-bottom: 45px !important;
+            box-sizing: border-box !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
     </style>
     """
+    # PDF chỉ cần các trang sheet; bỏ CSS xem trước và phần giao diện web.
     html_for_pdf = (
-        "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
+        '<!DOCTYPE html><html><head><meta charset="utf-8">'
         + pdf_style + "</head><body>"
-        + html_to_render + "</body></html>"
+        + "".join(pages_list) + "</body></html>"
     )
     pdf_key = str(hash(html_for_pdf))
     safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
