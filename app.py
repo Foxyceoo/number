@@ -501,10 +501,7 @@ if uploaded_files:
     # Tính chiều cao hiển thị trên web (8 dòng thì trang sẽ cao hơn một chút)
     total_pages = len(pages_list)
     calculated_height = total_pages * 1200 + 100
-    
-    # Render nội dung chính lên màn hình Web hiển thị
-    components.html(html_to_render, height=calculated_height, scrolling=False)
-    
+
     # =========================================================================
     # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
     # =========================================================================
@@ -557,5 +554,9 @@ if uploaded_files:
         """
         # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
         components.html(js_code_print, height=0)
+    
+    # Render nội dung chính lên màn hình Web hiển thị
+    components.html(html_to_render, height=calculated_height, scrolling=False)
+    
 
     
