@@ -381,8 +381,8 @@ if uploaded_files:
                         # Hai vị trí chấm cố định:
                         # Chấm sát số đen nếu nốt có ít nhất 1 chấm.
                         # Chấm phía trên đen nếu nốt có ít nhất 2 chấm.
-                        top_dot_color = "black" if dot_count >= 2 else "white"
-                        bottom_dot_color = "black" if dot_count >= 1 else "white"
+                        top_dot_color = "black" if dot_count >= 2 else "transparent"
+                        bottom_dot_color = "black" if dot_count >= 1 else "transparent"
 
                         note_html.append(f"""
                         <div style="
@@ -399,7 +399,7 @@ if uploaded_files:
                                 right: 0;
                                 height: 7px;
                                 line-height: 7px;
-                                font-size: 14px;
+                                font-size: 8px;
                                 color: {top_dot_color};
                             ">●</span>
 
