@@ -503,57 +503,61 @@ if uploaded_files:
     calculated_height = total_pages * 1200 + 100
 
     # =========================================================================
-    # 6. XỬ LÝ TRUYỀN TOÀN BỘ TRANG IN BẰNG PYTHON & MÃ HÓA JSON AN TOÀN
+    # 6. MỞ TOÀN BỘ TRANG NHẠC TRONG CỬA SỔ RIÊNG VÀ DÙNG LỆNH IN CỦA TRÌNH DUYỆT
     # =========================================================================
-    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)    
-    
-    # 1. Khởi tạo trạng thái kích hoạt in nếu chưa tồn tại
-    if "trigger_print" not in st.session_state:
-        st.session_state.trigger_print = False
+    st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
-    # 2. Khi bấm nút, bật cờ trigger
     if st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
             st.error("Không có dữ liệu trang để in!")
         else:
-            st.session_state.trigger_print = True
+            # Mã hóa riêng CSS và nội dung trang để đưa sang cửa sổ mới an toàn.
+            safe_style_json = json.dumps(page_style)
+            safe_pages_json = json.dumps("".join(pages_list))
+            print_id = int(time.time())
 
-    # 3. Khi cờ trigger được bật, tiến hành sinh JS
-    if st.session_state.get("trigger_print", False):
-        html_for_print = page_style + "".join(pages_list)
-        
-        import json
-        safe_html_json = json.dumps(html_for_print)
-        
-        # Tạo mã số duy nhất dựa trên thời gian
-        print_id = int(time.time())
-        
-        # Chèn thẳng print_id vào comment của JS để thay đổi nội dung chuỗi, ép Streamlit reload lại component này
-        js_code_print = f"""
-        <script>
-        (function() {{
-            // ID lượt in: {print_id}
-            var htmlContent = {safe_html_json};
-            
-            var printWindow = window.open('', '_blank');
-            if (!printWindow) {{
-                alert('Trình duyệt đã chặn cửa sổ bật lên (Popup). Bạn hãy cho phép hiện popup để in nhé!');
-                return;
-            }}
-            
-            printWindow.document.write('<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>' + htmlContent + '</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            
-            setTimeout(function() {{
-                printWindow.print();
-                printWindow.close();
-            }}, 500);
-        }})();
-        </script>
-        """
-        # Bỏ tham số key lỗi đi, chỉ giữ lại nội dung và chiều cao
-        components.html(js_code_print, height=0)
+            js_code_print = f"""
+            <script>
+            (function() {{
+                // ID lượt xuất: {print_id}
+                var pageStyle = {safe_style_json};
+                var pagesHtml = {safe_pages_json};
+                var printWindow = window.open('', '_blank');
+
+                if (!printWindow) {{
+                    alert('Trình duyệt đang chặn cửa sổ bật lên. Hãy cho phép popup cho trang này rồi bấm Xuất PDF lại nhé!');
+                    return;
+                }}
+
+                printWindow.document.open();
+                printWindow.document.write(
+                    '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+                    '<title>Sheet nhạc - In hoặc lưu PDF</title>' +
+                    pageStyle +
+                    '</head><body>' + pagesHtml + '</body></html>'
+                );
+                printWindow.document.close();
+                printWindow.focus();
+
+                // Mở hộp thoại in/lưu PDF của chính trình duyệt sau khi trang đã dựng xong.
+                // Không tự đóng cửa sổ để người dùng có thể kiểm tra và in lại nếu cần.
+                var openPrintDialog = function() {{
+                    printWindow.setTimeout(function() {{
+                        printWindow.focus();
+                        printWindow.print();
+                    }}, 700);
+                }};
+
+                if (printWindow.document.readyState === 'complete') {{
+                    openPrintDialog();
+                }} else {{
+                    printWindow.onload = openPrintDialog;
+                }}
+            }})();
+            </script>
+            """
+            components.html(js_code_print, height=0)
+
     
     # Render nội dung chính lên màn hình Web hiển thị
     components.html(html_to_render, height=calculated_height, scrolling=False)
