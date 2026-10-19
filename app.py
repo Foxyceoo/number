@@ -97,6 +97,36 @@ def xu_ly_nhat_ky(song_data):
             columns.append([i, temp_dict.get(i, [])])
     return columns
 
+# Kiểm tra và tự chuyển chế độ 111 về 115 khi bài có 8–13 nốt chồng
+def kiem_tra_che_do():
+    if st.session_state.get("display_mode") != "111":
+        return
+
+    playlist = list(st.session_state.get("playlist_files", {}).values())
+    if not playlist:
+        return
+
+    song_index = st.session_state.get("selected_song_index", 0)
+    if not 0 <= song_index < len(playlist):
+        return
+
+    try:
+        file_text = decode_file_content(playlist[song_index]["data"])
+        data = json.loads(file_text)
+        song_data = data[0] if isinstance(data, list) else data
+        columns = xu_ly_nhat_ky(song_data)
+
+        max_notes = max(
+            (len(col[1]) for col in columns if len(col) > 1),
+            default=0
+        )
+
+        if 8 <= max_notes <= 13:
+            st.session_state.display_mode = "115"
+
+    except (ValueError, TypeError, KeyError, IndexError, json.JSONDecodeError):
+        pass
+
 # ==========================================
 # GOM TOÀN BỘ SIDEBAR VÀO ĐÂY ĐỂ TRÁNH LỖI NHẢY ELEMENT
 # ==========================================
@@ -218,12 +248,13 @@ with st.sidebar:
         st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
         st.write("**Chế độ hiển thị:**")
 
-        display_mode = st.radio(
-            "Chọn chế độ hiển thị",
-            options=["115", "111", "abc"],
-            label_visibility="collapsed",
-            key="display_mode"
-        )
+                display_mode = st.radio(
+                    "Chọn chế độ hiển thị",
+                    options=["115", "111", "abc"],
+                    label_visibility="collapsed",
+                    key="display_mode",
+                    on_change=kiem_tra_che_do
+                )
 
         st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
@@ -266,8 +297,27 @@ with st.sidebar:
             is_current = (st.session_state.selected_song_index == idx)
             button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
             
-            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
-                st.session_state.selected_song_index = idx
+                        if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+                            st.session_state.selected_song_index = idx
+
+                            if st.session_state.get("display_mode") == "111":
+                                try:
+                                    file_text = decode_file_content(current_file["data"])
+                                    data = json.loads(file_text)
+                                    song_data = data[0] if isinstance(data, list) else data
+                                    columns = xu_ly_nhat_ky(song_data)
+
+                                    max_notes = max(
+                                        (len(col[1]) for col in columns if len(col) > 1),
+                                        default=0
+                                    )
+
+                                    if 8 <= max_notes <= 13:
+                                        st.session_state.display_mode = "115"
+
+                                except (ValueError, TypeError, KeyError, IndexError, json.JSONDecodeError):
+                                    pass
+
                 st.rerun()
 
 # --- Logic đọc dữ liệu cho bài được chọn (Để ngoài Sidebar) ---
@@ -326,13 +376,7 @@ if uploaded_files:
         (len(col[1]) for col in columns if len(col) > 1),
         default=0
     )
-
-    # Nếu bài có 8–13 nốt chồng thì không cho chọn chế độ 111
-    if 8 <= max_notes_in_song <= 13 and st.session_state.display_mode == "111":
-        st.session_state.display_mode = "115"
-        st.rerun()
     
-
     def get_number_from_data(note_data):
         # note_data là list [pitch, key]
         return int(note_data[1])
