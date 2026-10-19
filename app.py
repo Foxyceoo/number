@@ -297,26 +297,26 @@ with st.sidebar:
             is_current = (st.session_state.selected_song_index == idx)
             button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
             
-                        if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
-                            st.session_state.selected_song_index = idx
+            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+                st.session_state.selected_song_index = idx
 
-                            if st.session_state.get("display_mode") == "111":
-                                try:
-                                    file_text = decode_file_content(current_file["data"])
-                                    data = json.loads(file_text)
-                                    song_data = data[0] if isinstance(data, list) else data
-                                    columns = xu_ly_nhat_ky(song_data)
+                if st.session_state.get("display_mode") == "111":
+                    try:
+                        file_text = decode_file_content(current_file["data"])
+                        data = json.loads(file_text)
+                        song_data = data[0] if isinstance(data, list) else data
+                        columns = xu_ly_nhat_ky(song_data)
 
-                                    max_notes = max(
-                                        (len(col[1]) for col in columns if len(col) > 1),
-                                        default=0
-                                    )
+                        max_notes = max(
+                            (len(col[1]) for col in columns if len(col) > 1),
+                            default=0
+                        )
 
-                                    if 8 <= max_notes <= 13:
-                                        st.session_state.display_mode = "115"
+                        if 8 <= max_notes <= 13:
+                            st.session_state.display_mode = "115"
 
-                                except (ValueError, TypeError, KeyError, IndexError, json.JSONDecodeError):
-                                    pass
+                    except (ValueError, TypeError, KeyError, IndexError, json.JSONDecodeError):
+                        pass
 
                 st.rerun()
 
