@@ -345,8 +345,16 @@ if uploaded_files:
         default=0
     )
 
+    # Chiều cao mỗi nốt tùy theo chế độ hiển thị
+    note_item_height = 32 if display_mode == "1. 1.. 1..." else 20
+
     # Chiều cao thống nhất cho các cột trong toàn bài
-    note_height = max(75, max_notes_in_song * 32)
+    max_notes_in_song = max(
+        (len(col[1]) for col in columns if len(col) > 1),
+        default=0
+    )
+
+    note_height = max(75, max_notes_in_song * note_item_height)
     
     for i in range(0, len(columns), bits_per_page):
         khuong_columns = columns[i : i + bits_per_page]
