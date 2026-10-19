@@ -43,34 +43,39 @@ def get_symbol(value, mode):
 
 # Đọc nội dung file với nhiều bảng mã, ưu tiên UTF-8
 def decode_file_content(file_bytes):
+    # Nhận diện BOM đặc biệt và các bảng mã Unicode phổ biến.
+    if file_bytes.startswith(b"\xf3\xf2"):
+        file_bytes = file_bytes[2:]
+
     encodings = [
         "utf-8-sig",
-        "utf-8",
+        "utf-16",
+        "utf-16-le",
+        "utf-16-be",
         "gb18030",
         "gbk",
         "big5",
         "cp932",
         "shift_jis",
-        "utf-16",
-        "utf-16-le",
-        "utf-16-be",
         "cp1252",
         "latin-1",
     ]
 
     for encoding in encodings:
         try:
-            return file_bytes.decode(encoding)
+            text = file_bytes.decode(encoding)
+
+            # Loại bỏ BOM nếu còn sót lại.
+            text = text.lstrip("\ufeff")
+
+            # Chỉ chấp nhận nội dung có dạng JSON.
+            if text.lstrip().startswith(("[", "{")):
+                return text
+
         except (UnicodeDecodeError, LookupError):
             continue
 
-    raise UnicodeDecodeError(
-        "unknown",
-        file_bytes,
-        0,
-        min(1, len(file_bytes)),
-        "Không tìm được bảng mã phù hợp."
-    )
+    raise ValueError("Không tìm được bảng mã phù hợp hoặc file không phải JSON.")
 
 # 1. Để hàm ở trên cùng (sau các hàm tiện ích)
 def xu_ly_nhat_ky(song_data):
