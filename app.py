@@ -4,7 +4,11 @@ import json
 import math
 import time
 import os
+import re
 import streamlit.components.v1 as components
+
+# Mặc định mở sidebar khi truy cập ứng dụng; người dùng vẫn có thể thu gọn bằng nút <<.
+st.set_page_config(initial_sidebar_state="expanded")
 
 
 # Sát lề trái, không thụt đầu dòng
@@ -521,53 +525,74 @@ if uploaded_files:
     # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
-    # Nút xuất PDF
-    if "trigger_print" not in st.session_state:
-        st.session_state.trigger_print = False
-
+    # Tạo PDF và tải xuống với tên bài hát được điền sẵn
     if st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
-            st.error("Không có dữ liệu trang để in!")
+            st.error("Không có dữ liệu trang để xuất PDF!")
         else:
-            st.session_state.trigger_print = True
+            try:
+                from weasyprint import HTML
 
-    # Xử lý in bản nhạc
-    if st.session_state.get("trigger_print", False):
-        st.session_state.trigger_print = False
+                # CSS rieng cho PDF: giu dung kich thuoc A4, tranh flex/padding cua ban xem truoc lam lech trang.
+                pdf_style = """
+                <style>
+                    @page { size: A4 portrait; margin: 0; }
+                    html, body {
+                        width: 210mm !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        background: #ffffff !important;
+                        font-family: sans-serif;
+                    }
+                    body {
+                        display: block !important;
+                        align-items: initial !important;
+                        justify-content: initial !important;
+                    }
+                    .sheet-page {
+                        width: 210mm !important;
+                        height: 297mm !important;
+                        min-height: 297mm !important;
+                        max-width: none !important;
+                        box-sizing: border-box !important;
+                        margin: 0 !important;
+                        padding: 50px 0 !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        border-radius: 0 !important;
+                        page-break-after: always !important;
+                        break-after: page !important;
+                        overflow: hidden !important;
+                    }
+                    .khuong-wrapper {
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
+                </style>
+                """
+                html_for_pdf = (
+                    "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
+                    + pdf_style + "</head><body>"
+                    + html_to_render + "</body></html>"
+                )
+                pdf_bytes = HTML(string=html_for_pdf).write_pdf()
 
-        html_for_print = page_style + "".join(pages_list)
-        safe_html_json = json.dumps(html_for_print)
-        print_id = int(time.time())
+                # Làm sạch ký tự không phù hợp trong tên file
+                safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
+                if not safe_name:
+                    safe_name = "Sheet nhac"
 
-        js_code_print = f"""
-        <script>
-        (function() {{
-            // ID lượt in: {print_id}
-            var htmlContent = {safe_html_json};
-            var printWindow = window.open('', '_blank');
-
-            if (!printWindow) {{
-                alert('Trình duyệt đã chặn cửa sổ bật lên. Hãy cho phép popup để xuất PDF nhé!');
-                return;
-            }}
-
-            printWindow.document.write(
-                '<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>'
-                + htmlContent +
-                '</body></html>'
-            );
-
-            printWindow.document.close();
-            printWindow.focus();
-
-            setTimeout(function() {{
-                printWindow.print();
-            }}, 500);
-        }})();
-        </script>
-        """
-
-        components.html(js_code_print, height=0)
+                st.download_button(
+                    label="⬇️ Tải PDF xuống",
+                    data=pdf_bytes,
+                    file_name=f"{safe_name}.pdf",
+                    mime="application/pdf",
+                    key="download_generated_pdf",
+                )
+            except ImportError:
+                st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
+            except Exception as e:
+                st.error(f"Không thể tạo PDF: {e}")
 
     # Hiển thị bản nhạc      
     components.html(html_to_render, height=calculated_height, scrolling=False)
