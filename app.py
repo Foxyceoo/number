@@ -142,27 +142,7 @@ with st.sidebar:
         /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
         /* ========================================================================= */
         
-        /* 1. Thu nhỏ vùng Dropzone nhập file */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
-            padding: 10px !important;
-            min-height: 60px !important;
-            height: 60px !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
-            transform: scale(0.7) !important;
-            margin-bottom: 0px !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small {
-            font-size: 11px !important;
-        }
-
-        /* Ẩn danh sách file phụ, không ẩn toàn bộ div của nút tải */
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
-            display: none !important;
-        }
-
-        /* Chỉ hiển thị dấu cộng ở vùng tải file */
+        /* Vùng nhập bài: chỉ hiển thị một dấu cộng */
         [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
             position: relative;
             height: 60px !important;
@@ -170,10 +150,14 @@ with st.sidebar:
             padding: 0 !important;
         }
 
-        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
-            display: none !important;
+        /* Ẩn biểu tượng và chữ gốc để không bị trùng */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section span {
+            visibility: hidden !important;
         }
 
+        /* Chỉ hiện một dấu cộng */
         [data-testid="stSidebar"] [data-testid="stFileUploader"] section::after {
             content: "+";
             font-size: 30px;
@@ -185,6 +169,12 @@ with st.sidebar:
             align-items: center;
             justify-content: center;
             pointer-events: none;
+        }
+
+        /* Ẩn danh sách file phụ */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
+            display: none !important;
         }
         </style>
         """,
