@@ -556,7 +556,7 @@ if uploaded_files:
     calculated_height = total_pages * 1200 + 100
 
 
-    # Tên bài hát ở đầu khu vực chính, căn giữa ngay phía trên nút xuất 
+    # Tên bài hát ở đầu khu vực chính, căn giữa ngay phía trên nút xuất PDF
     display_song_name = song_name.rsplit(".", 1)[0].replace("_", " ").strip()
     st.markdown(
         f"<div style='width:100%; text-align:center; color:inherit; font-size:28px; "
@@ -564,10 +564,10 @@ if uploaded_files:
         unsafe_allow_html=True,
     )
 
-    # Khoảng cách trước nút xuất 
+    # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
-    # Chuẩn bị  ngay khi bài hát hoặc chế độ hiển thị thay đổi.
+    # Chuẩn bị PDF ngay khi bài hát hoặc chế độ hiển thị thay đổi.
     # Nhờ vậy khi bấm Tải PDF xuống, file đã được tạo sẵn.
     if "prepared_pdf_bytes" not in st.session_state:
         st.session_state.prepared_pdf_bytes = None
@@ -679,7 +679,7 @@ if uploaded_files:
                 finally:
                     st.session_state.prepared_pdf_future = None
             else:
-                st.caption("Loading...")
+                st.caption("Đang chuẩn bị PDF ở nền… Bạn vẫn có thể xem bản nhạc.")
 
         if st.session_state.get("prepared_pdf_bytes") is not None:
             if st.button("Xuất file PDF", key="print_sheet_button", help="Mở hộp thoại in để in hoặc lưu bản nhạc thành PDF"):
