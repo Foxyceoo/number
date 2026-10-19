@@ -248,13 +248,13 @@ with st.sidebar:
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
     st.write("**Chế độ hiển thị:**")
 
-            display_mode = st.radio(
-                "Chọn chế độ hiển thị",
-                options=["115", "111", "abc"],
-                label_visibility="collapsed",
-                key="display_mode",
-                on_change=kiem_tra_che_do
-            )
+    display_mode = st.radio(
+        "Chọn chế độ hiển thị",
+        options=["115", "111", "abc"],
+        label_visibility="collapsed",
+        key="display_mode",
+        on_change=kiem_tra_che_do
+    )
 
     st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
 
