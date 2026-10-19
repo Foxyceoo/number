@@ -94,6 +94,13 @@ st.markdown(
 st.markdown(
     """
     <style>
+
+    /* Giữ nút thu gọn sidebar luôn hiển thị */
+    [data-testid="stSidebarCollapseButton"] {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+    }
     /* Mở rộng tối đa container chính của Streamlit */
     .block-container {
         max-width: 100% !important;
