@@ -486,7 +486,31 @@ if uploaded_files:
             (len(col[1]) for col in columns if len(col) > 1),
             default=0
         )
-        lines_per_page = max(1, 14 - max_notes_in_song)
+
+        if max_notes_in_song == 3:
+            lines_per_page = 11
+        elif max_notes_in_song == 4:
+            lines_per_page = 10
+        elif max_notes_in_song == 5:
+            lines_per_page = 9
+        elif max_notes_in_song == 6:
+            lines_per_page = 8
+        elif max_notes_in_song == 7:
+            lines_per_page = 7
+        elif max_notes_in_song == 8:
+            lines_per_page = 6
+        elif max_notes_in_song == 9:
+            lines_per_page = 5
+        elif max_notes_in_song == 10:
+            lines_per_page = 4
+        elif max_notes_in_song == 11:
+            lines_per_page = 3
+        elif max_notes_in_song == 12:
+            lines_per_page = 2
+        elif max_notes_in_song >= 13:
+            lines_per_page = 1
+        else:
+            lines_per_page = 11
 
     # Danh sách chứa HTML của từng trang
     pages_list = []
