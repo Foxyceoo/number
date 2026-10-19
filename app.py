@@ -295,7 +295,7 @@ if uploaded_files:
     .khuong-wrapper {
         width: 100% !important;
         padding: 0 !important;
-        margin-bottom: 45px !important;
+        margin-bottom: 10px !important;
         break-inside: avoid;
         page-break-inside: avoid;
     }
