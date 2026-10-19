@@ -274,8 +274,8 @@ if uploaded_files:
     try:
         file_text = decode_file_content(current_selected_file["data"])
         if not file_text.strip():
-    st.error(f"File {current_selected_file['name']} đang trống.")
-    st.stop()
+            st.error(f"File {current_selected_file['name']} đang trống.")
+            st.stop()
         data = json.loads(file_text)
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         st.error(f"Không đọc được file {current_selected_file['name']}: {exc}")
