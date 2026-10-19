@@ -182,7 +182,7 @@ with st.sidebar:
 
     # 3. Hiển thị danh sách
     if not uploaded_files:
-        st.info("Chưa có bài hát nào được tải lên")
+        st.info("Chưa có bài hát nào được tải lên.")
     else:
         for idx, current_file in enumerate(uploaded_files):
             display_name = current_file["name"].replace(".json", "").replace(".txt", "").replace("_", " ")
@@ -540,6 +540,9 @@ if uploaded_files:
 
         html_for_print = page_style + "".join(pages_list)
         safe_html_json = json.dumps(html_for_print)
+        # Dùng tên bài hát làm tên gợi ý khi lưu bản in thành PDF
+        pdf_file_name = display_song_name or "Sheet nhac"
+        safe_pdf_title = json.dumps(pdf_file_name)
         print_id = int(time.time())
 
         js_code_print = f"""
@@ -547,6 +550,7 @@ if uploaded_files:
         (function() {{
             // ID lượt in: {print_id}
             var htmlContent = {safe_html_json};
+            var pdfTitle = {safe_pdf_title};
             var printWindow = window.open('', '_blank');
 
             if (!printWindow) {{
@@ -555,7 +559,7 @@ if uploaded_files:
             }}
 
             printWindow.document.write(
-                '<html><head><title>In Toàn Bộ Sheet Nhạc</title></head><body>'
+                '<html><head><title>' + pdfTitle + '</title></head><body>'
                 + htmlContent +
                 '</body></html>'
             );
