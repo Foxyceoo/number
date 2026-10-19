@@ -588,7 +588,7 @@ if uploaded_files:
         st.session_state.prepared_pdf_key = pdf_key
         if pages_list:
             try:
-                with st.spinner("Đang chuẩn bị PDF cho bài này..."):
+                with st.spinner("Loading..."):
                     st.session_state.prepared_pdf_bytes = tao_pdf_tu_html(html_for_pdf)
                 st.session_state.prepared_pdf_name = f"{safe_name}.pdf"
             except ImportError:
