@@ -661,7 +661,8 @@ if uploaded_files:
 
     hien_thi_nut_pdf()
 
-    # Hiển thị bản nhạc      
+    # Hiển thị bản nhạc  
+    st.write("Chế độ:", display_mode, "| Số khuông:", len(all_khuong_html))
     components.html(
         html_to_render,
         height=calculated_height,
