@@ -366,43 +366,65 @@ if uploaded_files:
             border_right = "1.5px solid #00008c" if (is_beat_4 or (col_idx + 1) == bits_per_page) else "none"
             border_left = "1.5px solid #00008c" if is_new_line else "none"
 
-            
             if vals:
                 note_html = []
+
                 for val in vals:
                     if display_mode == "1. 1.. 1...":
-                        parts = str(val).split(".")
-                        dots = len(parts) - 1
-                        number = parts[0] if parts[0] else "1"
+                        symbol = str(val)
+                        number = symbol.rstrip(".")
+                        dot_count = len(symbol) - len(number)
 
-                        if dots > 0:
-                            note_html.append(
-                                f"<div style='display:flex; flex-direction:column;"
-                                f"align-items:center; line-height:0.8;'>"
-                                f"<span style='font-size:14px; height:auto;"
-                                f"line-height:7px; white-space:normal;'>"
-                                f"{'<br>'.join(['·'] * dots)}</span>"
-                                f"<span>{number}</span></div>"
-                            )
-                        else:
-                            note_html.append(f"<div>{val}</div>")
+                        # Hai vị trí chấm cố định:
+                        # Chấm trên: xa số
+                        # Chấm dưới: gần số
+                        top_dot_color = "black" if dot_count >= 2 else "transparent"
+                        bottom_dot_color = "black" if dot_count >= 1 else "transparent"
+
+                        note_html.append(f"""
+                            <div style="
+                                position: relative;
+                                width: 100%;
+                                height: 32px;
+                                text-align: center;
+                                font-family: Calibri, sans-serif;
+                                font-weight: 600;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    height: 8px;
+                                    line-height: 8px;
+                                    font-size: 8px;
+                                    color: {top_dot_color};
+                                ">●</span>
+
+                                <span style="
+                                    position: absolute;
+                                    top: 6px;
+                                    left: 0;
+                                    right: 0;
+                                    height: 8px;
+                                    line-height: 8px;
+                                    font-size: 8px;
+                                    color: {bottom_dot_color};
+                                ">●</span>
+
+                                <span style="
+                                    position: absolute;
+                                    top: 12px;
+                                    left: 0;
+                                    right: 0;
+                                    width: 100%;
+                                    line-height: 19.5px;
+                                    font-size: 15px;
+                                ">{number}</span>
+                            </div>
+                        """)
                     else:
                         note_html.append(f"<div>{val}</div>")
-
-                all_nums = "".join(note_html)
-                cell_content = f"""
-                <div style='display:flex; flex-direction:column;
-                align-items:center; justify-content:flex-start;
-                min-height:75px; font-size:15px; font-weight:bold;
-                line-height:1.3; text-align:center;
-                font-family:monospace,sans-serif;'>
-                    {all_nums}
-                </div>
-                """
-
-            else:
-                # Đồng bộ min-height cho các ô trống để hàng nhạc thẳng tắp
-                cell_content = "<div style='min-height: 60px;'></div>"
 
             html_content += f"<td style='width: {cell_width_pct}%; border-right: {border_right}; border-left: {border_left}; padding: 2px 0 !important; vertical-align: top; box-sizing: border-box;'>{cell_content}</td>"
         
