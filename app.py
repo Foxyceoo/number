@@ -148,6 +148,27 @@ with st.sidebar:
             min-height: 60px !important;
             height: 60px !important;
         }
+        /* Chỉ giữ lại dấu cộng ở khu vực tải file */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section > div {
+            display: none !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            transform: scale(1.2) !important;
+            margin: 0 auto !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            min-height: 60px !important;
+            height: 60px !important;
+        }
         [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
             transform: scale(0.7) !important;
             margin-bottom: 0px !important;
