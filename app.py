@@ -483,8 +483,9 @@ if uploaded_files:
                             note_html.append(
                                 f"<div style='display:flex; flex-direction:column;"
                                 f"align-items:center; line-height:0.8;'>"
-                                f"<span style='font-size:13px; height:7px;"
-                                f"line-height:7px;'>{'·' * dots}</span>"
+                                f"<span style='font-size:14px; height:auto;"
+                                f"line-height:7px; white-space:normal;'>"
+                                f"{'<br>'.join(['·'] * dots)}</span>"
                                 f"<span>{number}</span></div>"
                             )
                         else:
