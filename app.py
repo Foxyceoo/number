@@ -4,7 +4,6 @@ import json
 import math
 import time
 import os
-import re
 import streamlit.components.v1 as components
 
 # Mặc định mở sidebar khi truy cập ứng dụng; người dùng vẫn có thể thu gọn bằng nút <<.
@@ -525,33 +524,57 @@ if uploaded_files:
     # Khoảng cách trước nút xuất PDF
     st.write('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
-    # Tạo PDF và tải xuống với tên bài hát được điền sẵn
+    # Nút xuất PDF
+    if "trigger_print" not in st.session_state:
+        st.session_state.trigger_print = False
+
     if st.button("Xuất PDF", key="btn_to_pdf_layout"):
         if not pages_list:
-            st.error("Không có dữ liệu trang để xuất PDF!")
+            st.error("Không có dữ liệu trang để in!")
         else:
-            try:
-                from weasyprint import HTML
+            st.session_state.trigger_print = True
 
-                html_for_pdf = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body>" + html_to_render + "</body></html>"
-                pdf_bytes = HTML(string=html_for_pdf).write_pdf()
+    # Xử lý in bản nhạc
+    if st.session_state.get("trigger_print", False):
+        st.session_state.trigger_print = False
 
-                # Làm sạch ký tự không phù hợp trong tên file
-                safe_name = re.sub(r'[\\/:*?"<>|]', "", display_song_name or "Sheet nhac").strip()
-                if not safe_name:
-                    safe_name = "Sheet nhac"
+        html_for_print = page_style + "".join(pages_list)
+        safe_html_json = json.dumps(html_for_print)
+        # Dùng tên bài hát làm tên gợi ý khi lưu bản in thành PDF
+        pdf_file_name = display_song_name or "Sheet nhac"
+        safe_pdf_title = json.dumps(pdf_file_name)
+        print_id = int(time.time())
 
-                st.download_button(
-                    label="⬇️ Tải PDF xuống",
-                    data=pdf_bytes,
-                    file_name=f"{safe_name}.pdf",
-                    mime="application/pdf",
-                    key="download_generated_pdf",
-                )
-            except ImportError:
-                st.error("Thiếu thư viện xuất PDF. Mở Terminal/PowerShell và chạy: pip install weasyprint")
-            except Exception as e:
-                st.error(f"Không thể tạo PDF: {e}")
+        js_code_print = f"""
+        <script>
+        (function() {{
+            // ID lượt in: {print_id}
+            var htmlContent = {safe_html_json};
+            var pdfTitle = {safe_pdf_title};
+            var printWindow = window.open('', '_blank');
+
+            if (!printWindow) {{
+                alert('Trình duyệt đã chặn cửa sổ bật lên. Hãy cho phép popup để xuất PDF nhé!');
+                return;
+            }}
+
+            printWindow.document.write(
+                '<html><head><title>' + pdfTitle + '</title></head><body>'
+                + htmlContent +
+                '</body></html>'
+            );
+
+            printWindow.document.close();
+            printWindow.focus();
+
+            setTimeout(function() {{
+                printWindow.print();
+            }}, 500);
+        }})();
+        </script>
+        """
+
+        components.html(js_code_print, height=0)
 
     # Hiển thị bản nhạc      
     components.html(html_to_render, height=calculated_height, scrolling=False)
