@@ -87,6 +87,160 @@ st.markdown(
 # 2. QUẢN LÝ SIDEBAR (Giao diện mới: Siêu gọn - Không lặp - Có nút xóa)
 # =========================================================================
 with st.sidebar:
+    st.title("Bộ chuyển đổi sheet số")
+    
+    # Khởi tạo danh sách lưu trữ file trong Session State nếu chưa có
+    if "playlist_files" not in st.session_state:
+        st.session_state.playlist_files = {}
+        
+    if "current_song" not in st.session_state:
+        st.session_state.current_song = None
+
+    # --- Danh sách bài hát (Dùng file uploader linh hoạt) ---
+    
+    st.write("Chọn file **JSON** hoặc **TXT** để tải lên! (nhấp khoảng trắng để nhập bài hát)")
+    
+    # 1. Nút upload file
+    uploaded_files = st.file_uploader(
+        "Chọn file JSON hoặc TXT để tải lên!",
+        type=["json", "txt"],
+        accept_multiple_files=True,
+        label_visibility="collapsed"
+    )
+
+    # --- Cấu hình chế độ hiển thị ---
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+    st.write("**Chế độ hiển thị:**")
+    display_mode = st.radio(
+        "Chọn chế độ hiển thị",
+        options=["1-15", "1. 1.. 1...", "abc"],
+        label_visibility="collapsed"
+    )
+    st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+
+    st.write("**Danh sách bài hát**")
+    st.markdown("<em>*tải lại trang sẽ làm mới danh sách</em>",unsafe_allow_html=True)
+
+    st.markdown(
+        """
+        <style>
+        /* Mở rộng tối đa container chính của Streamlit */
+        .block-container {
+            max-width: 100% !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-top: 2rem !important;
+        }
+        /* Căn giữa thành phần iframe */
+        iframe {
+            display: block;
+            margin: 0 auto !important;
+            width: 90% !important;
+        }
+        
+        /* ========================================================================= */
+        /* MỚI: SỬA LỖI ĐÈ CHỮ - ẨN TRIỆT ĐỂ DANH SÁCH FILE Ở SIDEBAR */
+        /* ========================================================================= */
+        
+        /* 1. Thu nhỏ vùng Dropzone nhập file */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            padding: 10px !important;
+            min-height: 60px !important;
+            height: 60px !important;
+        }
+        /* Chỉ giữ lại dấu cộng ở khu vực tải file */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section > div {
+            display: none !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            transform: scale(1.2) !important;
+            margin: 0 auto !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            min-height: 60px !important;
+            height: 60px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section svg {
+            transform: scale(0.7) !important;
+            margin-bottom: 0px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section small {
+            font-size: 11px !important;
+        }
+
+        /* 2. Ép toàn bộ các element đi kèm/nằm dưới stFileUploader (trừ vùng section kéo thả) có chiều cao bằng 0 và ẩn đi */
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] div,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] ul,
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] li {
+            display: none !important;
+            height: 0px !important;
+            padding: 0px !important;
+            margin: 0px !important;
+            overflow: hidden !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 2. Khởi tạo trạng thái chọn bài
+    if "selected_song_index" not in st.session_state:
+        st.session_state.selected_song_index = 0
+
+    # 3. Hiển thị danh sách
+    if not uploaded_files:
+        st.info("Chưa có bài hát nào được tải lên.")
+    else:
+        for idx, current_file in enumerate(uploaded_files):
+            display_name = current_file.name.replace(".json", "").replace("_", " ")
+            is_current = (st.session_state.selected_song_index == idx)
+            button_label = f"--- **{display_name}** ---" if is_current else f"**{display_name}**"
+            
+            if st.button(button_label, key=f"btn_{idx}", use_container_width=True):
+                st.session_state.selected_song_index = idx
+                st.rerun()
+
+# --- Logic đọc dữ liệu cho bài được chọn (Để ngoài Sidebar) ---
+if uploaded_files:
+    # Đảm bảo index không vượt quá số file hiện có
+    if st.session_state.selected_song_index >= len(uploaded_files):
+        st.session_state.selected_song_index = 0
+        
+    current_selected_file = uploaded_files[st.session_state.selected_song_index]
+    
+    # Đọc dữ liệu JSON
+    data = json.load(current_selected_file)
+    song_data = data[0] if isinstance(data, list) else data
+    song_name = current_selected_file.name.replace(".json", "")
+    
+ 
+    raw_columns = song_data.get("columns", [])
+    bits_per_page = 32  # Nếu muốn đổi thành 64 phách, bạn cứ sửa số này nhé!
+      
+
+    # Hàm lấy số thuần (cũ)
+    def get_number_from_key(note_data):
+        pitch = int(note_data[0])
+        return pitch + 1
+    
+
+    # Lấy danh sách các cột và số bit mỗi trang từ file
+    columns = xu_ly_nhat_ky(song_data)
+    bits_per_page = 32
+    
+
+    def get_number_from_data(note_data):
+        # note_data là list [pitch, key]
+        return int(note_data[1])
         
     #CSS
     # =========================================================================
