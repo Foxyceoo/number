@@ -215,7 +215,7 @@ if uploaded_files:
     
     # Đọc dữ liệu từ nội dung đã lưu trong session để các bài cũ vẫn còn khi thêm bài mới.
     try:
-        data = json.loads(current_selected_file["data"].decode("utf-8-sig"))
+        data = json.loads(current_selected_file["data"].decode("utf-16"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         st.error(f"Không đọc được file {current_selected_file['name']}: {exc}")
         st.stop()
