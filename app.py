@@ -259,7 +259,7 @@ if uploaded_files:
         width: 794px;
         height: 1123px;
         min-height: 1123px;
-        padding: 60px 0px !important; 
+        padding: 0px !important; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 4px;
         page-break-after: always;
