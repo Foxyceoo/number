@@ -455,7 +455,7 @@ if uploaded_files:
     .khuong-wrapper {
         width: 100% !important;
         padding: 0 !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 50px !important;
         break-inside: avoid;
         page-break-inside: avoid;
     }
@@ -677,7 +677,7 @@ if uploaded_files:
         elif max_notes_in_song == 4:
             lines_per_page = 10
         elif max_notes_in_song == 5:
-            lines_per_page = 9
+            lines_per_page = 7
         elif max_notes_in_song == 6:
             lines_per_page = 8
         elif max_notes_in_song == 7:
