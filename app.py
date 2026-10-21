@@ -455,7 +455,7 @@ if uploaded_files:
     .khuong-wrapper {
         width: 100% !important;
         padding: 0 !important;
-        margin-bottom: 40px !important;
+        margin-bottom: 30px !important;
         break-inside: avoid;
         page-break-inside: avoid;
     }
@@ -496,7 +496,7 @@ if uploaded_files:
     }
 
     .khuong-wrapper {
-        margin-bottom: 40px !important;
+        margin-bottom: 30px !important;
         break-inside: avoid !important;
         page-break-inside: avoid !important;
     }
