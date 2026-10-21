@@ -496,7 +496,7 @@ if uploaded_files:
     }
 
     .khuong-wrapper {
-        margin-bottom: 10px !important;
+        margin-bottom: 50px !important;
         break-inside: avoid !important;
         page-break-inside: avoid !important;
     }
