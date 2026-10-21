@@ -659,11 +659,11 @@ if uploaded_files:
     # Số dòng mỗi trang theo chế độ hiển thị
     if display_mode == "111":
         if max_notes_in_song <= 2:
-            lines_per_page = 11
+            lines_per_page = 8
         elif max_notes_in_song == 3:
-            lines_per_page = 9
-        elif max_notes_in_song == 4:
             lines_per_page = 7
+        elif max_notes_in_song == 4:
+            lines_per_page = 6
         elif max_notes_in_song == 5:
             lines_per_page = 5
         elif max_notes_in_song == 6:
@@ -673,27 +673,25 @@ if uploaded_files:
 
     else:
         if max_notes_in_song == 3:
-            lines_per_page = 11
+            lines_per_page = 9
         elif max_notes_in_song == 4:
-            lines_per_page = 10
+            lines_per_page = 8
         elif max_notes_in_song == 5:
             lines_per_page = 7
         elif max_notes_in_song == 6:
-            lines_per_page = 8
-        elif max_notes_in_song == 7:
-            lines_per_page = 7
-        elif max_notes_in_song == 8:
             lines_per_page = 6
-        elif max_notes_in_song == 9:
+        elif max_notes_in_song == 7:
             lines_per_page = 5
-        elif max_notes_in_song == 10:
+        elif max_notes_in_song == 8:
             lines_per_page = 4
-        elif max_notes_in_song == 11:
+        elif max_notes_in_song == 9:
             lines_per_page = 3
-        elif max_notes_in_song == 12:
+        elif max_notes_in_song == 10:
             lines_per_page = 2
+        elif max_notes_in_song == 11:
+            lines_per_page = 1
         else:
-            lines_per_page = 11
+            lines_per_page = 10
     
     # Danh sách chứa HTML của từng trang
     pages_list = []
